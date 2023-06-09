@@ -11,6 +11,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 
 ADIAVOLOCharacter::ADIAVOLOCharacter()
 {
@@ -44,11 +45,26 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+	bReplicates = true;
+}
+
+void ADIAVOLOCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	Health = MaxHealth;
+	Mana = MaxMana;
 }
 
 void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+	
+	BasicCD -= DeltaSeconds;
+	Skill1CD -= DeltaSeconds;
+	Skill2CD -= DeltaSeconds;
+	Skill3CD -= DeltaSeconds;
+	Skill4CD -= DeltaSeconds;
+	UltimateCD -= DeltaSeconds;
 }
 
 void ADIAVOLOCharacter::onBasicSkill()
@@ -68,6 +84,20 @@ void ADIAVOLOCharacter::onSkill4()
 }
 void ADIAVOLOCharacter::onUltimate()
 {
+}
+
+void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ADIAVOLOCharacter,Health);
+	DOREPLIFETIME(ADIAVOLOCharacter,Mana);
+	
+	DOREPLIFETIME(ADIAVOLOCharacter,BasicCD);
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill2CD);
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill3CD);
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill4CD);
+	DOREPLIFETIME(ADIAVOLOCharacter,UltimateCD);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
