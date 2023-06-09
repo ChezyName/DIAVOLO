@@ -10,6 +10,9 @@ UCLASS(Blueprintable)
 class ADIAVOLOCharacter : public ACharacter
 {
 	GENERATED_BODY()
+	float ZoomSpeed = 50;
+	float ZoomMin = 500;
+	float ZoomMax = 1700;
 
 public:
 	ADIAVOLOCharacter();
@@ -21,8 +24,14 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns CursorToWorld subobject **/
-	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+
+protected:
+	virtual void onBasicSkill();
+	virtual void onSkill1();
+	virtual void onSkill2();
+	virtual void onSkill3();
+	virtual void onSkill4();
+	virtual void onUltimate();
 
 private:
 	/** Top down camera */
@@ -36,5 +45,9 @@ private:
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void ZoomCamera(float Speed);
 };
 

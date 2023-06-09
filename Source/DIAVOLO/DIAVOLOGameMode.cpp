@@ -7,6 +7,7 @@
 
 ADIAVOLOGameMode::ADIAVOLOGameMode()
 {
+	/*
 	// use our custom PlayerController class
 	PlayerControllerClass = ADIAVOLOPlayerController::StaticClass();
 
@@ -16,4 +17,5 @@ ADIAVOLOGameMode::ADIAVOLOGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+	*/
 }

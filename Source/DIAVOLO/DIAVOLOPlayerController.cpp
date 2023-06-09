@@ -10,7 +10,18 @@
 ADIAVOLOPlayerController::ADIAVOLOPlayerController()
 {
 	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	DefaultMouseCursor = EMouseCursor::Default;
+}
+
+FVector ADIAVOLOPlayerController::getMousePosition()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	if(Hit.bBlockingHit)
+	{
+		return Hit.ImpactPoint;
+	}
+	return FVector::ZeroVector;
 }
 
 void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
