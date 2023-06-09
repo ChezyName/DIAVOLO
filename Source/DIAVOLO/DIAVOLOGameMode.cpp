@@ -21,6 +21,7 @@ void ADIAVOLOGameMode::GenerateDungeon()
 {
 	if(HasAuthority() && IsValid(GetWorld()))
 	{
+		UE_LOG(LogTemp, Display, TEXT("Creating Map..."));
 		CreateRoom(Start,FVector::ZeroVector,FRotator::ZeroRotator);
 	}
 }
@@ -29,14 +30,15 @@ void ADIAVOLOGameMode::CreateRoom(TSubclassOf<ARoom> Room, FVector Locaiton, FRo
 {
 	RoomCount++;
 	if(RoomCount > MaxRooms) return;
-	const ARoom* NewRoom = GetWorld()->SpawnActor<ARoom>(Start,Locaiton,Rotation);
+	const ARoom* NewRoom = GetWorld()->SpawnActor<ARoom>(Room,Locaiton,Rotation);
+	UE_LOG(LogTemp, Display, TEXT("%s"), *NewRoom->GetName());
 	for(int i = 0; i < NewRoom->Exits.Num(); i++)
 	{
-		CreateRoom(Start,NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation());
+		CreateRoom(GetRandomRoom(),NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation());
 	}
 }
 
-TSubclassOf<ARoom> ADIAVOLOGameMode::GetRandmRoom()
+TSubclassOf<ARoom> ADIAVOLOGameMode::GetRandomRoom()
 {
-	return RoomGeneration[FMath::RandRange(0,RoomGeneration.Num())];
+	return RoomGeneration[FMath::RandRange(0,RoomGeneration.Num()-1)];
 }

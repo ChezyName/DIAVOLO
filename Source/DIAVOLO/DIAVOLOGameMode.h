@@ -18,13 +18,10 @@ public:
 
 	void GenerateDungeon();
 	void CreateRoom(TSubclassOf<ARoom> Room,FVector Locaiton,FRotator Rotation);
+	TSubclassOf<ARoom> GetRandomRoom();
 
 	int RoomCount = 0;
-	int MaxRooms = 15;
-	
-	TSubclassOf<ARoom> GetRandmRoom();
-
-	int Seed = 123456789;
+	int MaxRooms = 25;
 
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<ARoom>> RoomGeneration;
