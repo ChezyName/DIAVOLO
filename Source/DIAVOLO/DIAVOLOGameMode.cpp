@@ -5,17 +5,38 @@
 #include "DIAVOLOCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
-ADIAVOLOGameMode::ADIAVOLOGameMode()
-{
-	/*
-	// use our custom PlayerController class
-	PlayerControllerClass = ADIAVOLOPlayerController::StaticClass();
+ADIAVOLOGameMode::ADIAVOLOGameMode(){
+}
 
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDownCPP/Blueprints/TopDownCharacter"));
-	if (PlayerPawnBPClass.Class != nullptr)
+void ADIAVOLOGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//Start Dungeon Generation Using SEED
+	GenerateDungeon();
+
+}
+
+void ADIAVOLOGameMode::GenerateDungeon()
+{
+	if(HasAuthority() && IsValid(GetWorld()))
 	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
+		CreateRoom(Start,FVector::ZeroVector,FRotator::ZeroRotator);
 	}
-	*/
+}
+
+void ADIAVOLOGameMode::CreateRoom(TSubclassOf<ARoom> Room, FVector Locaiton, FRotator Rotation)
+{
+	RoomCount++;
+	if(RoomCount > MaxRooms) return;
+	const ARoom* NewRoom = GetWorld()->SpawnActor<ARoom>(Start,Locaiton,Rotation);
+	for(int i = 0; i < NewRoom->Exits.Num(); i++)
+	{
+		CreateRoom(Start,NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation());
+	}
+}
+
+TSubclassOf<ARoom> ADIAVOLOGameMode::GetRandmRoom()
+{
+	return RoomGeneration[FMath::RandRange(0,RoomGeneration.Num())];
 }
