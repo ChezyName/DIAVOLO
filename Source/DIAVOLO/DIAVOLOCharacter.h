@@ -49,9 +49,9 @@ public:
 	UPROPERTY(Replicated)
 	float UltimateCD = 0;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Health = 0;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Mana = 0;
 
 protected:
