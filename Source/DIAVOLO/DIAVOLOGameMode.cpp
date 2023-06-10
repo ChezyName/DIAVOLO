@@ -47,7 +47,7 @@ void ADIAVOLOGameMode::CreateRoom(TSubclassOf<ARoom> Room, FVector Locaiton, FRo
 			//SPAWNERS
 			if(UKismetMathLibrary::RandomBool())
 			{
-				//Spawner
+				//Spawner / Large Room
 				CreateRoom(GetRandomSpawn(),NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation(),currentCount,sinceLastSpawn);
 			}
 			//HALL
@@ -55,7 +55,7 @@ void ADIAVOLOGameMode::CreateRoom(TSubclassOf<ARoom> Room, FVector Locaiton, FRo
 			{
 				sinceLastSpawn++;
 				//END
-				if(currentCount > int(MaxRooms/2) && UKismetMathLibrary::RandomBool())
+				if(currentCount > 1 && UKismetMathLibrary::RandomBool())
 				{
 					CreateRoom(HasEnd ? End : EndWTeleport,NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation(),currentCount,sinceLastSpawn);
 					HasEnd = true;
