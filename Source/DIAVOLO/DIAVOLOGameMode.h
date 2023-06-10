@@ -34,7 +34,8 @@ public:
 	TSubclassOf<ARoom> GetRandomTurn();
 	TSubclassOf<ARoom> GetRandomHall();
 	
-	int MaxRooms = 3;
+	int MaxRooms = 15;
+	int CRooms = 0;
 	int SpawnerSpawnPercent = 3;
 	bool HasEnd = false;
 
@@ -55,7 +56,7 @@ public:
 	TArray<TSubclassOf<ARoom>> GridBasedRooms;
 
 	bool CanPlaceRoom(int X, int Y);
-	void CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location, FRotator Rotation, int X, int Y);
+	void CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location, FRotator Rotation, int X, int Y, int Dist);
 	TArray<FGridItem> TileMap;
 };
 

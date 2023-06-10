@@ -3,6 +3,9 @@
 #include "DIAVOLOGameMode.h"
 #include "DIAVOLOPlayerController.h"
 #include "DIAVOLOCharacter.h"
+#include "DrawDebugHelpers.h"
+#include "Algo/RandomShuffle.h"
+#include "Kismet/KismetArrayLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -24,7 +27,7 @@ void ADIAVOLOGameMode::GenerateDungeon()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Creating Map..."));
 		//CreateRoom(Start,FVector::ZeroVector,FRotator::ZeroRotator,0,0);
-		CreateRoomGrid(Start,FVector::ZeroVector,FRotator::ZeroRotator,0,0);
+		CreateRoomGrid(Start,FVector::ZeroVector,FRotator::ZeroRotator,0,0,0);
 	}
 }
 
@@ -99,43 +102,53 @@ bool ADIAVOLOGameMode::CanPlaceRoom(int X, int Y)
 {
 	for(int i = 0; i < TileMap.Num(); i++)
 	{
-		if(TileMap[i].X == X && TileMap[i].Y == Y) return false;
+		if(TileMap[i].X == X && TileMap[i].Y == Y)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"ERR: "+
+				FString::SanitizeFloat(TileMap[i].X) + "," + FString::SanitizeFloat(TileMap[i].Y) + " / " +
+				FString::SanitizeFloat(X) + "," + FString::SanitizeFloat(Y));
+			return false;
+		}
 	}
 	return true;
 }
 
 //GRID BASED MAP GEN
-void ADIAVOLOGameMode::CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location, FRotator Rotation, int X, int Y)
+void ADIAVOLOGameMode::CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location, FRotator Rotation, int X, int Y,int Dist)
 {
+	UE_LOG(LogTemp, Warning, TEXT("(%s,%s)"), *FString::SanitizeFloat(X), *FString::SanitizeFloat(Y));
 	ARoom* NewRoom = GetWorld()->SpawnActor<ARoom>(Room,Location,Rotation);
 	FGridItem NewGridItem;
 	NewGridItem.Room = NewRoom;
 	NewGridItem.X = X;
 	NewGridItem.Y = Y;
 	TileMap.Add(NewGridItem);
+	Dist++;
+	CRooms++;
 
 	GEngine->AddOnScreenDebugMessage(-1,3,FColor::Cyan,"PLACED Room At ("+
 			FString::SanitizeFloat(X) + "," + FString::SanitizeFloat(Y) + "). Creating " +
 			FString::SanitizeFloat(NewRoom->Exits.Num()) + " Rooms.");
 
-	for(int i = 0; i < NewRoom->Exits.Num(); i++)
+	UArrowComponent* Exit = NewRoom->Exits[FMath::RandRange(0,NewRoom->Exits.Num()-1)];
+	
+	//X = FORWARD / BACKWARD (1,-1)
+	//Y = RIGHT / LEFT (-1,1)
+	float DirectionX = Exit->GetForwardVector().X + X;
+	float DirectionY = Exit->GetForwardVector().Y + Y;
+	GEngine->AddOnScreenDebugMessage(-1,8,FColor::Yellow,"TESTING Placing Room At ("+
+		FString::SanitizeFloat(DirectionX) + "," + FString::SanitizeFloat(DirectionY) + ").");
+	//CanPlaceRoom(DirectionX,DirectionY) == true
+	if(Dist < 15)
 	{
-		//X = FORWARD / BACKWARD (1,-1)
-		//Y = RIGHT / LEFT (-1,1)
-		float DirectionX = NewRoom->Exits[i]->GetForwardVector().X + X;
-		float DirectionY = NewRoom->Exits[i]->GetForwardVector().Y + Y;
-		GEngine->AddOnScreenDebugMessage(-1,3,FColor::Yellow,"TESTING Placing Room At ("+
-			FString::SanitizeFloat(DirectionX) + "," + FString::SanitizeFloat(DirectionY) + ").");
-		if(CanPlaceRoom(DirectionX,DirectionY) == true)
-		{
-			GEngine->AddOnScreenDebugMessage(-1,3,FColor::Green,"CREATED ROOM!");
-			CreateRoomGrid(GridBasedRooms[FMath::RandRange(0,GridBasedRooms.Num()-1)],
-				NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation(),
-				DirectionX,DirectionY);
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1,3,FColor::Red,"NO ROOM MADE!");
-		}
+		GEngine->AddOnScreenDebugMessage(-1,3,FColor::Green,"CREATED ROOM!");
+		CreateRoomGrid(GridBasedRooms[FMath::RandRange(0,GridBasedRooms.Num()-1)],
+			Exit->GetComponentLocation(),Exit->GetComponentRotation(),
+			DirectionX,DirectionY,Dist);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1,3,FColor::Red,"NO ROOM MADE!");
+		DrawDebugSphere(GetWorld(),Exit->GetComponentLocation(),25,32,FColor::Red,false,80,0,1.25);
 	}
 }
