@@ -24,6 +24,17 @@ FVector ADIAVOLOPlayerController::getMousePosition()
 	return FVector::ZeroVector;
 }
 
+FVector ADIAVOLOPlayerController::getMousePositionGround()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_EngineTraceChannel1, false, Hit);
+	if(Hit.bBlockingHit)
+	{
+		return Hit.ImpactPoint;
+	}
+	return FVector::ZeroVector;
+}
+
 void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -49,7 +60,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 {
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	GetHitResultUnderCursor(ECC_GameTraceChannel1, false, Hit);
 
 	if (Hit.bBlockingHit)
 	{

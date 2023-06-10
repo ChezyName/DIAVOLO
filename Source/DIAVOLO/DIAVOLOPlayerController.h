@@ -16,6 +16,7 @@ public:
 	
 	//Client ONLY FUNC
 	FVector getMousePosition();
+	FVector getMousePositionGround();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
