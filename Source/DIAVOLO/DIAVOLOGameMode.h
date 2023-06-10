@@ -7,6 +7,18 @@
 #include "GameFramework/GameModeBase.h"
 #include "DIAVOLOGameMode.generated.h"
 
+USTRUCT()
+struct FGridItem
+{
+public:
+	GENERATED_BODY()
+	int X = 0;
+	int Y = 0;
+	UPROPERTY()
+	ARoom* Room;
+};
+
+
 UCLASS(minimalapi)
 class ADIAVOLOGameMode : public AGameModeBase
 {
@@ -38,6 +50,13 @@ public:
 	TSubclassOf<ARoom> EndWTeleport;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ARoom> Start;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<ARoom>> GridBasedRooms;
+
+	bool CanPlaceRoom(int X, int Y);
+	void CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location, FRotator Rotation, int X, int Y);
+	TArray<FGridItem> TileMap;
 };
 
 

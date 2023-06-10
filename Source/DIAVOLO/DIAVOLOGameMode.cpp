@@ -23,7 +23,8 @@ void ADIAVOLOGameMode::GenerateDungeon()
 	if(HasAuthority() && IsValid(GetWorld()))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Creating Map..."));
-		CreateRoom(Start,FVector::ZeroVector,FRotator::ZeroRotator,0,0);
+		//CreateRoom(Start,FVector::ZeroVector,FRotator::ZeroRotator,0,0);
+		CreateRoomGrid(Start,FVector::ZeroVector,FRotator::ZeroRotator,0,0);
 	}
 }
 
@@ -92,4 +93,49 @@ TSubclassOf<ARoom> ADIAVOLOGameMode::GetRandomHall()
 TSubclassOf<ARoom> ADIAVOLOGameMode::GetRandomSpawn()
 {
 	return Spawners[FMath::RandRange(0,Spawners.Num()-1)];
+}
+
+bool ADIAVOLOGameMode::CanPlaceRoom(int X, int Y)
+{
+	for(int i = 0; i < TileMap.Num(); i++)
+	{
+		if(TileMap[i].X == X && TileMap[i].Y == Y) return false;
+	}
+	return true;
+}
+
+//GRID BASED MAP GEN
+void ADIAVOLOGameMode::CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location, FRotator Rotation, int X, int Y)
+{
+	ARoom* NewRoom = GetWorld()->SpawnActor<ARoom>(Room,Location,Rotation);
+	FGridItem NewGridItem;
+	NewGridItem.Room = NewRoom;
+	NewGridItem.X = X;
+	NewGridItem.Y = Y;
+	TileMap.Add(NewGridItem);
+
+	GEngine->AddOnScreenDebugMessage(-1,3,FColor::Cyan,"PLACED Room At ("+
+			FString::SanitizeFloat(X) + "," + FString::SanitizeFloat(Y) + "). Creating " +
+			FString::SanitizeFloat(NewRoom->Exits.Num()) + " Rooms.");
+
+	for(int i = 0; i < NewRoom->Exits.Num(); i++)
+	{
+		//X = FORWARD / BACKWARD (1,-1)
+		//Y = RIGHT / LEFT (-1,1)
+		float DirectionX = NewRoom->Exits[i]->GetForwardVector().X + X;
+		float DirectionY = NewRoom->Exits[i]->GetForwardVector().Y + Y;
+		GEngine->AddOnScreenDebugMessage(-1,3,FColor::Yellow,"TESTING Placing Room At ("+
+			FString::SanitizeFloat(DirectionX) + "," + FString::SanitizeFloat(DirectionY) + ").");
+		if(CanPlaceRoom(DirectionX,DirectionY) == true)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,3,FColor::Green,"CREATED ROOM!");
+			CreateRoomGrid(GridBasedRooms[FMath::RandRange(0,GridBasedRooms.Num()-1)],
+				NewRoom->Exits[i]->GetComponentLocation(),NewRoom->Exits[i]->GetComponentRotation(),
+				DirectionX,DirectionY);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1,3,FColor::Red,"NO ROOM MADE!");
+		}
+	}
 }
