@@ -3,14 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Enemy.h"
 #include "GameFramework/PlayerController.h"
 #include "DIAVOLOPlayerController.generated.h"
 
-UENUM()
-enum EPlayerStates
+UENUM(BlueprintType)
+enum class EPlayerStates : uint8
 {
-	E_MOVE = 0 UMETA(DisplayName="Moving"),
-	E_AUTOATTACK = 1 UMETA(DisplayName="Auto Attack")
+	E_IDLE = 0 UMETA(DisplayName="Moving"),
+	E_MOVE = 1 UMETA(DisplayName="Moving"),
+	E_MOVE_ATTACK = 2 UMETA(DisplayName="Moving For Attack"),
+	E_ATTACK = 3 UMETA(DisplayName="Attacking"),
+	E_ABILITY = 4 UMETA(DisplayName="Ability"),
 };
 
 UCLASS()
@@ -25,9 +29,22 @@ public:
 	FVector getMousePosition();
 	FVector getMousePositionGround();
 	FVector getMousePositionEnemy();
+
+	UFUNCTION(Server,Reliable)
+	void ChangeCharState(EPlayerStates newState);
+
+	UFUNCTION(BlueprintGetter)
+	EPlayerStates getCharState();
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category="Player State")
+	EPlayerStates CharState = EPlayerStates::E_IDLE;
+
+	FVector newMoveToLocation = FVector::ZeroVector;
+	AEnemy* EnemyAttacking;
+	bool CloseEnough();
 	
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
@@ -54,6 +71,8 @@ protected:
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
 
 

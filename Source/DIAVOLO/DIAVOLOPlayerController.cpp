@@ -5,7 +5,9 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "DIAVOLOCharacter.h"
+#include "DrawDebugHelpers.h"
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 
 ADIAVOLOPlayerController::ADIAVOLOPlayerController()
 {
@@ -41,25 +43,85 @@ FVector ADIAVOLOPlayerController::getMousePositionEnemy()
 	GetHitResultUnderCursor(ECC_GameTraceChannel2, false, Hit);
 	if(Hit.bBlockingHit)
 	{
+		EnemyAttacking = Cast<AEnemy>(Hit.Actor);
 		return Hit.ImpactPoint;
 	}
 	return FVector::ZeroVector;
+}
+
+void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates newState)
+{
+	CharState = newState;
+}
+
+EPlayerStates ADIAVOLOPlayerController::getCharState()
+{
+	return CharState;
+}
+
+bool ADIAVOLOPlayerController::CloseEnough()
+{
+	if(GetPawn())
+	{
+		FVector newPlr = GetPawn()->GetActorLocation();
+		newPlr.Z = 0;
+
+		FVector newDest = newMoveToLocation;
+		newDest.Z = 0;
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,FString::SanitizeFloat(FVector::Dist( newDest,newPlr)));
+		DrawDebugLine(GetWorld(),newPlr,newDest,FColor::Emerald,false,-1,0,5);
+		
+		return FVector::Dist(newPlr,newDest) <64;
+	}
+	return false;
 }
 
 void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,
+		(CharState == EPlayerStates::E_IDLE ? "IDLE" :
+		CharState == EPlayerStates::E_MOVE ? "MOVE" :
+		CharState == EPlayerStates::E_ATTACK ? "ATTACK" :
+		CharState == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
+		CharState == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
+
+	if(EnemyAttacking)
+	{
+		FVector TempLoc = EnemyAttacking->GetActorLocation();
+		TempLoc.Z = 0;
+		DrawDebugSphere(GetWorld(),TempLoc,125,2,FColor::Emerald,false,-1,0,2);
+	}
+	
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
 	{
 		if(getMousePositionEnemy() != FVector::ZeroVector)
 		{
-			ClientAttackMove(getMousePositionEnemy(),250);
-			ServerAttackMove(getMousePositionEnemy(),250);
-			GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
+			ClientAttackMove(getMousePositionEnemy(),125);
+			ServerAttackMove(getMousePositionEnemy(),125);
+			//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
 		}
 		else MoveToMouseCursor();
+	}
+
+	if(HasAuthority())
+	{
+		switch (CharState)
+		{
+			case EPlayerStates::E_MOVE:
+				if(CloseEnough()) CharState = EPlayerStates::E_IDLE;
+				break;
+			case EPlayerStates::E_MOVE_ATTACK:
+				if(CloseEnough()) CharState = EPlayerStates::E_ATTACK;
+				else if(EnemyAttacking)
+				{
+					ClientAttackMove(EnemyAttacking->GetActorLocation(),125);
+					ServerAttackMove(EnemyAttacking->GetActorLocation(),125);
+				}
+				break;
+		}
 	}
 }
 
@@ -95,8 +157,9 @@ void ADIAVOLOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
+		if ((Distance > 32.0f))
 		{
+			newMoveToLocation = DestLocation;
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
 		}
 	}
@@ -109,6 +172,7 @@ void ADIAVOLOPlayerController::ClientMove_Implementation(FVector NewLoc)
 
 void ADIAVOLOPlayerController::ServerMove_Implementation(FVector NewLoc)
 {
+	CharState = EPlayerStates::E_MOVE;
 	SetNewMoveDestination(NewLoc);
 }
 
@@ -124,6 +188,7 @@ void ADIAVOLOPlayerController::ClientAttackMove_Implementation(FVector NewLoc,fl
 
 void ADIAVOLOPlayerController::ServerAttackMove_Implementation(FVector NewLoc,float Range)
 {
+	CharState = EPlayerStates::E_MOVE_ATTACK;
 	const FVector plr = GetPawn()->GetActorLocation();
 	FVector Dir = NewLoc - plr;
 	Dir.Normalize();
@@ -142,4 +207,10 @@ void ADIAVOLOPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ADIAVOLOPlayerController,CharState);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
