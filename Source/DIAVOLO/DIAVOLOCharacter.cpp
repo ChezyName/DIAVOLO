@@ -9,6 +9,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Net/UnrealNetwork.h"
@@ -65,6 +66,16 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 	Skill3CD -= DeltaSeconds;
 	Skill4CD -= DeltaSeconds;
 	UltimateCD -= DeltaSeconds;
+}
+
+void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
+{
+	const FVector Player = GetActorLocation();
+	FVector Dir = Position - Player;
+	Dir.Normalize();
+
+	const FVector Target = Position - (Dir * Range);
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
 void ADIAVOLOCharacter::onBasicSkill()

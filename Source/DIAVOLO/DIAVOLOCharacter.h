@@ -53,6 +53,8 @@ public:
 	float Health = 0;
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Mana = 0;
+	
+	void MoveToRange(FVector Position,float Range);
 
 protected:
 	virtual void onBasicSkill();

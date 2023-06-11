@@ -27,7 +27,18 @@ FVector ADIAVOLOPlayerController::getMousePosition()
 FVector ADIAVOLOPlayerController::getMousePositionGround()
 {
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_EngineTraceChannel1, false, Hit);
+	GetHitResultUnderCursor(ECC_GameTraceChannel1, false, Hit);
+	if(Hit.bBlockingHit)
+	{
+		return Hit.ImpactPoint;
+	}
+	return FVector::ZeroVector;
+}
+
+FVector ADIAVOLOPlayerController::getMousePositionEnemy()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_GameTraceChannel2, false, Hit);
 	if(Hit.bBlockingHit)
 	{
 		return Hit.ImpactPoint;
@@ -42,7 +53,13 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
 	{
-		MoveToMouseCursor();
+		if(getMousePositionEnemy() != FVector::ZeroVector)
+		{
+			ClientAttackMove(getMousePositionEnemy(),250);
+			ServerAttackMove(getMousePositionEnemy(),250);
+			GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
+		}
+		else MoveToMouseCursor();
 	}
 }
 
@@ -93,6 +110,26 @@ void ADIAVOLOPlayerController::ClientMove_Implementation(FVector NewLoc)
 void ADIAVOLOPlayerController::ServerMove_Implementation(FVector NewLoc)
 {
 	SetNewMoveDestination(NewLoc);
+}
+
+void ADIAVOLOPlayerController::ClientAttackMove_Implementation(FVector NewLoc,float Range)
+{
+	const FVector plr = GetPawn()->GetActorLocation();
+	FVector Dir = NewLoc - plr;
+	Dir.Normalize();
+
+	const FVector Target = NewLoc - (Dir * Range);
+	SetNewMoveDestination(Target);
+}
+
+void ADIAVOLOPlayerController::ServerAttackMove_Implementation(FVector NewLoc,float Range)
+{
+	const FVector plr = GetPawn()->GetActorLocation();
+	FVector Dir = NewLoc - plr;
+	Dir.Normalize();
+
+	const FVector Target = NewLoc - (Dir * Range);
+	SetNewMoveDestination(Target);
 }
 
 void ADIAVOLOPlayerController::OnSetDestinationPressed()
