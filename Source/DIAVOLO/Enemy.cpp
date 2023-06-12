@@ -12,7 +12,7 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	MouseOver = CreateDefaultSubobject<UCapsuleComponent>("MouseOver");
-	MouseOver->SetCapsuleSize(75,100);
+	MouseOver->SetCapsuleSize(75,125);
 	MouseOver->SetupAttachment(RootComponent);
 	MouseOver->SetCollisionProfileName("Enemy");
 }

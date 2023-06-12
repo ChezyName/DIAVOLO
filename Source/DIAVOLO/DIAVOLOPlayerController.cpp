@@ -40,13 +40,24 @@ FVector ADIAVOLOPlayerController::getMousePositionGround()
 
 FVector ADIAVOLOPlayerController::getMousePositionEnemy()
 {
+	FVector WorldLocation, WorldDirection;
+	DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
+
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_GameTraceChannel2, false, Hit);
-	if(Hit.bBlockingHit)
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(Hit, WorldLocation,
+		WorldLocation + WorldDirection * 5000, ECC_GameTraceChannel2, Params);
+
+	if (Hit.bBlockingHit)
 	{
-		EnemyAttacking = Cast<AEnemy>(Hit.Actor);
-		return Hit.ImpactPoint;
+		EnemyAttacking = Cast<AEnemy>(Hit.Actor.Get());
+		if (EnemyAttacking)
+		{
+			return Hit.ImpactPoint;
+		}
 	}
+
 	return FVector::ZeroVector;
 }
 
@@ -93,7 +104,8 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	{
 		FVector TempLoc = EnemyAttacking->GetActorLocation();
 		TempLoc.Z = 0;
-		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),125,32,FColor::Emerald,false,-1,0,2);
+		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),CharacterClass->AutoAttack.AttackRange,
+			32,FColor::Emerald,false,-1,0,2);
 	}
 	
 	// keep updating the destination every tick while desired
@@ -101,8 +113,8 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	{
 		if(getMousePositionEnemy() != FVector::ZeroVector && CharState != EPlayerStates::E_ATTACK_WINDUP)
 		{
-			ClientAttackMove(getMousePositionEnemy(),125);
-			ServerAttackMove(getMousePositionEnemy(),125);
+			ClientAttackMove(getMousePositionEnemy(),CharacterClass->AutoAttack.AttackRange);
+			ServerAttackMove(getMousePositionEnemy(),CharacterClass->AutoAttack.AttackRange);
 			//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
 		}
 		else MoveToMouseCursor();
@@ -119,8 +131,9 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 				if(CloseEnough()) AutoAttack();
 				else if(EnemyAttacking)
 				{
-					ClientAttackMove(EnemyAttacking->GetActorLocation(),125);
-					ServerAttackMove(EnemyAttacking->GetActorLocation(),125);
+					CharState = EPlayerStates::E_ATTACK_WINDUP;
+					ClientAttackMove(EnemyAttacking->GetActorLocation(),CharacterClass->AutoAttack.AttackRange);
+					ServerAttackMove(EnemyAttacking->GetActorLocation(),CharacterClass->AutoAttack.AttackRange);
 				}
 				break;
 		}
@@ -198,7 +211,16 @@ void ADIAVOLOPlayerController::ClientAttackMove_Implementation(FVector NewLoc,fl
 	FVector Dir = NewLoc - plr;
 	Dir.Normalize();
 
-	FVector Target = NewLoc - (Dir * Range);
+	FVector Target;
+	float Distance = FVector::Dist(plr, NewLoc);
+	if (Distance > Range)
+	{
+		Target = NewLoc - (Dir * Range);
+	}
+	else
+	{
+		Target = plr; // Player is already within range, return current position
+	}
 	Target.Z = 0;
 	SetNewMoveDestination(Target);
 }
@@ -210,7 +232,16 @@ void ADIAVOLOPlayerController::ServerAttackMove_Implementation(FVector NewLoc,fl
 	FVector Dir = NewLoc - plr;
 	Dir.Normalize();
 
-	FVector Target = NewLoc - (Dir * Range);
+	FVector Target;
+	float Distance = FVector::Dist(plr, NewLoc);
+	if (Distance > Range)
+	{
+		Target = NewLoc - (Dir * Range);
+	}
+	else
+	{
+		Target = plr; // Player is already within range, return current position
+	}
 	Target.Z = 0;
 	SetNewMoveDestination(Target);
 }

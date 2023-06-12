@@ -40,7 +40,10 @@ struct FAutoAttack
 	float TimeAfterAttack = 0;
 
 	UPROPERTY(EditAnywhere)
-	float AttackDamage;
+	float AttackDamage = 125;
+
+	UPROPERTY(EditAnywhere)
+	float AttackRange = 250;
 };
 
 UCLASS(Blueprintable)
