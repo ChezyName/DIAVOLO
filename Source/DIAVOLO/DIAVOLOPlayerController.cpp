@@ -84,11 +84,12 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,
 		(CharState == EPlayerStates::E_IDLE ? "IDLE" :
 		CharState == EPlayerStates::E_MOVE ? "MOVE" :
-		CharState == EPlayerStates::E_ATTACK ? "ATTACK" :
+		CharState == EPlayerStates::E_ATTACK_WINDUP ? "ATTACK WINDUP" :
+		CharState == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
 		CharState == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
 		CharState == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
 
-	if(EnemyAttacking)
+	if(EnemyAttacking && (CharState == EPlayerStates::E_MOVE_ATTACK || CharState == EPlayerStates::E_ATTACK_FULL))
 	{
 		FVector TempLoc = EnemyAttacking->GetActorLocation();
 		TempLoc.Z = 0;
@@ -98,7 +99,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
 	{
-		if(getMousePositionEnemy() != FVector::ZeroVector)
+		if(getMousePositionEnemy() != FVector::ZeroVector && CharState != EPlayerStates::E_ATTACK_WINDUP)
 		{
 			ClientAttackMove(getMousePositionEnemy(),125);
 			ServerAttackMove(getMousePositionEnemy(),125);
@@ -115,7 +116,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 				if(CloseEnough()) CharState = EPlayerStates::E_IDLE;
 				break;
 			case EPlayerStates::E_MOVE_ATTACK:
-				if(CloseEnough()) CharState = EPlayerStates::E_ATTACK;
+				if(CloseEnough()) AutoAttack();
 				else if(EnemyAttacking)
 				{
 					ClientAttackMove(EnemyAttacking->GetActorLocation(),125);
@@ -135,6 +136,12 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ADIAVOLOPlayerController::OnSetDestinationReleased);
 }
 
+void ADIAVOLOPlayerController::BeginPlay()
+{
+	CharacterClass = Cast<ADIAVOLOCharacter>(GetPawn());
+	Super::BeginPlay();
+}
+
 
 void ADIAVOLOPlayerController::MoveToMouseCursor()
 {
@@ -142,9 +149,17 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_GameTraceChannel1, false, Hit);
 
-	if (Hit.bBlockingHit)
+	if(CharState == EPlayerStates::E_ATTACK_WINDUP)
+	{
+		WindUpCanceled = true;
+		CharacterClass->StopAnimMontage(CharacterClass->AutoAttack.Animation);
+		CharState = EPlayerStates::E_IDLE;
+	}
+	
+	if (Hit.bBlockingHit && CharState != EPlayerStates::E_ABILITY && CharState != EPlayerStates::E_ATTACK_FULL)
 	{
 		// We hit something, move there
+		EnemyAttacking = nullptr;
 		ClientMove(Hit.ImpactPoint);
 		ServerMove(Hit.ImpactPoint);
 	}
@@ -216,4 +231,37 @@ void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	DOREPLIFETIME(ADIAVOLOPlayerController,CharState);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void ADIAVOLOPlayerController::AutoAttack()
+{
+	if(EnemyAttacking == nullptr) return;
+	UAnimMontage* AttackAnim = CharacterClass->AutoAttack.Animation;
+	if(AttackAnim)
+	{
+		CharacterClass->PlayAnimMontage(AttackAnim);
+	}
+	CharState = EPlayerStates::E_ATTACK_WINDUP;
+	WindUpCanceled = false;
+
+	//Wait Windup To Deal Damage
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([&]
+	{
+		if(!WindUpCanceled)
+		{
+			if(EnemyAttacking){
+				EnemyAttacking->Damage(CharacterClass->AutoAttack.AttackDamage * CharacterClass->DamageMultiplier);
+				CharState = EPlayerStates::E_IDLE;
+			}
+			else
+			{
+				CharState = EPlayerStates::E_IDLE;
+				return;
+			}
+		}
+	});
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, CharacterClass->AutoAttack.TimeBeforeAttack, false);
 }

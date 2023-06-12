@@ -10,7 +10,11 @@ AEnemy::AEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	GetCapsuleComponent()->SetCollisionProfileName("Enemy");
+
+	MouseOver = CreateDefaultSubobject<UCapsuleComponent>("MouseOver");
+	MouseOver->SetCapsuleSize(75,100);
+	MouseOver->SetupAttachment(RootComponent);
+	MouseOver->SetCollisionProfileName("Enemy");
 }
 
 // Called when the game starts or when spawned
@@ -37,9 +41,11 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AEnemy::Damage_Implementation(float DamageAmount)
 {
 	Health -= DamageAmount;
+	GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,GetName() + " Has Taken " +
+		FString::SanitizeFloat(DamageAmount) + " HP!");
 	if(Health <= 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Green,GetName() + " Has Died!");
+		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,GetName() + " Has Died!");
 	}
 }
 

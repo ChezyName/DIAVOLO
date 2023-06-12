@@ -20,6 +20,9 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditDefaultsOnly,Category="Enemy",meta = (AllowPrivateAccess = "true"))
 	float Health = 100;
+
+	UPROPERTY(EditAnywhere)
+	UCapsuleComponent* MouseOver;
 	
 public:	
 	// Called every frame

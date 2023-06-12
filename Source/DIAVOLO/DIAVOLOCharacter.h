@@ -3,8 +3,45 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseProjectile.h"
 #include "GameFramework/Character.h"
 #include "DIAVOLOCharacter.generated.h"
+
+UENUM(BlueprintType)
+enum class EAutoType : uint8
+{
+	E_MELEE = 0 UMETA(DisplayName="Melee"),
+	E_RANGE = 1 UMETA(DisplayName="Ranged"),
+};
+
+USTRUCT(BlueprintType)
+struct FAutoAttack
+{
+	GENERATED_BODY()
+
+	//The Type Of Attack
+	UPROPERTY(EditAnywhere)
+	EAutoType AutoType = EAutoType::E_MELEE;
+
+	//If Its A Projectile
+	UPROPERTY(EditAnywhere,meta=(EditCondition="AutoType == EAutoType::E_RANGE"))
+	ABaseProjectile* Projectile;
+
+	//Animation
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* Animation;
+
+	//Delay Before Dealing / Calculating Damage
+	UPROPERTY(EditAnywhere)
+	float TimeBeforeAttack = 0;
+
+	//Delay After Doing Anything
+	UPROPERTY(EditAnywhere)
+	float TimeAfterAttack = 0;
+
+	UPROPERTY(EditAnywhere)
+	float AttackDamage;
+};
 
 UCLASS(Blueprintable)
 class ADIAVOLOCharacter : public ACharacter
@@ -36,6 +73,8 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
+	float DamageMultiplier = 1.f;
+	
 	UPROPERTY(Replicated)
 	float BasicCD = 0;
 	UPROPERTY(Replicated)
@@ -56,7 +95,10 @@ public:
 	
 	void MoveToRange(FVector Position,float Range);
 
-protected:
+	//ALL ATTACKS
+	UPROPERTY(EditAnywhere,Category="ATTACKS")
+	FAutoAttack AutoAttack;
+	
 	virtual void onBasicSkill();
 	virtual void onSkill1();
 	virtual void onSkill2();

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DIAVOLOCharacter.h"
 #include "Enemy.h"
 #include "GameFramework/PlayerController.h"
 #include "DIAVOLOPlayerController.generated.h"
@@ -13,7 +14,8 @@ enum class EPlayerStates : uint8
 	E_IDLE = 0 UMETA(DisplayName="Moving"),
 	E_MOVE = 1 UMETA(DisplayName="Moving"),
 	E_MOVE_ATTACK = 2 UMETA(DisplayName="Moving For Attack"),
-	E_ATTACK = 3 UMETA(DisplayName="Attacking"),
+	E_ATTACK_WINDUP = 3 UMETA(DisplayName="Charging Auto Attack"),
+	E_ATTACK_FULL = 3 UMETA(DisplayName="After Attack Hit"),
 	E_ABILITY = 4 UMETA(DisplayName="Ability"),
 };
 
@@ -30,6 +32,9 @@ public:
 	FVector getMousePositionGround();
 	FVector getMousePositionEnemy();
 
+	//Auto Attack
+	bool WindUpCanceled;
+
 	UFUNCTION(Server,Reliable)
 	void ChangeCharState(EPlayerStates newState);
 
@@ -42,6 +47,9 @@ protected:
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category="Player State")
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
+	UPROPERTY()
+	ADIAVOLOCharacter* CharacterClass;
+	
 	FVector newMoveToLocation = FVector::ZeroVector;
 	AEnemy* EnemyAttacking;
 	bool CloseEnough();
@@ -49,7 +57,7 @@ protected:
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
-	// End PlayerController interface
+	virtual void BeginPlay() override;
 	
 	/** Navigate player to the current mouse cursor location. */
 	void MoveToMouseCursor();
@@ -73,6 +81,8 @@ protected:
 	void OnSetDestinationReleased();
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void AutoAttack();
 };
 
 
