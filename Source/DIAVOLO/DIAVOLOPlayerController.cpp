@@ -32,6 +32,7 @@ FVector ADIAVOLOPlayerController::getMousePositionGround()
 	GetHitResultUnderCursor(ECC_GameTraceChannel1, false, Hit);
 	if(Hit.bBlockingHit)
 	{
+		EnemyAttacking = nullptr;
 		return Hit.ImpactPoint;
 	}
 	return FVector::ZeroVector;
@@ -71,7 +72,7 @@ bool ADIAVOLOPlayerController::CloseEnough()
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,FString::SanitizeFloat(FVector::Dist( newDest,newPlr)));
 		DrawDebugLine(GetWorld(),newPlr,newDest,FColor::Emerald,false,-1,0,5);
 		
-		return FVector::Dist(newPlr,newDest) <64;
+		return FVector::Dist(newPlr,newDest) < 64;
 	}
 	return false;
 }
@@ -91,7 +92,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	{
 		FVector TempLoc = EnemyAttacking->GetActorLocation();
 		TempLoc.Z = 0;
-		DrawDebugSphere(GetWorld(),TempLoc,125,2,FColor::Emerald,false,-1,0,2);
+		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),125,32,FColor::Emerald,false,-1,0,2);
 	}
 	
 	// keep updating the destination every tick while desired
@@ -182,7 +183,8 @@ void ADIAVOLOPlayerController::ClientAttackMove_Implementation(FVector NewLoc,fl
 	FVector Dir = NewLoc - plr;
 	Dir.Normalize();
 
-	const FVector Target = NewLoc - (Dir * Range);
+	FVector Target = NewLoc - (Dir * Range);
+	Target.Z = 0;
 	SetNewMoveDestination(Target);
 }
 
@@ -193,7 +195,8 @@ void ADIAVOLOPlayerController::ServerAttackMove_Implementation(FVector NewLoc,fl
 	FVector Dir = NewLoc - plr;
 	Dir.Normalize();
 
-	const FVector Target = NewLoc - (Dir * Range);
+	FVector Target = NewLoc - (Dir * Range);
+	Target.Z = 0;
 	SetNewMoveDestination(Target);
 }
 
