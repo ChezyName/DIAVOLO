@@ -33,5 +33,5 @@ public:
 	void ChangeCharState(EPlayerStates NewState);
 
 	virtual void Tick(float DeltaSeconds) override;
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

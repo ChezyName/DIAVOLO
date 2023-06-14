@@ -7,6 +7,7 @@
 
 void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
 {
+	GEngine->AddOnScreenDebugMessage(-1,1,FColor::Emerald,"Changed State On PS!");
 	CharState = NewState;
 }
 

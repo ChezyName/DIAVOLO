@@ -97,7 +97,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if(GetCharState() && HasAuthority() && false)
+	if(GetCharState())
 	{
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + ": " +
 			(GetCharState()->CharState == EPlayerStates::E_IDLE ? "IDLE" :
@@ -134,6 +134,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 
 	if(GetCharState() && HasAuthority())
 	{
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "EEEE");
 		switch (GetCharState()->CharState)
 		{
 			case EPlayerStates::E_MOVE:

@@ -65,7 +65,7 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Client,Reliable)
 	void DoAutoAttack();
 
 	UFUNCTION(Server,Reliable)
