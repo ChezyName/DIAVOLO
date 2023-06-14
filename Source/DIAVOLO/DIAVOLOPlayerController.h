@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DIAVOLOCharacter.h"
 #include "Enemy.h"
 #include "GameFramework/PlayerController.h"
 #include "DIAVOLOPlayerController.generated.h"
@@ -11,7 +10,7 @@
 UENUM(BlueprintType)
 enum class EPlayerStates : uint8
 {
-	E_IDLE = 0 UMETA(DisplayName="Moving"),
+	E_IDLE = 0 UMETA(DisplayName="Idle"),
 	E_MOVE = 1 UMETA(DisplayName="Moving"),
 	E_MOVE_ATTACK = 2 UMETA(DisplayName="Moving For Attack"),
 	E_ATTACK_WINDUP = 3 UMETA(DisplayName="Charging Auto Attack"),
@@ -48,7 +47,7 @@ protected:
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
 	UPROPERTY()
-	ADIAVOLOCharacter* CharacterClass;
+	class ADIAVOLOCharacter* CharacterClass;
 	
 	FVector newMoveToLocation = FVector::ZeroVector;
 	AEnemy* EnemyAttacking;
@@ -82,7 +81,8 @@ protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	void AutoAttack();
+	UFUNCTION(Server,Reliable)
+	void DoAutoAttack();
 };
 
 

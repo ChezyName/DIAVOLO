@@ -1,12 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DIAVOLOPlayerController.h"
+
+#include "BaseProjectile.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 ADIAVOLOPlayerController::ADIAVOLOPlayerController()
@@ -92,6 +95,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	/*
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,
 		(CharState == EPlayerStates::E_IDLE ? "IDLE" :
 		CharState == EPlayerStates::E_MOVE ? "MOVE" :
@@ -99,22 +103,31 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 		CharState == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
 		CharState == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
 		CharState == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
+	*/
 
-	if(EnemyAttacking && (CharState == EPlayerStates::E_MOVE_ATTACK || CharState == EPlayerStates::E_ATTACK_FULL))
+	if(EnemyAttacking)
 	{
+		
 		FVector TempLoc = EnemyAttacking->GetActorLocation();
 		TempLoc.Z = 0;
 		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),CharacterClass->AutoAttack.AttackRange,
 			32,FColor::Emerald,false,-1,0,2);
 	}
+
+	//Draw Debug Lines
+	if(GetPawn()) DrawDebugLine(GetWorld(),GetPawn()->GetActorLocation(),newMoveToLocation,FColor::Emerald,false,-1,0,5);
 	
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
 	{
-		if(getMousePositionEnemy() != FVector::ZeroVector && CharState != EPlayerStates::E_ATTACK_WINDUP)
+		if(getMousePositionEnemy() != FVector::ZeroVector)
 		{
-			ClientAttackMove(getMousePositionEnemy(),CharacterClass->AutoAttack.AttackRange);
-			ServerAttackMove(getMousePositionEnemy(),CharacterClass->AutoAttack.AttackRange);
+			if(CharState != EPlayerStates::E_ATTACK_WINDUP && 
+			CharState != EPlayerStates::E_ATTACK_FULL)
+			{
+				ClientAttackMove(getMousePositionEnemy(),CharacterClass->AutoAttack.AttackRange);
+				ServerAttackMove(getMousePositionEnemy(),CharacterClass->AutoAttack.AttackRange);
+			}
 			//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
 		}
 		else MoveToMouseCursor();
@@ -128,7 +141,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 				if(CloseEnough()) CharState = EPlayerStates::E_IDLE;
 				break;
 			case EPlayerStates::E_MOVE_ATTACK:
-				if(CloseEnough()) AutoAttack();
+				if(CloseEnough()) DoAutoAttack();
 				else if(EnemyAttacking)
 				{
 					CharState = EPlayerStates::E_ATTACK_WINDUP;
@@ -264,7 +277,7 @@ void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-void ADIAVOLOPlayerController::AutoAttack()
+void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 {
 	if(EnemyAttacking == nullptr) return;
 	UAnimMontage* AttackAnim = CharacterClass->AutoAttack.Animation;
@@ -282,7 +295,8 @@ void ADIAVOLOPlayerController::AutoAttack()
 		if(!WindUpCanceled)
 		{
 			if(EnemyAttacking){
-				EnemyAttacking->Damage(CharacterClass->AutoAttack.AttackDamage * CharacterClass->DamageMultiplier);
+				ADIAVOLOCharacter* Char = Cast<ADIAVOLOCharacter>(GetPawn());
+				if(Char) Char->onBasicSkill(EnemyAttacking);
 				CharState = EPlayerStates::E_IDLE;
 			}
 			else

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseProjectile.h"
+#include "DIAVOLOPlayerController.h"
 #include "GameFramework/Character.h"
 #include "DIAVOLOCharacter.generated.h"
 
@@ -25,7 +26,10 @@ struct FAutoAttack
 
 	//If Its A Projectile
 	UPROPERTY(EditAnywhere,meta=(EditCondition="AutoType == EAutoType::E_RANGE"))
-	ABaseProjectile* Projectile;
+	TSubclassOf<class ABaseProjectile> Projectile;
+
+	UPROPERTY(EditAnywhere,meta=(EditCondition="AutoType == EAutoType::E_RANGE"))
+	float ProjectileVelocity = 100;
 
 	//Animation
 	UPROPERTY(EditAnywhere)
@@ -50,7 +54,7 @@ UCLASS(Blueprintable)
 class ADIAVOLOCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
 	float ZoomSpeed = 50;
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
@@ -75,6 +79,12 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category="Player State")
+	EPlayerStates ClassState;
+
+	UFUNCTION(Server,Reliable)
+	void setClassState();
 
 	float DamageMultiplier = 1.f;
 	
@@ -101,13 +111,19 @@ public:
 	//ALL ATTACKS
 	UPROPERTY(EditAnywhere,Category="ATTACKS")
 	FAutoAttack AutoAttack;
-	
-	virtual void onBasicSkill();
-	virtual void onSkill1();
-	virtual void onSkill2();
-	virtual void onSkill3();
-	virtual void onSkill4();
-	virtual void onUltimate();
+
+	UFUNCTION(Server,Reliable)
+	virtual void onBasicSkill(AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	virtual void onSkill1(AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	virtual void onSkill2(AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	virtual void onSkill3(AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	virtual void onSkill4(AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	virtual void onUltimate(AEnemy* Enemy);
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 

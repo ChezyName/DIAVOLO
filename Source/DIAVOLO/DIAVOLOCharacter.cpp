@@ -12,6 +12,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 ADIAVOLOCharacter::ADIAVOLOCharacter()
@@ -47,6 +48,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	bReplicates = true;
+	GetMesh()->SetIsReplicated(true);
 }
 
 void ADIAVOLOCharacter::BeginPlay()
@@ -54,6 +56,15 @@ void ADIAVOLOCharacter::BeginPlay()
 	Super::BeginPlay();
 	Health = MaxHealth;
 	Mana = MaxMana;
+}
+
+void ADIAVOLOCharacter::setClassState_Implementation()
+{
+	if(HasAuthority() && GetController())
+	{
+		ADIAVOLOPlayerController* PController = Cast<ADIAVOLOPlayerController>(GetController());
+		ClassState = PController->getCharState();
+	}
 }
 
 void ADIAVOLOCharacter::Tick(float DeltaSeconds)
@@ -66,6 +77,16 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 	Skill3CD -= DeltaSeconds;
 	Skill4CD -= DeltaSeconds;
 	UltimateCD -= DeltaSeconds;
+
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,
+		(ClassState == EPlayerStates::E_IDLE ? "IDLE" :
+		ClassState == EPlayerStates::E_MOVE ? "MOVE" :
+		ClassState == EPlayerStates::E_ATTACK_WINDUP ? "ATTACK WINDUP" :
+		ClassState == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
+		ClassState == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
+		ClassState == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
+
+	setClassState();
 }
 
 void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
@@ -78,22 +99,48 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
-void ADIAVOLOCharacter::onBasicSkill()
+void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
+{
+	if(AutoAttack.AutoType == EAutoType::E_MELEE)
+	{
+		Enemy->Damage(AutoAttack.AttackDamage * DamageMultiplier);
+	}
+	else
+	{
+		//Create Projectile Facing Enemy
+		ABaseProjectile* Projectile = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,AutoAttack.Projectile,FTransform(FRotator::ZeroRotator,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+		if(Projectile != nullptr)
+		{
+			//Finalizing Create Projecitle
+			Projectile->ProjectileOwner = this;
+			Projectile->InitVelocity = AutoAttack.ProjectileVelocity;
+			Projectile->Damage = AutoAttack.AttackDamage * DamageMultiplier;
+			Projectile->SetOwner(this);
+
+			//Calculate Rotation
+			FVector Direction = Enemy->GetActorLocation() - GetActorLocation();
+			Direction.Normalize();
+
+			FRotator LookAtRotation = FRotationMatrix::MakeFromX(Direction).Rotator();
+						
+			//Spawn The Actor
+			UGameplayStatics::FinishSpawningActor(Projectile, FTransform(LookAtRotation,GetActorLocation()));
+		}
+	}
+}
+void ADIAVOLOCharacter::onSkill1_Implementation(AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill1()
+void ADIAVOLOCharacter::onSkill2_Implementation(AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill2()
+void ADIAVOLOCharacter::onSkill3_Implementation(AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill3()
+void ADIAVOLOCharacter::onSkill4_Implementation(AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill4()
-{
-}
-void ADIAVOLOCharacter::onUltimate()
+void ADIAVOLOCharacter::onUltimate_Implementation(AEnemy* Enemy)
 {
 }
 
@@ -101,6 +148,7 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	DOREPLIFETIME(ADIAVOLOCharacter,Health);
 	DOREPLIFETIME(ADIAVOLOCharacter,Mana);
+	DOREPLIFETIME(ADIAVOLOCharacter,ClassState);
 	
 	DOREPLIFETIME(ADIAVOLOCharacter,BasicCD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);
@@ -114,13 +162,6 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAction("Basic",IE_Pressed,this,&ADIAVOLOCharacter::onBasicSkill);
-	PlayerInputComponent->BindAction("Skill1",IE_Pressed,this,&ADIAVOLOCharacter::onSkill1);
-	PlayerInputComponent->BindAction("Skill2",IE_Pressed,this,&ADIAVOLOCharacter::onSkill2);
-	PlayerInputComponent->BindAction("Skill3",IE_Pressed,this,&ADIAVOLOCharacter::onSkill3);
-	PlayerInputComponent->BindAction("Skill4",IE_Pressed,this,&ADIAVOLOCharacter::onSkill4);
-	PlayerInputComponent->BindAction("Ultimate",IE_Pressed,this,&ADIAVOLOCharacter::onUltimate);
 
 	PlayerInputComponent->BindAxis("Zoom",this,&ADIAVOLOCharacter::ZoomCamera);
 }
