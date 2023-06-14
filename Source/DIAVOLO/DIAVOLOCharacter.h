@@ -80,12 +80,6 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category="Player State")
-	EPlayerStates ClassState;
-
-	UFUNCTION(Server,Reliable)
-	void setClassState();
-
 	float DamageMultiplier = 1.f;
 	
 	UPROPERTY(Replicated)

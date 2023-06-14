@@ -13,6 +13,7 @@
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 ADIAVOLOCharacter::ADIAVOLOCharacter()
@@ -58,15 +59,6 @@ void ADIAVOLOCharacter::BeginPlay()
 	Mana = MaxMana;
 }
 
-void ADIAVOLOCharacter::setClassState_Implementation()
-{
-	if(HasAuthority() && GetController())
-	{
-		ADIAVOLOPlayerController* PController = Cast<ADIAVOLOPlayerController>(GetController());
-		ClassState = PController->getCharState();
-	}
-}
-
 void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
@@ -77,16 +69,6 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 	Skill3CD -= DeltaSeconds;
 	Skill4CD -= DeltaSeconds;
 	UltimateCD -= DeltaSeconds;
-
-	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,
-		(ClassState == EPlayerStates::E_IDLE ? "IDLE" :
-		ClassState == EPlayerStates::E_MOVE ? "MOVE" :
-		ClassState == EPlayerStates::E_ATTACK_WINDUP ? "ATTACK WINDUP" :
-		ClassState == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
-		ClassState == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
-		ClassState == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
-
-	setClassState();
 }
 
 void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
@@ -101,6 +83,7 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 
 void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 {
+	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Enemy->GetActorLocation()));
 	if(AutoAttack.AutoType == EAutoType::E_MELEE)
 	{
 		Enemy->Damage(AutoAttack.AttackDamage * DamageMultiplier);
@@ -148,7 +131,6 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	DOREPLIFETIME(ADIAVOLOCharacter,Health);
 	DOREPLIFETIME(ADIAVOLOCharacter,Mana);
-	DOREPLIFETIME(ADIAVOLOCharacter,ClassState);
 	
 	DOREPLIFETIME(ADIAVOLOCharacter,BasicCD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);
