@@ -35,6 +35,9 @@ protected:
 	FVector newMoveToLocation = FVector::ZeroVector;
 	AEnemy* EnemyAttacking;
 	bool CloseEnough();
+
+	UFUNCTION(Server,Reliable)
+	void setEnemy(AEnemy* Enemy);
 	
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;

@@ -5,6 +5,11 @@
 
 #include "Net/UnrealNetwork.h"
 
+void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
+{
+	CharState = NewState;
+}
+
 void ADiavoloPS::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

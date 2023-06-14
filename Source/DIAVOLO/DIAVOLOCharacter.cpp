@@ -69,6 +69,8 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 	Skill3CD -= DeltaSeconds;
 	Skill4CD -= DeltaSeconds;
 	UltimateCD -= DeltaSeconds;
+
+	if(HasAuthority()) GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red, "SERVER ON " + GetController()->GetName());
 }
 
 void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)

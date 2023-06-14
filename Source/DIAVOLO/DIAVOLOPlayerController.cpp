@@ -10,6 +10,7 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
 ADIAVOLOPlayerController::ADIAVOLOPlayerController()
@@ -57,6 +58,7 @@ FVector ADIAVOLOPlayerController::getMousePositionEnemy()
 		EnemyAttacking = Cast<AEnemy>(Hit.Actor.Get());
 		if (EnemyAttacking)
 		{
+			setEnemy(EnemyAttacking);
 			return Hit.ImpactPoint;
 		}
 	}
@@ -78,7 +80,7 @@ bool ADIAVOLOPlayerController::CloseEnough()
 
 		FVector newDest = newMoveToLocation;
 		newDest.Z = 0;
-		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,FString::SanitizeFloat(FVector::Dist( newDest,newPlr)));
+		//GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,FString::SanitizeFloat(FVector::Dist( newDest,newPlr)));
 		DrawDebugLine(GetWorld(),newPlr,newDest,FColor::Emerald,false,-1,0,5);
 		
 		return FVector::Dist(newPlr,newDest) < 64;
@@ -86,11 +88,16 @@ bool ADIAVOLOPlayerController::CloseEnough()
 	return false;
 }
 
+void ADIAVOLOPlayerController::setEnemy_Implementation(AEnemy* Enemy)
+{
+	EnemyAttacking = Enemy;
+}
+
 void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if(GetCharState())
+	if(GetCharState() && HasAuthority() && false)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + ": " +
 			(GetCharState()->CharState == EPlayerStates::E_IDLE ? "IDLE" :
@@ -103,15 +110,11 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 
 	if(EnemyAttacking)
 	{
-		
 		FVector TempLoc = EnemyAttacking->GetActorLocation();
 		TempLoc.Z = 0;
 		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),CharacterClass->AutoAttack.AttackRange,
 			32,FColor::Emerald,false,-1,0,2);
 	}
-
-	//Draw Debug Lines
-	if(GetPawn()) DrawDebugLine(GetWorld(),GetPawn()->GetActorLocation(),newMoveToLocation,FColor::Emerald,false,-1,0,5);
 	
 	// keep updating the destination every tick while desired
 	if (bMoveToMouseCursor)
@@ -129,20 +132,29 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 		else MoveToMouseCursor();
 	}
 
-	if(HasAuthority() && GetCharState())
+	if(GetCharState() && HasAuthority())
 	{
 		switch (GetCharState()->CharState)
 		{
 			case EPlayerStates::E_MOVE:
-				if(CloseEnough()) ChangeCharState(EPlayerStates::E_IDLE);
+				if(CloseEnough())
+				{
+					ChangeCharState(EPlayerStates::E_IDLE);
+					GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE -> IDLE");
+				}
 				break;
 			case EPlayerStates::E_MOVE_ATTACK:
-				if(CloseEnough()) DoAutoAttack();
+				if(CloseEnough())
+				{
+					DoAutoAttack();
+					GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE/ATTACK -> ATTACK");
+				}
 				else if(EnemyAttacking)
 				{
-					ChangeCharState(EPlayerStates::E_ATTACK_WINDUP);
+					ChangeCharState(EPlayerStates::E_MOVE_ATTACK);
 					ClientAttackMove(EnemyAttacking->GetActorLocation(),CharacterClass->AutoAttack.AttackRange);
 					ServerAttackMove(EnemyAttacking->GetActorLocation(),CharacterClass->AutoAttack.AttackRange);
+					GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE//ATTACK");
 				}
 				break;
 		}
@@ -269,13 +281,18 @@ void ADIAVOLOPlayerController::OnSetDestinationReleased()
 
 void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewState)
 {
-	if(GetCharState()) GetCharState()->CharState = NewState;
+	if(GetCharState() && HasAuthority()) GetCharState()->ChangeCharState(NewState);
 }
 
 void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 {
+	if(EnemyAttacking == nullptr || CharacterClass == nullptr) return;
 	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,GetName() + " USING BASIC ATTACK!");
-	if(EnemyAttacking == nullptr) return;
+
+	//Face Enemy
+	if(GetPawn()) GetPawn()->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(),
+		EnemyAttacking->GetActorLocation()));
+
 	UAnimMontage* AttackAnim = CharacterClass->AutoAttack.Animation;
 	if(AttackAnim)
 	{

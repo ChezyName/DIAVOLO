@@ -29,6 +29,9 @@ public:
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
+	UFUNCTION(Server,Reliable)
+	void ChangeCharState(EPlayerStates NewState);
+
 	virtual void Tick(float DeltaSeconds) override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
