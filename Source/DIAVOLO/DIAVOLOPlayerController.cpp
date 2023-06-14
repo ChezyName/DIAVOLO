@@ -3,11 +3,13 @@
 #include "DIAVOLOPlayerController.h"
 
 #include "BaseProjectile.h"
+#include "CharacterProxy.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "CharacterProxy.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -201,9 +203,9 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	}
 }
 
-void ADIAVOLOPlayerController::SetNewMoveDestination(const FVector DestLocation)
+void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVector DestLocation)
 {
-	APawn* const MyPawn = GetPawn();
+	ACharacterProxy* const MyPawn = Cast<ACharacterProxy>(GetPawn());
 	if (MyPawn)
 	{
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
@@ -212,7 +214,7 @@ void ADIAVOLOPlayerController::SetNewMoveDestination(const FVector DestLocation)
 		if ((Distance > 32.0f))
 		{
 			newMoveToLocation = DestLocation;
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+			MyPawn->MoveToLocation(this, DestLocation);
 		}
 	}
 }

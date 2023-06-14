@@ -48,6 +48,7 @@ protected:
 	void MoveToMouseCursor();
 	
 	/** Navigate player to the given world location. */
+	UFUNCTION(Server,Reliable)
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	//Basic Move To Location
