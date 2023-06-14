@@ -195,6 +195,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	{
 		// We hit something, move there
 		EnemyAttacking = nullptr;
+		ChangeCharState(EPlayerStates::E_MOVE);
 		ClientMove(Hit.ImpactPoint);
 		ServerMove(Hit.ImpactPoint);
 	}
