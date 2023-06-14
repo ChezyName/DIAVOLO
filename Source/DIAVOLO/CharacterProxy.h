@@ -3,10 +3,14 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "CharacterProxy.generated.h"
 
 UCLASS()
-class ACharacterProxy : public ACharacter
+class ACharacterProxy : public APawn
 {
 	GENERATED_BODY()
 
