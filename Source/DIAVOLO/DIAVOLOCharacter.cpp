@@ -49,6 +49,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	bReplicates = true;
+	GetMovementComponent()->SetIsReplicated(true);
 	GetMesh()->SetIsReplicated(true);
 }
 

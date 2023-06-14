@@ -23,20 +23,24 @@ public:
 	TSubclassOf<AActor> CharacterClass;
 
 	// pointer to actual character
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	class ADIAVOLOCharacter* Character;
 
+	// used by controller to get the moving to work
+	void MoveToLocation(const class ADIAVOLOPlayerController* controller, const FVector& DestLocation);
+	
+protected:
 	// AIController we will use
 	class AAIController* PlayerAIController;
+
+	UFUNCTION(Server,Reliable)
+	void onStartSetChar();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
-	// used by controller to get the moving to work
-	void MoveToLocation(const class ADIAVOLOPlayerController* controller, const FVector& DestLocation);
 
 	// Called to bind functionality to input
 	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

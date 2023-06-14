@@ -30,8 +30,8 @@ protected:
 	ADiavoloPS* GetCharState();
 
 	UPROPERTY()
-	class ADIAVOLOCharacter* CharacterClass;
-	
+	class ACharacterProxy* Proxy;
+
 	FVector newMoveToLocation = FVector::ZeroVector;
 	AEnemy* EnemyAttacking;
 	bool CloseEnough();
@@ -51,14 +51,13 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void SetNewMoveDestination(const FVector DestLocation);
 
+	ACharacterProxy* GetProxy();
+
 	//Basic Move To Location
-	UFUNCTION(Client,Unreliable)
-	void ClientMove(FVector NewLoc);
 	UFUNCTION(Server,Unreliable)
 	void ServerMove(FVector NewLoc);
+	
 	//Move To Location / Attack After
-	UFUNCTION(Client,Unreliable)
-	void ClientAttackMove(FVector NewLoc,float Range);
 	UFUNCTION(Server,Unreliable)
 	void ServerAttackMove(FVector NewLoc,float Range);
 
@@ -66,7 +65,10 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 
-	UFUNCTION(Client,Reliable)
+	UFUNCTION(Server,Reliable)
+	void ServerUpdateState();
+	
+	UFUNCTION(Server,Reliable)
 	void DoAutoAttack();
 
 	UFUNCTION(Server,Reliable)

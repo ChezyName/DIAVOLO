@@ -60,12 +60,12 @@ class ADIAVOLOCharacter : public ACharacter
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
 	float ZoomMin = 500;
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
-	float ZoomMax = 1700;
+	float ZoomMax = 800;
 
-	UPROPERTY(EditAnywhere,Category="CameraZoom")
+	UPROPERTY(EditAnywhere,Category="Character Info")
 	float MaxHealth = 1500;
 
-	UPROPERTY(EditAnywhere,Category="CameraZoom")
+	UPROPERTY(EditAnywhere,Category="Character Info")
 	float MaxMana = 800;
 
 public:
@@ -103,7 +103,7 @@ public:
 	void MoveToRange(FVector Position,float Range);
 
 	//ALL ATTACKS
-	UPROPERTY(EditAnywhere,Category="ATTACKS")
+	UPROPERTY(EditAnywhere,Category="Character Info")
 	FAutoAttack AutoAttack;
 
 	UFUNCTION(Server,Reliable)

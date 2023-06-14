@@ -42,29 +42,32 @@ ACharacterProxy::ACharacterProxy(const class FObjectInitializer& ObjectInitializ
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+void ACharacterProxy::onStartSetChar_Implementation()
+{
+	// get current location of player proxy
+	FVector Location = GetActorLocation();
+	FRotator Rotation = GetActorRotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.bNoFail = true;
+
+	// spawn actual player
+	Character = Cast<ADIAVOLOCharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
+
+	GEngine->AddOnScreenDebugMessage(-1,8,FColor::Turquoise,Character ? "Spawned!" : "Not Spawned?!?");
+
+	// we use AI to control the player character for navigation
+	PlayerAIController = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());
+	PlayerAIController->Possess(Character);
+}
+
 // Called when the game starts or when spawned
 void ACharacterProxy::BeginPlay()
 {
+	if(GetLocalRole() == ENetRole::ROLE_Authority) onStartSetChar();
 	Super::BeginPlay();
-	
-	if (GetLocalRole() == ROLE_Authority)
-	{
-		// get current location of player proxy
-		FVector Location = GetActorLocation();
-		FRotator Rotation = GetActorRotation();
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = GetInstigator();
-		SpawnParams.bNoFail = true;
-
-		// spawn actual player
-		Character = Cast<ADIAVOLOCharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
-
-		// we use AI to control the player character for navigation
-		PlayerAIController = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());
-		PlayerAIController->Possess(Character);
-	}
 }
 
 // Called every frame
