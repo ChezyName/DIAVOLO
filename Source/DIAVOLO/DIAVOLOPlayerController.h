@@ -27,7 +27,8 @@ protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
 
-	ADiavoloPS* GetCharState();
+	ADiavoloPS* GetState();
+	EPlayerStates GetCharState();
 
 	UPROPERTY()
 	class ACharacterProxy* Proxy;

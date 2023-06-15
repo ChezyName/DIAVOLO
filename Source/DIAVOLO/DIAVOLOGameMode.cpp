@@ -104,9 +104,11 @@ bool ADIAVOLOGameMode::CanPlaceRoom(int X, int Y)
 	{
 		if(TileMap[i].X == X && TileMap[i].Y == Y)
 		{
+			/*
 			GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"ERR: "+
 				FString::SanitizeFloat(TileMap[i].X) + "," + FString::SanitizeFloat(TileMap[i].Y) + " / " +
 				FString::SanitizeFloat(X) + "," + FString::SanitizeFloat(Y));
+			*/
 			return false;
 		}
 	}
@@ -126,9 +128,11 @@ void ADIAVOLOGameMode::CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location,
 	Dist++;
 	CRooms++;
 
+	/*
 	GEngine->AddOnScreenDebugMessage(-1,3,FColor::Cyan,"PLACED Room At ("+
 			FString::SanitizeFloat(X) + "," + FString::SanitizeFloat(Y) + "). Creating " +
 			FString::SanitizeFloat(NewRoom->Exits.Num()) + " Rooms.");
+	*/
 
 	UArrowComponent* Exit = NewRoom->Exits[FMath::RandRange(0,NewRoom->Exits.Num()-1)];
 	
@@ -136,19 +140,23 @@ void ADIAVOLOGameMode::CreateRoomGrid(TSubclassOf<ARoom> Room, FVector Location,
 	//Y = RIGHT / LEFT (-1,1)
 	float DirectionX = Exit->GetForwardVector().X + X;
 	float DirectionY = Exit->GetForwardVector().Y + Y;
+
+	/*
 	GEngine->AddOnScreenDebugMessage(-1,8,FColor::Yellow,"TESTING Placing Room At ("+
 		FString::SanitizeFloat(DirectionX) + "," + FString::SanitizeFloat(DirectionY) + ").");
+	*/
+	
 	//CanPlaceRoom(DirectionX,DirectionY) == true
 	if(Dist < 15)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,3,FColor::Green,"CREATED ROOM!");
+		//GEngine->AddOnScreenDebugMessage(-1,3,FColor::Green,"CREATED ROOM!");
 		CreateRoomGrid(GridBasedRooms[FMath::RandRange(0,GridBasedRooms.Num()-1)],
 			Exit->GetComponentLocation(),Exit->GetComponentRotation(),
 			DirectionX,DirectionY,Dist);
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1,3,FColor::Red,"NO ROOM MADE!");
+		//GEngine->AddOnScreenDebugMessage(-1,3,FColor::Red,"NO ROOM MADE!");
 		DrawDebugSphere(GetWorld(),Exit->GetComponentLocation(),25,32,FColor::Red,false,80,0,1.25);
 	}
 }

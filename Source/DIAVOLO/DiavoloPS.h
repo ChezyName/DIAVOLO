@@ -26,15 +26,12 @@ class DIAVOLO_API ADiavoloPS : public APlayerState
 	GENERATED_BODY()
 
 private:
-	UFUNCTION(Server,Reliable)
-	void ChangeCharStateSERVER(EPlayerStates NewState);
-
 public:
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
-	
-	void ChangeCharState(EPlayerStates NewState);
 
-	virtual void Tick(float DeltaSeconds) override;
+	UFUNCTION(Server,Reliable)
+	void ChangeCharState(EPlayerStates NewState);
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

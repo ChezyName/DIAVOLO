@@ -68,7 +68,13 @@ FVector ADIAVOLOPlayerController::getMousePositionEnemy()
 	return FVector::ZeroVector;
 }
 
-ADiavoloPS* ADIAVOLOPlayerController::GetCharState()
+EPlayerStates ADIAVOLOPlayerController::GetCharState()
+{
+	if(GetProxy() && GetProxy()->Character) return GetProxy()->Character->CharState;
+	return EPlayerStates::E_IDLE;
+}
+
+ADiavoloPS* ADIAVOLOPlayerController::GetState()
 {
 	return GetPlayerState<ADiavoloPS>();
 }
@@ -82,7 +88,7 @@ bool ADIAVOLOPlayerController::CloseEnough()
 
 		FVector newDest = newMoveToLocation;
 		newDest.Z = 0;
-		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,FString::SanitizeFloat(FVector::Dist( newDest,newPlr)));
+		//GEngine->AddOnScreenDebugMessage(-1,0,FColor::Yellow,FString::SanitizeFloat(FVector::Dist( newDest,newPlr)));
 		DrawDebugLine(GetWorld(),newPlr,newDest,FColor::Emerald,false,-1,0,5);
 		
 		return FVector::Dist(newPlr,newDest) < 64;
@@ -99,16 +105,13 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	if(GetCharState())
-	{
-		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + ": " +
-			(GetCharState()->CharState == EPlayerStates::E_IDLE ? "IDLE" :
-			GetCharState()->CharState == EPlayerStates::E_MOVE ? "MOVE" :
-			GetCharState()->CharState == EPlayerStates::E_ATTACK_WINDUP ? "ATTACK WINDUP" :
-			GetCharState()->CharState == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
-			GetCharState()->CharState == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
-			GetCharState()->CharState == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
-	}
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + ": " +
+		(GetCharState() == EPlayerStates::E_IDLE ? "IDLE" :
+		GetCharState() == EPlayerStates::E_MOVE ? "MOVE" :
+		GetCharState() == EPlayerStates::E_ATTACK_WINDUP ? "ATTACK WINDUP" :
+		GetCharState() == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
+		GetCharState() == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
+		GetCharState() == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
 
 	if(EnemyAttacking)
 	{
@@ -123,8 +126,8 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	{
 		if(getMousePositionEnemy() != FVector::ZeroVector)
 		{
-			if(GetCharState() && GetCharState()->CharState != EPlayerStates::E_ATTACK_WINDUP && 
-			GetCharState()->CharState != EPlayerStates::E_ATTACK_FULL)
+			if(GetCharState() != EPlayerStates::E_ATTACK_WINDUP && 
+			GetCharState() != EPlayerStates::E_ATTACK_FULL)
 			{
 				ServerAttackMove(getMousePositionEnemy(),GetProxy()->Character->AutoAttack.AttackRange);
 			}
@@ -138,35 +141,32 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 
 void ADIAVOLOPlayerController::ServerUpdateState_Implementation()
 {
-	if(GetCharState())
+	switch (GetCharState())
 	{
-		switch (GetCharState()->CharState)
+	case EPlayerStates::E_MOVE:
+		if(CloseEnough())
 		{
-		case EPlayerStates::E_MOVE:
-			if(CloseEnough())
-			{
-				ChangeCharState(EPlayerStates::E_IDLE);
-				GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE -> IDLE");
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + " STILL MOVING");
-			}
-			break;
-		case EPlayerStates::E_MOVE_ATTACK:
-			if(CloseEnough())
-			{
-				DoAutoAttack();
-				GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE/ATTACK -> ATTACK");
-			}
-			else if(EnemyAttacking)
-			{
-				ChangeCharState(EPlayerStates::E_MOVE_ATTACK);
-				ServerAttackMove(EnemyAttacking->GetActorLocation(),GetProxy()->Character->AutoAttack.AttackRange);
-				GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE//ATTACK");
-			}
-			break;
+			ChangeCharState(EPlayerStates::E_IDLE);
+			//GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE -> IDLE");
 		}
+		else
+		{
+			//GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + " STILL MOVING");
+		}
+		break;
+	case EPlayerStates::E_MOVE_ATTACK:
+		if(CloseEnough())
+		{
+			DoAutoAttack();
+			//->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE/ATTACK -> ATTACK");
+		}
+		else if(EnemyAttacking)
+		{
+			ChangeCharState(EPlayerStates::E_MOVE_ATTACK);
+			ServerAttackMove(EnemyAttacking->GetActorLocation(),GetProxy()->Character->AutoAttack.AttackRange);
+			//GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE//ATTACK");
+		}
+		break;
 	}
 }
 
@@ -192,7 +192,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_GameTraceChannel1, false, Hit);
 
-	if(GetCharState() && GetCharState()->CharState == EPlayerStates::E_ATTACK_WINDUP)
+	if(GetCharState() == EPlayerStates::E_ATTACK_WINDUP)
 	{
 		WindUpCanceled = true;
 		GetProxy()->Character->StopAnimationServer(GetProxy()->Character->AutoAttack.Animation);
@@ -202,7 +202,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	if (Hit.bBlockingHit) // && GetCharState() && GetCharState()->CharState != EPlayerStates::E_ABILITY && GetCharState()->CharState != EPlayerStates::E_ATTACK_FULL)
 	{
 		// We hit something, move there
-		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Orange,"Moving!");
+		//GEngine->AddOnScreenDebugMessage(-1,5,FColor::Orange,"Moving!");
 		EnemyAttacking = nullptr;
 		ChangeCharState(EPlayerStates::E_MOVE);
 		ServerMove(Hit.ImpactPoint);
@@ -218,9 +218,12 @@ ACharacterProxy* ADIAVOLOPlayerController::GetProxy()
 
 void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVector DestLocation)
 {
+	/*
 	if(GetProxy()) GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"Pawn Moving > " +
 		*(GetProxy() ? "PROXY" : " ___ ") + *(GetProxy()->Character ? "CHARACTER" : " ___ "));
 	else GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"PROXY DONT EXIST!");
+	*/
+	
 	if (GetProxy() && GetProxy()->Character)
 	{
 		float const Distance = FVector::Dist(DestLocation, GetProxy()->Character->GetActorLocation());
@@ -236,7 +239,7 @@ void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVecto
 
 void ADIAVOLOPlayerController::ServerMove_Implementation(FVector NewLoc)
 {
-	GEngine->AddOnScreenDebugMessage(-1,5,FColor::Orange,"SERVER Moving!");
+	//GEngine->AddOnScreenDebugMessage(-1,5,FColor::Orange,"SERVER Moving!");
 	ChangeCharState(EPlayerStates::E_MOVE);
 	SetNewMoveDestination(NewLoc);
 }
@@ -277,9 +280,9 @@ void ADIAVOLOPlayerController::OnSetDestinationReleased()
 
 void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewState)
 {
-	if(GetCharState() && HasAuthority())
+	if(GetState() && HasAuthority())
 	{
-		GetCharState()->ChangeCharState(NewState);
+		GetState()->ChangeCharState(NewState);
 		GetProxy()->Character->ServerSetState(NewState);
 	}
 }
@@ -287,7 +290,7 @@ void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewS
 void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 {
 	if(EnemyAttacking == nullptr || GetProxy()->Character == nullptr) return;
-	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,GetName() + " USING BASIC ATTACK!");
+	//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,GetName() + " USING BASIC ATTACK!");
 
 	//Face Enemy
 	if(GetProxy()->Character) GetProxy()->Character->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(Proxy->Character->GetActorLocation(),
