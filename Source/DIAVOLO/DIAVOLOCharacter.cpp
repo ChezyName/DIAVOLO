@@ -84,9 +84,19 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
-void ADIAVOLOCharacter::ServerSetState(EPlayerStates State)
+void ADIAVOLOCharacter::ServerSetState_Implementation(EPlayerStates State)
 {
 	CharState = State;
+}
+
+void ADIAVOLOCharacter::PlayAnimationServer_Implementation(UAnimMontage* Animation)
+{
+	PlayAnimMontage(Animation);
+}
+
+void ADIAVOLOCharacter::StopAnimationServer_Implementation(UAnimMontage* Animation)
+{
+	StopAnimMontage(Animation);
 }
 
 void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)

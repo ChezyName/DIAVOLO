@@ -102,7 +102,14 @@ public:
 	
 	void MoveToRange(FVector Position,float Range);
 
+	UFUNCTION(Server,Reliable)
 	void ServerSetState(EPlayerStates State);
+
+	UFUNCTION(Server,Reliable)
+	void PlayAnimationServer(UAnimMontage* Animation);
+
+	UFUNCTION(Server,Reliable)
+	void StopAnimationServer(UAnimMontage* Animation);
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	EPlayerStates CharState = EPlayerStates::E_IDLE;

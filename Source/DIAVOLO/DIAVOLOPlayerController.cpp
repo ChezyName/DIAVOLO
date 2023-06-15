@@ -195,7 +195,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	if(GetCharState() && GetCharState()->CharState == EPlayerStates::E_ATTACK_WINDUP)
 	{
 		WindUpCanceled = true;
-		GetProxy()->Character->StopAnimMontage(GetProxy()->Character->AutoAttack.Animation);
+		GetProxy()->Character->StopAnimationServer(GetProxy()->Character->AutoAttack.Animation);
 		ChangeCharState(EPlayerStates::E_IDLE);
 	}
 	
@@ -296,7 +296,7 @@ void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 	UAnimMontage* AttackAnim = GetProxy()->Character->AutoAttack.Animation;
 	if(AttackAnim)
 	{
-		GetProxy()->Character->PlayAnimMontage(AttackAnim);
+		GetProxy()->Character->PlayAnimationServer(AttackAnim);
 	}
 	ChangeCharState(EPlayerStates::E_ATTACK_WINDUP);
 	WindUpCanceled = false;
