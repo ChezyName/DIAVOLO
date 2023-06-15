@@ -91,11 +91,27 @@ void ADIAVOLOCharacter::ServerSetState_Implementation(EPlayerStates State)
 
 void ADIAVOLOCharacter::PlayAnimationServer_Implementation(UAnimMontage* Animation)
 {
+	GEngine->AddOnScreenDebugMessage(-1,80,FColor::Yellow,"Server Play Animation");
 	PlayAnimMontage(Animation);
+	PlayAnimationClient(Animation);
 }
 
 void ADIAVOLOCharacter::StopAnimationServer_Implementation(UAnimMontage* Animation)
 {
+	GEngine->AddOnScreenDebugMessage(-1,80,FColor::Yellow,"Server Stop Animation");
+	StopAnimMontage(Animation);
+	StopAnimationClient(Animation);
+}
+
+void ADIAVOLOCharacter::PlayAnimationClient_Implementation(UAnimMontage* Animation)
+{
+	GEngine->AddOnScreenDebugMessage(-1,80,FColor::Yellow,"Client Play Animation");
+	PlayAnimMontage(Animation);
+}
+
+void ADIAVOLOCharacter::StopAnimationClient_Implementation(UAnimMontage* Animation)
+{
+	GEngine->AddOnScreenDebugMessage(-1,80,FColor::Yellow,"Client Stop Animation");
 	StopAnimMontage(Animation);
 }
 

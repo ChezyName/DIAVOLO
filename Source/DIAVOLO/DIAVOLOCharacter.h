@@ -107,9 +107,15 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void PlayAnimationServer(UAnimMontage* Animation);
-
 	UFUNCTION(Server,Reliable)
 	void StopAnimationServer(UAnimMontage* Animation);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void PlayAnimationClient(UAnimMontage* Animation);
+	UFUNCTION(NetMulticast,Reliable)
+	void StopAnimationClient(UAnimMontage* Animation);
+
+
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
