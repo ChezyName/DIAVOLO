@@ -277,7 +277,11 @@ void ADIAVOLOPlayerController::OnSetDestinationReleased()
 
 void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewState)
 {
-	if(GetCharState() && HasAuthority()) GetCharState()->ChangeCharState(NewState);
+	if(GetCharState() && HasAuthority())
+	{
+		GetCharState()->ChangeCharState(NewState);
+		GetProxy()->Character->ServerSetState(NewState);
+	}
 }
 
 void ADIAVOLOPlayerController::DoAutoAttack_Implementation()

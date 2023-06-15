@@ -84,6 +84,11 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
+void ADIAVOLOCharacter::ServerSetState(EPlayerStates State)
+{
+	CharState = State;
+}
+
 void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 {
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Enemy->GetActorLocation()));
@@ -134,6 +139,8 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	DOREPLIFETIME(ADIAVOLOCharacter,Health);
 	DOREPLIFETIME(ADIAVOLOCharacter,Mana);
+
+	DOREPLIFETIME(ADIAVOLOCharacter,CharState);
 	
 	DOREPLIFETIME(ADIAVOLOCharacter,BasicCD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);

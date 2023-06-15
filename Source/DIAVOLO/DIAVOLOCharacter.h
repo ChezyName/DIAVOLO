@@ -102,6 +102,11 @@ public:
 	
 	void MoveToRange(FVector Position,float Range);
 
+	void ServerSetState(EPlayerStates State);
+
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	EPlayerStates CharState = EPlayerStates::E_IDLE;
+
 	//ALL ATTACKS
 	UPROPERTY(EditAnywhere,Category="Character Info")
 	FAutoAttack AutoAttack;
