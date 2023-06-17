@@ -11,25 +11,37 @@ ABaseProjectile::ABaseProjectile()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
-	
-	// Use a sphere as a simple collision representation
-	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(5.0f);
-	CollisionComp->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
-	CollisionComp->SetGenerateOverlapEvents(true);
-	CollisionComp->OnComponentHit.AddDynamic(this,&ABaseProjectile::OnHit);
-	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);// set up a notification for when this component hits something blocking
-	
-	// Players can't walk on it
-	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
-	// Set as root component
-	RootComponent = CollisionComp;
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("root"));
+
+	CollisionCompB = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	CollisionCompB->InitBoxExtent(FVector(5.0f,5.0f,5.0f));
+	CollisionCompB->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
+	CollisionCompB->SetGenerateOverlapEvents(true);
+	CollisionCompB->OnComponentHit.AddDynamic(this,&ABaseProjectile::OnHit);
+	CollisionCompB->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);// set up a notification for when this component hits something blocking
+	CollisionCompB->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionCompB->CanCharacterStepUpOn = ECB_No;
+	CollisionCompB->SetupAttachment(RootComponent);
+
+	CollisionCompS = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	CollisionCompS->InitSphereRadius(5.0f);
+	CollisionCompS->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
+	CollisionCompS->SetGenerateOverlapEvents(true);
+	CollisionCompS->OnComponentHit.AddDynamic(this,&ABaseProjectile::OnHit);
+	CollisionCompS->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);// set up a notification for when this component hits something blocking
+	CollisionCompS->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionCompS->CanCharacterStepUpOn = ECB_No;
+	CollisionCompS->SetupAttachment(RootComponent);
+
+	if(CollisionType == ECollisionType::E_SPHERE) CollisionCompS->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
+	else CollisionCompS->BodyInstance.SetCollisionProfileName("NoCollision");
+	
+	if(CollisionType == ECollisionType::E_BOX) CollisionCompB->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
+	else CollisionCompB->BodyInstance.SetCollisionProfileName("NoCollision");
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = CollisionComp;
 	ProjectileMovement->InitialSpeed = InitVelocity * 100;
 	ProjectileMovement->MaxSpeed = 100000000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
@@ -45,13 +57,64 @@ ABaseProjectile::ABaseProjectile()
 	lastPosition = GetActorLocation();
 }
 
+void ABaseProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Changing Values"));
+
+	switch (CollisionType)
+	{
+		case ECollisionType::E_SPHERE:
+			// Handle sphere collision logic
+			CollisionCompS->SetActive(true);
+			CollisionCompB->SetActive(false);
+
+			CollisionCompS->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
+			CollisionCompB->BodyInstance.SetCollisionProfileName("NoCollision");
+
+			CollisionCompB->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			CollisionCompS->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				
+			ProjectileMovement->UpdatedComponent = CollisionCompS;
+
+			CollisionCompB->SetHiddenInGame(true);
+			CollisionCompB->SetHiddenInSceneCapture(true);
+		UE_LOG(LogTemp, Warning, TEXT("Changing SPHERE Values"));
+			break;
+
+		case ECollisionType::E_BOX:
+			// Handle box collision logic
+			CollisionCompB->SetActive(true);
+			CollisionCompS->SetActive(false);
+
+			CollisionCompB->BodyInstance.SetCollisionProfileName("OverlapAllDynamic");
+			CollisionCompS->BodyInstance.SetCollisionProfileName("NoCollision");
+
+			CollisionCompB->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			CollisionCompS->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					
+			ProjectileMovement->UpdatedComponent = CollisionCompB;
+					
+			CollisionCompS->SetHiddenInGame(true);
+			CollisionCompS->SetHiddenInSceneCapture(true);
+		UE_LOG(LogTemp, Warning, TEXT("Changing BOX Values"));
+			break;
+
+		default:
+			// Handle other collision types or an invalid value
+			break;
+	}
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
 // Called when the game starts or when spawned
 void ABaseProjectile::BeginPlay()
 {
 	ProjectileMovement->Velocity = GetActorForwardVector() * (InitVelocity*100);
 	lastPosition = GetActorLocation();
 
-	CollisionComp->IgnoreActorWhenMoving(ProjectileOwner,true);
+	CollisionCompS->IgnoreActorWhenMoving(ProjectileOwner,true);
+	CollisionCompB->IgnoreActorWhenMoving(ProjectileOwner,true);
 	Super::BeginPlay();
 }
 
@@ -62,6 +125,10 @@ void ABaseProjectile::OnHit_Implementation(UPrimitiveComponent* HitComponent, AA
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
 	DrawDebugBox(GetWorld(),Hit.ImpactPoint,FVector(5,5,5),FColor::Cyan,false,5);
+
+	AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
+	if(HitEnemy) OnHitEnemy(HitEnemy);
+	//else OnHitWall();
 }
 
 void ABaseProjectile::OnOverlap_Implementation(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -70,7 +137,25 @@ void ABaseProjectile::OnOverlap_Implementation(UPrimitiveComponent* OverlappedCo
 	if(!HasAuthority()) return;
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
-	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(5,5,5),FColor::Cyan,false,5);
+	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(15,15,15),FColor::Red,false,5);
+
+	AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
+	if(HitEnemy) OnHitEnemy(HitEnemy);
+	//else OnHitWall();
+}
+
+void ABaseProjectile::OnHitWall()
+{
+	WallsHit++;
+	//if(WallsHit > TotalWallsCanHit) Destroy();
+}
+
+void ABaseProjectile::OnHitEnemy(AEnemy* EnemyHit)
+{
+	if(HasHit) return;
+	HasHit = true;
+	EnemyHit->Damage(Damage);
+	SetupForDestroy();
 }
 
 // Called every frame
