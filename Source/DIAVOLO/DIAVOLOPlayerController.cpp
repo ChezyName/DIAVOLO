@@ -64,7 +64,7 @@ FVector ADIAVOLOPlayerController::getMousePositionEnemy()
 			return Hit.ImpactPoint;
 		}
 	}
-
+	
 	return FVector::ZeroVector;
 }
 
@@ -177,6 +177,11 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ADIAVOLOPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ADIAVOLOPlayerController::OnSetDestinationReleased);
+
+	InputComponent->BindAction("Skill1",IE_Pressed,this,&ADIAVOLOPlayerController::onSkill1C);
+	InputComponent->BindAction("Skill2",IE_Pressed,this,&ADIAVOLOPlayerController::onSkill2C);
+	InputComponent->BindAction("Skill3",IE_Pressed,this,&ADIAVOLOPlayerController::onSkill3C);
+	InputComponent->BindAction("Ultimate",IE_Pressed,this,&ADIAVOLOPlayerController::onUltimateC);
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
@@ -214,6 +219,13 @@ ACharacterProxy* ADIAVOLOPlayerController::GetProxy()
 	if(Proxy) return Proxy;
 	Proxy = Cast<ACharacterProxy>(GetPawn());
 	return Proxy;
+}
+
+void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ADIAVOLOPlayerController,EnemyAttacking);
+	DOREPLIFETIME(ADIAVOLOPlayerController,MousePosition);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVector DestLocation)
@@ -324,4 +336,52 @@ void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, GetProxy()->Character->AutoAttack.TimeBeforeAttack, false);
+}
+
+//===========================================================================================
+//                                CLIENT
+
+void ADIAVOLOPlayerController::onSkill1C_Implementation()
+{
+	FVector Ground = getMousePositionGround();
+	getMousePositionEnemy();
+	onSkill1S(Ground,EnemyAttacking);
+}
+void ADIAVOLOPlayerController::onSkill2C_Implementation()
+{
+	FVector Ground = getMousePositionGround();
+	getMousePositionEnemy();
+	onSkill2S(Ground,EnemyAttacking);
+}
+void ADIAVOLOPlayerController::onSkill3C_Implementation()
+{
+	FVector Ground = getMousePositionGround();
+	getMousePositionEnemy();
+	onSkill3S(Ground,EnemyAttacking);
+}
+void ADIAVOLOPlayerController::onUltimateC_Implementation()
+{
+	FVector Ground = getMousePositionGround();
+	getMousePositionEnemy();
+	onUltimateS(Ground,EnemyAttacking);
+}
+
+//===========================================================================================
+//                                SERVER
+
+void ADIAVOLOPlayerController::onSkill1S_Implementation(FVector MouseLoc,AEnemy* Enemy)
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+}
+void ADIAVOLOPlayerController::onSkill2S_Implementation(FVector MouseLoc,AEnemy* Enemy)
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+}
+void ADIAVOLOPlayerController::onSkill3S_Implementation(FVector MouseLoc,AEnemy* Enemy)
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+}
+void ADIAVOLOPlayerController::onUltimateS_Implementation(FVector MouseLoc,AEnemy* Enemy)
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
 }

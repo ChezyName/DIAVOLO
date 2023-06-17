@@ -34,7 +34,13 @@ protected:
 	class ACharacterProxy* Proxy;
 
 	FVector newMoveToLocation = FVector::ZeroVector;
+
+	UPROPERTY(Replicated)
 	AEnemy* EnemyAttacking;
+
+	UPROPERTY(Replicated)
+	FVector MousePosition;
+	
 	bool CloseEnough();
 
 	UFUNCTION(Server,Reliable)
@@ -52,7 +58,27 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void SetNewMoveDestination(const FVector DestLocation);
 
+	UFUNCTION(Client,Reliable)
+	void onSkill1C();
+	UFUNCTION(Client,Reliable)
+	void onSkill2C();
+	UFUNCTION(Client,Reliable)
+	void onSkill3C();
+	UFUNCTION(Client,Reliable)
+	void onUltimateC();
+
+	UFUNCTION(Server,Reliable)
+	void onSkill1S(FVector MouseLoc,AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	void onSkill2S(FVector MouseLoc,AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	void onSkill3S(FVector MouseLoc,AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	void onUltimateS(FVector MouseLoc,AEnemy* Enemy);
+
 	ACharacterProxy* GetProxy();
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 
 	//Basic Move To Location
 	UFUNCTION(Server,Unreliable)

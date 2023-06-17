@@ -91,8 +91,6 @@ public:
 	UPROPERTY(Replicated)
 	float Skill3CD = 0;
 	UPROPERTY(Replicated)
-	float Skill4CD = 0;
-	UPROPERTY(Replicated)
 	float UltimateCD = 0;
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
@@ -127,15 +125,13 @@ public:
 	UFUNCTION(Server,Reliable)
 	virtual void onBasicSkill(AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
-	virtual void onSkill1(AEnemy* Enemy);
+	virtual void onSkill1(FVector Location,AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
-	virtual void onSkill2(AEnemy* Enemy);
+	virtual void onSkill2(FVector Location,AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
-	virtual void onSkill3(AEnemy* Enemy);
+	virtual void onSkill3(FVector Location,AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
-	virtual void onSkill4(AEnemy* Enemy);
-	UFUNCTION(Server,Reliable)
-	virtual void onUltimate(AEnemy* Enemy);
+	virtual void onUltimate(FVector Location,AEnemy* Enemy);
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 

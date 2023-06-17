@@ -64,12 +64,14 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 	
-	BasicCD -= DeltaSeconds;
-	Skill1CD -= DeltaSeconds;
-	Skill2CD -= DeltaSeconds;
-	Skill3CD -= DeltaSeconds;
-	Skill4CD -= DeltaSeconds;
-	UltimateCD -= DeltaSeconds;
+	if(HasAuthority())
+	{
+		BasicCD -= DeltaSeconds;
+		Skill1CD -= DeltaSeconds;
+		Skill2CD -= DeltaSeconds;
+		Skill3CD -= DeltaSeconds;
+		UltimateCD -= DeltaSeconds;
+	}
 
 	//if(HasAuthority()) GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red, "SERVER ON " + GetController()->GetName());
 }
@@ -145,19 +147,16 @@ void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 		}
 	}
 }
-void ADIAVOLOCharacter::onSkill1_Implementation(AEnemy* Enemy)
+void ADIAVOLOCharacter::onSkill1_Implementation(FVector Location,AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill2_Implementation(AEnemy* Enemy)
+void ADIAVOLOCharacter::onSkill2_Implementation(FVector Location,AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill3_Implementation(AEnemy* Enemy)
+void ADIAVOLOCharacter::onSkill3_Implementation(FVector Location,AEnemy* Enemy)
 {
 }
-void ADIAVOLOCharacter::onSkill4_Implementation(AEnemy* Enemy)
-{
-}
-void ADIAVOLOCharacter::onUltimate_Implementation(AEnemy* Enemy)
+void ADIAVOLOCharacter::onUltimate_Implementation(FVector Location,AEnemy* Enemy)
 {
 }
 
@@ -172,7 +171,6 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill2CD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill3CD);
-	DOREPLIFETIME(ADIAVOLOCharacter,Skill4CD);
 	DOREPLIFETIME(ADIAVOLOCharacter,UltimateCD);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
