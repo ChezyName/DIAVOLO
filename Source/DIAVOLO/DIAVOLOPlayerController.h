@@ -76,6 +76,15 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void onUltimateS(FVector MouseLoc,AEnemy* Enemy);
 
+	UFUNCTION(Server,Reliable)
+	void endSkill1();
+	UFUNCTION(Server,Reliable)
+	void endSkill2();
+	UFUNCTION(Server,Reliable)
+	void endSkill3();
+	UFUNCTION(Server,Reliable)
+	void endUltimate();
+
 	ACharacterProxy* GetProxy();
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;

@@ -160,6 +160,20 @@ void ADIAVOLOCharacter::onUltimate_Implementation(FVector Location,AEnemy* Enemy
 {
 }
 
+void ADIAVOLOCharacter::endSkill1_Implementation()
+{
+}
+void ADIAVOLOCharacter::endSkill2_Implementation()
+{
+}
+void ADIAVOLOCharacter::endSkill3_Implementation()
+{
+}
+void ADIAVOLOCharacter::endUltimate_Implementation()
+{
+}
+
+
 void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(ADIAVOLOCharacter,Health);

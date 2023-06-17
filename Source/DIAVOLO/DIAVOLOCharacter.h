@@ -133,6 +133,15 @@ public:
 	UFUNCTION(Server,Reliable)
 	virtual void onUltimate(FVector Location,AEnemy* Enemy);
 
+	UFUNCTION(Server,Reliable)
+	virtual void endSkill1();
+	UFUNCTION(Server,Reliable)
+	virtual void endSkill2();
+	UFUNCTION(Server,Reliable)
+	virtual void endSkill3();
+	UFUNCTION(Server,Reliable)
+	virtual void endUltimate();
+
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 
 private:

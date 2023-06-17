@@ -375,13 +375,33 @@ void ADIAVOLOPlayerController::onSkill1S_Implementation(FVector MouseLoc,AEnemy*
 }
 void ADIAVOLOPlayerController::onSkill2S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill2(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onSkill3S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill3(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onUltimateS_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onUltimate(MouseLoc,Enemy);
+}
+
+//===========================================================================================
+//                          END ABILITY SERVER
+
+void ADIAVOLOPlayerController::endSkill1_Implementation()
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endSkill1();
+}
+void ADIAVOLOPlayerController::endSkill2_Implementation()
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endSkill2();
+}
+void ADIAVOLOPlayerController::endSkill3_Implementation()
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endSkill3();
+}
+void ADIAVOLOPlayerController::endUltimate_Implementation()
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endUltimate();
 }
