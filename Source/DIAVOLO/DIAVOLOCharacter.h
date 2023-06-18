@@ -121,7 +121,7 @@ public:
 	float DamageMultiplier = 1.f;
 
 	float ManaCD = 0;
-	float ManaCDOnSkillUse = 1.5;
+	float ManaCDOnSkillUse = 3;
 	
 	UPROPERTY(Replicated)
 	float BasicCD = 0;

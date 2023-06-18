@@ -22,18 +22,36 @@ public:
 	TSubclassOf<class ABaseProjectile> ClawProjectile;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	UAnimMontage* ClawAnimation;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	UNiagaraSystem* TeleportFX;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	float ClawSpawnDelayAnimation = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	float ClawDamage = 600;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	float ClawVelocity = 6;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	float ClawTeleportDelay = .6;
 	
 private:
 	UPROPERTY()
 	ABaseProjectile* Claw = nullptr;
 	bool bSwapped = false;
+	bool bDoing = false;
+	float TPDelay = 0;
+	FRotator LookAtRotation;
+	
 
 	UFUNCTION(NetMulticast,Reliable)
 	void PlayClawTeleportFX(FVector Location);
+
+	virtual void Tick(float DeltaSeconds) override;
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
