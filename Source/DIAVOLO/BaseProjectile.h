@@ -37,6 +37,7 @@ public:
 	ECollisionType CollisionType = ECollisionType::E_SPHERE;
 
 	bool HasHit = false;
+	bool Destroying = false;
 	//Call Destroy On The Function [SERVER ONLY]
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetupForDestroy();

@@ -155,6 +155,7 @@ void ABaseProjectile::OnHitEnemy(AEnemy* EnemyHit)
 	if(HasHit) return;
 	HasHit = true;
 	EnemyHit->Damage(Damage);
+	Destroying = true;
 	SetupForDestroy();
 }
 

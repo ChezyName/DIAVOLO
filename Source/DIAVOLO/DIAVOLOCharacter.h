@@ -16,6 +16,24 @@ enum class EAutoType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FCooldowns
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	float Skill1 = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float Skill2 = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float Skill3 = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float Ultimate = 0;
+};
+
+USTRUCT(BlueprintType)
 struct FAutoAttack
 {
 	GENERATED_BODY()
@@ -122,6 +140,10 @@ public:
 	UPROPERTY(EditAnywhere,Category="Character Info")
 	FAutoAttack AutoAttack;
 
+	//Cooldowns
+	UPROPERTY(EditAnywhere,Category="Character Info")
+	FCooldowns AttackCooldowns;
+	
 	UFUNCTION(Server,Reliable)
 	virtual void onBasicSkill(AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
