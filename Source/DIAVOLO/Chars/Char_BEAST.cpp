@@ -1,22 +1,36 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "NiagaraFunctionLibrary.h"
 #include "Char_BEAST.h"
 
 #include "Kismet/GameplayStatics.h"
 
+void AChar_BEAST::PlayClawTeleportFX_Implementation(FVector Location)
+{
+	if(IsValid(TeleportFX))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),TeleportFX,Location,FRotator::ZeroRotator);
+	}
+}
+
 void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 {
-	GEngine->AddOnScreenDebugMessage(-1,60,FColor::Emerald,"BEAST SKILL #1 -> " + FString::SanitizeFloat(Skill1CD));
-	if(Claw != nullptr && bSwapped == false && Claw->Destroying == false)
+	if(Mana < AttackManaConsumption.Skill1) return;
+	//GEngine->AddOnScreenDebugMessage(-1,60,FColor::Emerald,"BEAST SKILL #1 -> " + FString::SanitizeFloat(Skill1CD));
+
+	if(IsValid(Claw) && bSwapped == false && Claw->Destroying == false)
 	{
 		//Swap Spots With Claw
-		FTransform ClawTransform = Claw->GetActorTransform();
-		FTransform PlrTransform = GetActorTransform();
-
-		Claw->SetActorTransform(PlrTransform);
+		const FTransform ClawTransform = Claw->GetActorTransform();
+		const FTransform PlrTransform = GetActorTransform();
+		
 		SetActorTransform(ClawTransform);
 		bSwapped = true;
+
+		PlayClawTeleportFX(ClawTransform.GetLocation());
+		PlayClawTeleportFX(PlrTransform.GetLocation());
+		Claw->Destroy();
+		Claw = nullptr;
 	}
 	else
 	{
@@ -31,7 +45,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 			//Finalizing Create Projecitle
 			Claw->ProjectileOwner = this;
 			Claw->InitVelocity = AutoAttack.ProjectileVelocity;
-			Claw->Damage = AutoAttack.AttackDamage * DamageMultiplier;
+			Claw->Damage = ClawDamage * DamageMultiplier;
 			Claw->SetOwner(this);
 
 			//Calculate Rotation
@@ -46,6 +60,8 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		}
 
 		Skill1CD = AttackCooldowns.Skill1;
+		Mana -= AttackManaConsumption.Skill1;
+		ManaCD = ManaCDOnSkillUse;
 	}
 	
 	Super::onSkill1_Implementation(Location, Enemy);

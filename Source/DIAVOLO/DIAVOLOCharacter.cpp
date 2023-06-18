@@ -71,10 +71,17 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 		Skill2CD -= DeltaSeconds;
 		Skill3CD -= DeltaSeconds;
 		UltimateCD -= DeltaSeconds;
+		ManaCD -= DeltaSeconds;
+		if(ManaCD < 0 && Mana < MaxMana) Mana += AttackManaConsumption.ManaRechargeRate * DeltaSeconds;
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Mana: " +
+			FString::SanitizeFloat(Mana) + ". CD: " + FString::SanitizeFloat(ManaCD));
 	}
 
 	//if(HasAuthority()) GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red, "SERVER ON " + GetController()->GetName());
 }
+
+float ADIAVOLOCharacter::GetHealthPercent(){ return Health / MaxHealth; }
+float ADIAVOLOCharacter::GetManaPercent(){ return Mana / MaxMana; }
 
 void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 {

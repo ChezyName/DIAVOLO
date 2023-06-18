@@ -34,6 +34,27 @@ struct FCooldowns
 };
 
 USTRUCT(BlueprintType)
+struct FManaConsumption
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	float Skill1 = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float Skill2 = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float Skill3 = 0;
+	
+	UPROPERTY(EditAnywhere)
+	float Ultimate = 0;
+
+	UPROPERTY(EditAnywhere)
+	float ManaRechargeRate = 15;
+};
+
+USTRUCT(BlueprintType)
 struct FAutoAttack
 {
 	GENERATED_BODY()
@@ -80,10 +101,9 @@ class ADIAVOLOCharacter : public ACharacter
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
 	float ZoomMax = 800;
 
-	UPROPERTY(EditAnywhere,Category="Character Info")
+	UPROPERTY(EditAnywhere,Category="Character Info | Health // Mana ")
 	float MaxHealth = 1500;
-
-	UPROPERTY(EditAnywhere,Category="Character Info")
+	UPROPERTY(EditAnywhere,Category="Character Info | Health // Mana ")
 	float MaxMana = 800;
 
 public:
@@ -99,6 +119,9 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	float DamageMultiplier = 1.f;
+
+	float ManaCD = 0;
+	float ManaCDOnSkillUse = 1.5;
 	
 	UPROPERTY(Replicated)
 	float BasicCD = 0;
@@ -110,11 +133,16 @@ public:
 	float Skill3CD = 0;
 	UPROPERTY(Replicated)
 	float UltimateCD = 0;
-
+	
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Health = 0;
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Mana = 0;
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealthPercent();
+	UFUNCTION(BlueprintCallable)
+	float GetManaPercent();
 	
 	void MoveToRange(FVector Position,float Range);
 
@@ -137,12 +165,15 @@ public:
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
 	//ALL ATTACKS
-	UPROPERTY(EditAnywhere,Category="Character Info")
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks")
 	FAutoAttack AutoAttack;
 
 	//Cooldowns
-	UPROPERTY(EditAnywhere,Category="Character Info")
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks")
 	FCooldowns AttackCooldowns;
+	
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks")
+	FManaConsumption AttackManaConsumption;
 	
 	UFUNCTION(Server,Reliable)
 	virtual void onBasicSkill(AEnemy* Enemy);

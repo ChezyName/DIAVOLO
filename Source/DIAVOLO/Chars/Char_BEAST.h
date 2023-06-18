@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "DIAVOLO/DIAVOLOCharacter.h"
+#include "Niagara/Public/NiagaraComponent.h"
+#include "Niagara/Public/NiagaraFunctionLibrary.h"
 #include "Char_BEAST.generated.h"
 
 /**
@@ -16,13 +18,22 @@ class DIAVOLO_API AChar_BEAST : public ADIAVOLOCharacter
 	
 public:
 
-	UPROPERTY(EditAnywhere,Category="Character Info")
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	TSubclassOf<class ABaseProjectile> ClawProjectile;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	UNiagaraSystem* TeleportFX;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	float ClawDamage = 600;
 	
 private:
 	UPROPERTY()
 	ABaseProjectile* Claw = nullptr;
 	bool bSwapped = false;
+
+	UFUNCTION(NetMulticast,Reliable)
+	void PlayClawTeleportFX(FVector Location);
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
