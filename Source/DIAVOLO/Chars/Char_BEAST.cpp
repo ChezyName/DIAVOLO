@@ -95,3 +95,18 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 	
 	Super::onSkill1_Implementation(Location, Enemy);
 }
+
+void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
+{
+	FVector MyLoc = Location;
+	MyLoc.Z = GetActorLocation().Z;
+	FVector LaunchDirection = MyLoc - GetActorLocation();
+	LaunchDirection.Normalize();
+	
+	LaunchCharacter(LaunchDirection * LaunchVelocity, true, false);
+	
+	Skill1CD = AttackCooldowns.Skill3;
+	Mana -= AttackManaConsumption.Skill3;
+	ManaCD = ManaCDOnSkillUse;
+	Super::onSkill3(Location, Enemy);
+}

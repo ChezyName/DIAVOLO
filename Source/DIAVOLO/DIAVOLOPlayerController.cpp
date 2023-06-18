@@ -345,24 +345,28 @@ void ADIAVOLOPlayerController::onSkill1C_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
+	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill1S(Ground,EnemyAttacking);
 }
 void ADIAVOLOPlayerController::onSkill2C_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
+	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill2S(Ground,EnemyAttacking);
 }
 void ADIAVOLOPlayerController::onSkill3C_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
+	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill3S(Ground,EnemyAttacking);
 }
 void ADIAVOLOPlayerController::onUltimateC_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
+	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onUltimateS(Ground,EnemyAttacking);
 }
 

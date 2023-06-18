@@ -18,6 +18,7 @@ class DIAVOLO_API AChar_BEAST : public ADIAVOLOCharacter
 	
 public:
 
+	// SKILL 1
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	TSubclassOf<class ABaseProjectile> ClawProjectile;
 
@@ -38,7 +39,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	float ClawTeleportDelay = .6;
-	
+
+	// SKILL 2
+
+	// SKILL 3
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
+	float LaunchVelocity = 45;
 private:
 	UPROPERTY()
 	ABaseProjectile* Claw = nullptr;
@@ -55,9 +61,11 @@ private:
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
+	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
+	
 	/*
 	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
-	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
+	
 	virtual void onUltimate(FVector Location, AEnemy* Enemy) override;
 
 
