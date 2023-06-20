@@ -27,6 +27,8 @@ public:
 	
 	class ADIAVOLOCharacter* ProjectileOwner;
 
+	
+
 	float InitVelocity;
 	float Damage = 0;
 	

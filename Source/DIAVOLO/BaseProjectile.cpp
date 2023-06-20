@@ -47,6 +47,7 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
+	ProjectileMovement->UpdatedComponent = RootComponent;
 	ProjectileMovement->SetIsReplicated(true);
 
 	// Die after 3 seconds by default
@@ -73,8 +74,6 @@ void ABaseProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 
 			CollisionCompB->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			CollisionCompS->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				
-			ProjectileMovement->UpdatedComponent = CollisionCompS;
 
 			CollisionCompB->SetHiddenInGame(true);
 			CollisionCompB->SetHiddenInSceneCapture(true);
@@ -91,8 +90,6 @@ void ABaseProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 
 			CollisionCompB->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			CollisionCompS->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					
-			ProjectileMovement->UpdatedComponent = CollisionCompB;
 					
 			CollisionCompS->SetHiddenInGame(true);
 			CollisionCompS->SetHiddenInSceneCapture(true);
@@ -115,17 +112,33 @@ void ABaseProjectile::BeginPlay()
 
 	CollisionCompS->IgnoreActorWhenMoving(ProjectileOwner,true);
 	CollisionCompB->IgnoreActorWhenMoving(ProjectileOwner,true);
+
+	switch (CollisionType)
+	{
+		case ECollisionType::E_SPHERE:
+			// Handle sphere collision logic
+			CollisionCompS->SetActive(true);
+			CollisionCompB->SetActive(false);
+			break;
+
+		case ECollisionType::E_BOX:
+			// Handle box collision logic
+			CollisionCompB->SetActive(true);
+			CollisionCompS->SetActive(false);
+			break;
+	}
 	Super::BeginPlay();
 }
 
 void ABaseProjectile::OnHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+                                           UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if(!HasAuthority()) return;
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
-	DrawDebugBox(GetWorld(),Hit.ImpactPoint,FVector(5,5,5),FColor::Cyan,false,5);
 
+	DrawDebugBox(GetWorld(),Hit.ImpactPoint,FVector(5,5,5),FColor::Cyan,false,5);
+	
 	AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
 	if(HitEnemy) OnHitEnemy(HitEnemy);
 	//else OnHitWall();
@@ -137,7 +150,8 @@ void ABaseProjectile::OnOverlap_Implementation(UPrimitiveComponent* OverlappedCo
 	if(!HasAuthority()) return;
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
-	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(15,15,15),FColor::Red,false,5);
+
+	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(5,5,5),FColor::Cyan,false,5);
 
 	AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
 	if(HitEnemy) OnHitEnemy(HitEnemy);

@@ -122,7 +122,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	}
 	
 	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
+	if (bMoveToMouseCursor && GetCharState() != EPlayerStates::E_ABILITY)
 	{
 		if(getMousePositionEnemy() != FVector::ZeroVector)
 		{

@@ -43,16 +43,40 @@ public:
 	// SKILL 2
 
 	// SKILL 3
-	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
-	float LaunchVelocity = 45;
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	TSubclassOf<class ACallBackProjectile> GrappleProjectile;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	float GrappleLifetime = 3;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	float GrappleVelocity = 18;
+	
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	float GrappleSpeed = 125;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	float GrappleCloseEnough = 64;
+	
 private:
+	//Skill 1 : Q
 	UPROPERTY()
 	ABaseProjectile* Claw = nullptr;
 	bool bSwapped = false;
 	bool bDoing = false;
 	float TPDelay = 0;
 	FRotator LookAtRotation;
+
+	//Skill 3 : E
+	UPROPERTY()
+	ACallBackProjectile* Grapple = nullptr;
+	UFUNCTION()
+	void onGrappleHit(FVector HitImpact, AEnemy* EnemyHit);
+	bool Grappling = false;
+	FVector toLoc = FVector::ZeroVector;
 	
+	float GrappleOutT = 0;
+	bool GrappleOut = false;
 
 	UFUNCTION(NetMulticast,Reliable)
 	void PlayClawTeleportFX(FVector Location);
