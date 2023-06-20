@@ -15,21 +15,40 @@ enum class EAutoType : uint8
 	E_RANGE = 1 UMETA(DisplayName="Ranged"),
 };
 
+
+USTRUCT(BlueprintType)
+struct FAbilityIcons
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UTexture2D* Skill1Icon;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UTexture2D* Skill2Icon;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UTexture2D* Skill3Icon;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	UTexture2D* ULTIMATEIcon;
+};
+
 USTRUCT(BlueprintType)
 struct FCooldowns
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Skill1 = 0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Skill2 = 0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Skill3 = 0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Ultimate = 0;
 };
 
@@ -38,19 +57,19 @@ struct FManaConsumption
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Skill1 = 0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Skill2 = 0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Skill3 = 0;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float Ultimate = 0;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	float ManaRechargeRate = 15;
 };
 
@@ -123,15 +142,15 @@ public:
 	float ManaCD = 0;
 	float ManaCDOnSkillUse = 3;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float BasicCD = 0;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Skill1CD = 0;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Skill2CD = 0;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Skill3CD = 0;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float UltimateCD = 0;
 	
 	UPROPERTY(Replicated,BlueprintReadOnly)
@@ -165,15 +184,18 @@ public:
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
 	//ALL ATTACKS
-	UPROPERTY(EditAnywhere,Category="Character Info | Attacks")
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks",BlueprintReadOnly)
 	FAutoAttack AutoAttack;
 
 	//Cooldowns
-	UPROPERTY(EditAnywhere,Category="Character Info | Attacks")
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks",BlueprintReadOnly)
 	FCooldowns AttackCooldowns;
 	
-	UPROPERTY(EditAnywhere,Category="Character Info | Attacks")
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks",BlueprintReadOnly)
 	FManaConsumption AttackManaConsumption;
+
+	UPROPERTY(EditAnywhere,Category="Character Info | Attacks",BlueprintReadOnly)
+	FAbilityIcons AbilityIcons;
 	
 	UFUNCTION(Server,Reliable)
 	virtual void onBasicSkill(AEnemy* Enemy);
