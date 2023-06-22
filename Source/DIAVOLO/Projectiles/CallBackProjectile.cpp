@@ -21,3 +21,15 @@ void ACallBackProjectile::OnOverlap_Implementation(UPrimitiveComponent* Overlapp
 	FunctionOnOverlap.ExecuteIfBound(GetActorLocation(),IfHitEnemy);
 	Super::OnOverlap_Implementation(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 }
+
+void ACallBackProjectile::OnHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if(!HasAuthority()) return;
+	if(OtherActor == ProjectileOwner) return;
+	if(OtherActor->GetClass() == this->GetClass()) return;
+	
+	AEnemy* IfHitEnemy = Cast<AEnemy>(OtherActor);
+	FunctionOnOverlap.ExecuteIfBound(GetActorLocation(),IfHitEnemy);
+	Super::OnHit_Implementation(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
+}
