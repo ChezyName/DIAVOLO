@@ -176,7 +176,7 @@ void ABaseProjectile::OnHitEnemy(AEnemy* EnemyHit)
 // Called every frame
 void ABaseProjectile::Tick(float DeltaTime)
 {
-	DrawDebugLine(GetWorld(),lastPosition,GetActorLocation(),FColor::Cyan,false,1.5f,-1);
+	//DrawDebugLine(GetWorld(),lastPosition,GetActorLocation(),FColor::Cyan,false,1.5f,-1);
 	lastPosition = GetActorLocation();
 	Super::Tick(DeltaTime);
 }

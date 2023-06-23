@@ -25,9 +25,8 @@ public:
 	// Sets default values for this actor's properties
 	ABaseProjectile();
 	
+	UPROPERTY(BlueprintReadOnly)
 	class ADIAVOLOCharacter* ProjectileOwner;
-
-	
 
 	float InitVelocity;
 	float Damage = 0;
