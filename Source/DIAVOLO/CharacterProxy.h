@@ -27,7 +27,7 @@ public:
 	class ADIAVOLOCharacter* Character;
 
 	// used by controller to get the moving to work
-	void MoveToLocation(const class ADIAVOLOPlayerController* controller, const FVector& DestLocation);
+	void MoveToLocation(const FVector& DestLocation);
 	
 protected:
 	// AIController we will use

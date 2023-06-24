@@ -128,6 +128,8 @@ class ADIAVOLOCharacter : public ACharacter
 public:
 	ADIAVOLOCharacter();
 
+	class ACharacterProxy* ParentProxy;
+
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;

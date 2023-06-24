@@ -244,7 +244,7 @@ void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVecto
 		if ((Distance > 32.0f))
 		{
 			newMoveToLocation = DestLocation;
-			GetProxy()->MoveToLocation(this, DestLocation);
+			GetProxy()->MoveToLocation(DestLocation);
 		}
 	}
 }

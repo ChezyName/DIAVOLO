@@ -61,6 +61,7 @@ void ACharacterProxy::onStartSetChar_Implementation()
 	// we use AI to control the player character for navigation
 	PlayerAIController = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());
 	PlayerAIController->Possess(Character);
+	Character->ParentProxy = this;
 }
 
 // Called when the game starts or when spawned
@@ -88,7 +89,7 @@ void ACharacterProxy::Tick( float DeltaTime )
 	}
 }
 
-void ACharacterProxy::MoveToLocation(const class ADIAVOLOPlayerController* controller, const FVector& DestLocation)
+void ACharacterProxy::MoveToLocation(const FVector& DestLocation)
 {
 	/**
 	*  Engage AI to path find

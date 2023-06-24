@@ -104,6 +104,11 @@ void ABaseProjectile::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
+void ABaseProjectile::EnableProjectileMovement(bool canMove)
+{
+	ProjectileMovement->SetActive(canMove);
+}
+
 // Called when the game starts or when spawned
 void ABaseProjectile::BeginPlay()
 {

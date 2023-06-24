@@ -43,6 +43,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetupForDestroy();
 
+	void EnableProjectileMovement(bool canMove);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

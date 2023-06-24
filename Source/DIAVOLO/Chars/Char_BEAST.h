@@ -57,6 +57,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
 	float GrappleCloseEnough = 64;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	UAnimMontage* GrappleStart;
+	
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
+	UAnimMontage* GrapplePull;
 	
 private:
 	//Skill 1 : Q

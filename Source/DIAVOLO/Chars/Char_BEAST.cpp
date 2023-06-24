@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "NiagaraFunctionLibrary.h"
 #include "PhysXInterfaceWrapperCore.h"
+#include "DIAVOLO/CharacterProxy.h"
 #include "DIAVOLO/Projectiles/CallBackProjectile.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -23,7 +24,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 {
 	TPDelay -= DeltaSeconds;
 
-	if(Grappling)
+	if(Grappling && Grapple != nullptr)
 	{
 		FVector Direction = (toLoc - GetActorLocation()).GetSafeNormal();
 		FVector Velocity = Direction * GrappleSpeed;
@@ -31,26 +32,44 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 
 		DrawDebugDirectionalArrow(GetWorld(),GetActorLocation(),
 					Velocity,5,FColor::Cyan,false,-1,0,5);
+
+		//Look at GrappleHook
+		FVector TargetDirection = Grapple->GetActorLocation() - GetActorLocation();
+		TargetDirection.Normalize();
+		FRotator TargetRotation = TargetDirection.Rotation();
+		SetActorRotation(TargetRotation);
 		
 		if(FVector::Dist(GetActorLocation(),toLoc) < GrappleCloseEnough)
 		{
+			if(GrappleStart) StopAnimationServer(GrappleStart);
+			if(GrapplePull) StopAnimationServer(GrapplePull);
 			Grappling = false;
 			GrappleOut = false;
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
+			if(Grapple) Grapple->Destroy();
 		}
 	}
 	
-	if(GrappleOut && !Grappling)
+	if(GrappleOut && Grapple != nullptr)
 	{
 		GrappleOutT -= DeltaSeconds;
+
+		//Look at GrappleHook
+		FVector TargetDirection = Grapple->GetActorLocation() - GetActorLocation();
+		TargetDirection.Normalize();
+		FRotator TargetRotation = TargetDirection.Rotation();
+		SetActorRotation(TargetRotation);
+		
 		if(GrappleOutT < 0)
 		{
+			if(GrappleStart) StopAnimationServer(GrappleStart);
 			GrappleOut = false;
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
+			if(Grapple) Grapple->Destroy();
 		}
 	}
 	
@@ -71,6 +90,9 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 
 	if(IsValid(Claw) && bSwapped == false && Claw->Destroying == false && TPDelay < 0)
 	{
+		//Stop Movement
+		ParentProxy->MoveToLocation(GetActorLocation());
+		
 		//Swap Spots With Claw
 		const FTransform ClawTransform = Claw->GetActorTransform();
 		const FTransform PlrTransform = GetActorTransform();
@@ -90,6 +112,9 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		if(Skill1CD > 0 || bDoing) return;
 		bDoing = true;
 		CharState = EPlayerStates::E_ABILITY;
+		
+		//Stop Movement
+		ParentProxy->MoveToLocation(GetActorLocation());
 		
 		SetActorRotation(LookAtRotation);
 		
@@ -141,10 +166,14 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 	PDir.Normalize();
 
 	FRotator NewLookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
+	SetActorRotation(NewLookAtRotation);
+	ParentProxy->MoveToLocation(GetActorLocation());
 	
 	Grapple = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,GrappleProjectile,FTransform(NewLookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 	if(Grapple != nullptr)
 	{
+		if(GrappleStart) PlayAnimationServer(GrappleStart);
+		
 		//Finalizing Create Projecitle
 		Grapple->ProjectileOwner = this;
 		Grapple->InitVelocity = GrappleVelocity;
@@ -171,6 +200,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 
 void AChar_BEAST::onGrappleHit(FVector HitImpact, AEnemy* EnemyHit)
 {
+	/*
 	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Orange,
 		"Grapple Hit At Location!");
 	
@@ -179,11 +209,19 @@ void AChar_BEAST::onGrappleHit(FVector HitImpact, AEnemy* EnemyHit)
 	
 	DrawDebugLine(GetWorld(),GetActorLocation(),HitImpact,
 		FColor::Orange, false, 25, 0, 2);
+	*/
+	
+	DrawDebugSphere(GetWorld(),HitImpact,50,32,FColor::Orange,
+		false,25,0,2);
 
 	//Grappling
+	GrappleOutT = GrappleLifetime;
 	Grappling = true;
 	toLoc = HitImpact;
 	
+	if(GrappleStart) StopAnimationServer(GrappleStart);
+	if(GrapplePull) PlayAnimationServer(GrapplePull);
+	
 	CharState = EPlayerStates::E_ABILITY;
-	Grapple->Destroy();
-}
+	Grapple->EnableProjectileMovement(false);
+};
