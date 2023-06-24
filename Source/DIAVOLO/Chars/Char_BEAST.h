@@ -17,7 +17,8 @@ class DIAVOLO_API AChar_BEAST : public ADIAVOLOCharacter
 	GENERATED_BODY()
 	
 public:
-
+	AChar_BEAST();
+	
 	// SKILL 1
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	TSubclassOf<class ABaseProjectile> ClawProjectile;
@@ -41,6 +42,14 @@ public:
 	float ClawTeleportDelay = .6;
 
 	// SKILL 2
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	USphereComponent* SpinHitbox;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	float SpinDamage = 600;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	float SpinDuration = 0.25f;
 
 	// SKILL 3
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
@@ -72,6 +81,11 @@ private:
 	bool bDoing = false;
 	float TPDelay = 0;
 	FRotator LookAtRotation;
+	bool hasDoneCD = true;
+	bool bSpawned = false;
+
+	//Skill 2 : W
+	bool SpinActive = false;
 
 	//Skill 3 : E
 	UPROPERTY()
@@ -91,6 +105,7 @@ private:
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
+	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
 	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
 	
 	/*

@@ -12,6 +12,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
+AChar_BEAST::AChar_BEAST()
+{
+	SpinHitbox = CreateDefaultSubobject<USphereComponent>("SpinHitbox");
+	SpinHitbox->SetupAttachment(RootComponent);
+	SpinHitbox->InitSphereRadius(250);
+}
+
 void AChar_BEAST::PlayClawTeleportFX_Implementation(FVector Location)
 {
 	if(IsValid(TeleportFX))
@@ -49,7 +56,17 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
 			if(Grapple) Grapple->Destroy();
+			Skill3CD = AttackCooldowns.Skill3;
 		}
+	}
+	
+	if(!IsValid(Claw) && bSpawned && hasDoneCD == false)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Black,"Reset Cooldown SK1");
+		Skill1CD = AttackCooldowns.Skill1;
+		hasDoneCD = true;
+		bDoing = false;
+		bSpawned = false;
 	}
 	
 	if(GrappleOut && Grapple != nullptr)
@@ -65,11 +82,13 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 		if(GrappleOutT < 0)
 		{
 			if(GrappleStart) StopAnimationServer(GrappleStart);
+			if(GrapplePull) StopAnimationServer(GrapplePull);
 			GrappleOut = false;
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
 			if(Grapple) Grapple->Destroy();
+			Skill3CD = AttackCooldowns.Skill3;
 		}
 	}
 	
@@ -106,12 +125,15 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		Claw = nullptr;
 		Mana -= AttackManaConsumption.Skill1;
 		ManaCD = ManaCDOnSkillUse;
+		Skill1CD = AttackCooldowns.Skill1;
+		hasDoneCD = true;
 	}
 	else
 	{
 		if(Skill1CD > 0 || bDoing) return;
 		bDoing = true;
 		CharState = EPlayerStates::E_ABILITY;
+		hasDoneCD = false;
 		
 		//Stop Movement
 		ParentProxy->MoveToLocation(GetActorLocation());
@@ -139,10 +161,10 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 						
 				//Spawn The Actor
 				UGameplayStatics::FinishSpawningActor(Claw, FTransform(LookAtRotation,GetActorLocation()));
+				bSpawned = true;
 			}
 
 			TPDelay = ClawTeleportDelay;
-			Skill1CD = AttackCooldowns.Skill1;
 			Mana -= AttackManaConsumption.Skill1;
 			ManaCD = ManaCDOnSkillUse;
 			GetMovementComponent()->SetActive(true);
@@ -155,6 +177,29 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 	}
 	
 	Super::onSkill1_Implementation(Location, Enemy);
+}
+
+void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
+{
+	//Pre Ability
+	if(Mana < AttackManaConsumption.Skill3 || Skill3CD > 0) return;
+	CharState = EPlayerStates::E_ABILITY;
+
+	SpinActive = true;
+
+	//End Ability
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([&]
+	{
+		SpinActive = false;
+		Skill3CD = AttackCooldowns.Skill3;
+		Mana -= AttackManaConsumption.Skill3;
+		ManaCD = ManaCDOnSkillUse;
+	});
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SpinDuration, false);
+	Super::onSkill2(Location, Enemy);
 }
 
 void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
@@ -187,8 +232,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 		Grapple->FunctionOnOverlap.BindUFunction(this,FName("onGrappleHit"));
 
 		CharState = EPlayerStates::E_ABILITY;
-
-		Skill3CD = AttackCooldowns.Skill3;
+		
 		Mana -= AttackManaConsumption.Skill3;
 		ManaCD = ManaCDOnSkillUse;
 						
