@@ -128,6 +128,7 @@ class ADIAVOLOCharacter : public ACharacter
 public:
 	ADIAVOLOCharacter();
 
+	UPROPERTY()
 	class ACharacterProxy* ParentProxy;
 
 	// Called every frame.

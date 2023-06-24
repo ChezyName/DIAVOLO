@@ -4,6 +4,7 @@
 #include "BaseProjectile.h"
 #include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ABaseProjectile::ABaseProjectile()
@@ -133,6 +134,12 @@ void ABaseProjectile::BeginPlay()
 			break;
 	}
 	Super::BeginPlay();
+}
+
+void ABaseProjectile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ABaseProjectile,ProjectileOwner);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void ABaseProjectile::OnHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor,

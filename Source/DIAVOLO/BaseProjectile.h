@@ -25,7 +25,7 @@ public:
 	// Sets default values for this actor's properties
 	ABaseProjectile();
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly,Replicated)
 	class ADIAVOLOCharacter* ProjectileOwner;
 
 	float InitVelocity;
@@ -47,6 +47,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 	
 	UFUNCTION(Server,Reliable)
 	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
