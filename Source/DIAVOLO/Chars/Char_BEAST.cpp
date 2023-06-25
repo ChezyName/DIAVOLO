@@ -11,12 +11,18 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 AChar_BEAST::AChar_BEAST()
 {
 	SpinHitbox = CreateDefaultSubobject<USphereComponent>("SpinHitbox");
 	SpinHitbox->SetupAttachment(RootComponent);
 	SpinHitbox->InitSphereRadius(250);
+
+	SpinVFX = CreateDefaultSubobject<UStaticMeshComponent>("SpinVFX");
+	SpinVFX->SetupAttachment(RootComponent);
+	SpinVFX->SetCollisionProfileName("NoCollision");
+	SpinVFX->SetIsReplicated(true);
 }
 
 void AChar_BEAST::PlayClawTeleportFX_Implementation(FVector Location)
@@ -27,9 +33,45 @@ void AChar_BEAST::PlayClawTeleportFX_Implementation(FVector Location)
 	}
 }
 
+void AChar_BEAST::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(AChar_BEAST,SpinActive);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void AChar_BEAST::BeginPlay()
+{
+	SpinVFX->SetVisibility(false);
+	Super::BeginPlay();
+}
+
 void AChar_BEAST::Tick(float DeltaSeconds)
 {
 	TPDelay -= DeltaSeconds;
+	WaitMinSpin -= DeltaSeconds;
+
+	SpinVFX->AddLocalRotation(SpinSpeed*DeltaSeconds);
+	SpinVFX->SetVisibility(SpinActive);
+
+	if(StopOnMinSpin && WaitMinSpin < 0) endSkill2();
+
+	if(SpinActive)
+	{
+		//Spinning, Deal Damage
+		DelayPerTickSpin -= DeltaSeconds;
+		if(DelayPerTickSpin < 0)
+		{
+			DelayPerTickSpin = SpinDamageTick;
+			TArray<AActor*> OverlappingActors;
+			SpinHitbox->GetOverlappingActors(OverlappingActors);
+			for (AActor* Actor : OverlappingActors)
+            {
+                // Do something with each overlapping actor
+				AEnemy* myEnemy = Cast<AEnemy>(Actor);
+				if(myEnemy) myEnemy->Damage(SpinDamage);
+            }
+		}
+	}
 
 	if(Grappling && Grapple != nullptr)
 	{
@@ -55,6 +97,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
+			bUsingAbility = false;
 			if(Grapple) Grapple->Destroy();
 			Skill3CD = AttackCooldowns.Skill3;
 		}
@@ -87,6 +130,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
+			bUsingAbility = false;
 			if(Grapple) Grapple->Destroy();
 			Skill3CD = AttackCooldowns.Skill3;
 		}
@@ -133,6 +177,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		if(Skill1CD > 0 || bDoing) return;
 		bDoing = true;
 		CharState = EPlayerStates::E_ABILITY;
+		bUsingAbility = true;
 		hasDoneCD = false;
 		
 		//Stop Movement
@@ -170,6 +215,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 			GetMovementComponent()->SetActive(true);
 			bDoing = false;
 			CharState = EPlayerStates::E_IDLE;
+			bUsingAbility = false;
 		});
 		
 		FTimerHandle TimerHandle;
@@ -182,24 +228,57 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 {
 	//Pre Ability
-	if(Mana < AttackManaConsumption.Skill3 || Skill3CD > 0) return;
+	if(Mana < AttackManaConsumption.Skill2 || Skill2CD > 0) return;
 	CharState = EPlayerStates::E_ABILITY;
+	bUsingAbility = true;
 
+	//Stop Movement
+	ParentProxy->MoveToLocation(GetActorLocation());
 	SpinActive = true;
+	GetMesh()->SetVisibility(false);
+	bEndedEarly = false;
+	StopOnMinSpin = false;
+	WaitMinSpin = MINSpinDuration;
 
 	//End Ability
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindLambda([&]
 	{
+		if(bEndedEarly) return;
+		bEndedEarly = true;
 		SpinActive = false;
-		Skill3CD = AttackCooldowns.Skill3;
-		Mana -= AttackManaConsumption.Skill3;
+		Skill2CD = AttackCooldowns.Skill2;
+		Mana -= AttackManaConsumption.Skill2;
+		CharState = EPlayerStates::E_IDLE;
+		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
+		GetMesh()->SetVisibility(true);
 	});
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SpinDuration, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, MAXSpinDuration, false);
 	Super::onSkill2(Location, Enemy);
+}
+
+void AChar_BEAST::endSkill2()
+{
+	if(bEndedEarly) return;
+	if(WaitMinSpin > 0)
+	{
+		StopOnMinSpin = true;
+	}
+	else
+	{
+		bEndedEarly = true;
+		SpinActive = false;
+		Skill2CD = AttackCooldowns.Skill2;
+		Mana -= AttackManaConsumption.Skill2;
+		CharState = EPlayerStates::E_IDLE;
+		bUsingAbility = false;
+		ManaCD = ManaCDOnSkillUse;
+		GetMesh()->SetVisibility(true);
+	}
+	Super::endSkill2();
 }
 
 void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
@@ -232,6 +311,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 		Grapple->FunctionOnOverlap.BindUFunction(this,FName("onGrappleHit"));
 
 		CharState = EPlayerStates::E_ABILITY;
+		bUsingAbility = true;
 		
 		Mana -= AttackManaConsumption.Skill3;
 		ManaCD = ManaCDOnSkillUse;
@@ -267,5 +347,6 @@ void AChar_BEAST::onGrappleHit(FVector HitImpact, AEnemy* EnemyHit)
 	if(GrapplePull) PlayAnimationServer(GrapplePull);
 	
 	CharState = EPlayerStates::E_ABILITY;
+	bUsingAbility = true;
 	Grapple->EnableProjectileMovement(false);
 };

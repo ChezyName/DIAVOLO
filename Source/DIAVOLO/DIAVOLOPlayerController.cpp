@@ -122,7 +122,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	}
 	
 	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor && GetCharState() != EPlayerStates::E_ABILITY)
+	if (bMoveToMouseCursor && GetProxy() && GetProxy()->Character && !GetProxy()->Character->bUsingAbility)
 	{
 		if(getMousePositionEnemy() != FVector::ZeroVector)
 		{
@@ -182,6 +182,11 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill2",IE_Pressed,this,&ADIAVOLOPlayerController::onSkill2C);
 	InputComponent->BindAction("Skill3",IE_Pressed,this,&ADIAVOLOPlayerController::onSkill3C);
 	InputComponent->BindAction("Ultimate",IE_Pressed,this,&ADIAVOLOPlayerController::onUltimateC);
+
+	InputComponent->BindAction("Skill1",IE_Released,this,&ADIAVOLOPlayerController::endSkill1C);
+	InputComponent->BindAction("Skill2",IE_Released,this,&ADIAVOLOPlayerController::endSkill2C);
+	InputComponent->BindAction("Skill3",IE_Released,this,&ADIAVOLOPlayerController::endSkill3C);
+	InputComponent->BindAction("Ultimate",IE_Released,this,&ADIAVOLOPlayerController::endUltimateC);
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
@@ -301,7 +306,7 @@ void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewS
 
 void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 {
-	if(EnemyAttacking == nullptr || GetProxy()->Character == nullptr) return;
+	if(EnemyAttacking == nullptr || GetProxy()->Character == nullptr || GetProxy()->Character->bUsingAbility) return;
 	//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,GetName() + " USING BASIC ATTACK!");
 
 	//Face Enemy
@@ -345,7 +350,8 @@ void ADIAVOLOPlayerController::onSkill1C_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY) return;
+	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
+		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill1S(Ground,EnemyAttacking);
 }
@@ -353,7 +359,8 @@ void ADIAVOLOPlayerController::onSkill2C_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY) return;
+	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
+		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill2S(Ground,EnemyAttacking);
 }
@@ -361,7 +368,8 @@ void ADIAVOLOPlayerController::onSkill3C_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY) return;
+	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
+		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill3S(Ground,EnemyAttacking);
 }
@@ -369,7 +377,8 @@ void ADIAVOLOPlayerController::onUltimateC_Implementation()
 {
 	FVector Ground = getMousePositionGround();
 	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY) return;
+	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
+		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onUltimateS(Ground,EnemyAttacking);
 }
@@ -393,6 +402,14 @@ void ADIAVOLOPlayerController::onUltimateS_Implementation(FVector MouseLoc,AEnem
 {
 	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onUltimate(MouseLoc,Enemy);
 }
+
+//===========================================================================================
+//                          END ABILITY CLIENT
+
+void ADIAVOLOPlayerController::endSkill1C_Implementation(){ endSkill1(); }
+void ADIAVOLOPlayerController::endSkill2C_Implementation(){ endSkill2(); }
+void ADIAVOLOPlayerController::endSkill3C_Implementation(){ endSkill3(); }
+void ADIAVOLOPlayerController::endUltimateC_Implementation(){ endUltimate(); }
 
 //===========================================================================================
 //                          END ABILITY SERVER

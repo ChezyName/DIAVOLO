@@ -46,10 +46,22 @@ public:
 	USphereComponent* SpinHitbox;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	UStaticMeshComponent* SpinVFX;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	FRotator SpinSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
 	float SpinDamage = 600;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
-	float SpinDuration = 0.25f;
+	float SpinDamageTick = 0.025f;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	float MINSpinDuration = 0.05f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	float MAXSpinDuration = 1.25f;
 
 	// SKILL 3
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
@@ -85,7 +97,12 @@ private:
 	bool bSpawned = false;
 
 	//Skill 2 : W
+	UPROPERTY(Replicated)
 	bool SpinActive = false;
+	bool bEndedEarly = false;
+	float DelayPerTickSpin = 0;
+	float WaitMinSpin = 0;
+	bool StopOnMinSpin = false;
 
 	//Skill 3 : E
 	UPROPERTY()
@@ -101,12 +118,16 @@ private:
 	UFUNCTION(NetMulticast,Reliable)
 	void PlayClawTeleportFX(FVector Location);
 
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
 	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
+	virtual void endSkill2() override;
 	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 	
 	/*
 	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;

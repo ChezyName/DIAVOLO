@@ -76,6 +76,15 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void onUltimateS(FVector MouseLoc,AEnemy* Enemy);
 
+	UFUNCTION(Client,Reliable)
+	void endSkill1C();
+	UFUNCTION(Client,Reliable)
+	void endSkill2C();
+	UFUNCTION(Client,Reliable)
+	void endSkill3C();
+	UFUNCTION(Client,Reliable)
+	void endUltimateC();
+
 	UFUNCTION(Server,Reliable)
 	void endSkill1();
 	UFUNCTION(Server,Reliable)

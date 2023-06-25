@@ -186,6 +186,9 @@ public:
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	bool bUsingAbility = false;
+
 	//ALL ATTACKS
 	UPROPERTY(EditAnywhere,Category="Character Info | Attacks",BlueprintReadOnly)
 	FAutoAttack AutoAttack;

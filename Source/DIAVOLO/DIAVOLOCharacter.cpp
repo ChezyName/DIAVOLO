@@ -187,6 +187,7 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADIAVOLOCharacter,Mana);
 
 	DOREPLIFETIME(ADIAVOLOCharacter,CharState);
+	DOREPLIFETIME(ADIAVOLOCharacter,bUsingAbility);
 	
 	DOREPLIFETIME(ADIAVOLOCharacter,BasicCD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);

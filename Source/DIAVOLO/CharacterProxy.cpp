@@ -98,6 +98,11 @@ void ACharacterProxy::MoveToLocation(const FVector& DestLocation)
 	*
 	*  And thus, we get the illusion of moving with the Player Character
 	*/
+	if(Character->bUsingAbility == true)
+	{
+		PlayerAIController->MoveToLocation(Character->GetActorLocation());
+		return;
+	};
 	PlayerAIController->MoveToLocation(DestLocation);
 }
 
