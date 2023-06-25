@@ -76,7 +76,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 	if(Grappling && Grapple != nullptr)
 	{
 		FVector Direction = (toLoc - GetActorLocation()).GetSafeNormal();
-		FVector Velocity = Direction * GrappleSpeed;
+		FVector Velocity = Direction * (GrapplePullSpeed*100);
 		GetCharacterMovement()->Launch(Velocity);
 
 		DrawDebugDirectionalArrow(GetWorld(),GetActorLocation(),

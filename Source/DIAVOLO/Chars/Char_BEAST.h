@@ -74,7 +74,7 @@ public:
 	float GrappleVelocity = 18;
 	
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
-	float GrappleSpeed = 125;
+	float GrapplePullSpeed = 125;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
 	float GrappleCloseEnough = 64;
