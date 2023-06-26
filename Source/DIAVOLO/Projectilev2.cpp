@@ -33,7 +33,7 @@ AProjectilev2::AProjectilev2()
 	ProjectileMovement->MaxSpeed = 100000000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
-	ProjectileMovement->ProjectileGravityScale = 0.75f;
+	ProjectileMovement->ProjectileGravityScale = 0.f;
 	lastPosition = GetActorLocation();
 
 	// Die after 3 seconds by default

@@ -14,11 +14,11 @@ class ABaseProjectile : public AActor
 	GENERATED_BODY()
 
 	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* CollisionComp;
 
 	/** Projectile movement component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
 	virtual void Tick(float DeltaSeconds) override;
@@ -52,6 +52,8 @@ public:
 	UBoxComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 	
 	class UWeapon* Weapon;
 

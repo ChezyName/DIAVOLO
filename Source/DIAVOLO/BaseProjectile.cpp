@@ -32,7 +32,7 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement->MaxSpeed = 100000000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
-	ProjectileMovement->ProjectileGravityScale = 0.75f;
+	ProjectileMovement->ProjectileGravityScale = 0.f;
 	lastPosition = GetActorLocation();
 
 	// Die after 3 seconds by default
@@ -51,6 +51,7 @@ void ABaseProjectile::BeginPlay()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	//Bloom
+	CollisionComp->IgnoreActorWhenMoving(ProjectileOwner,true);
 	ProjectileMovement->Velocity = GetActorForwardVector() * (InitVelocity*100);
 	lastPosition = GetActorLocation();
 	startingPosition = lastPosition;
@@ -75,7 +76,9 @@ void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	if(OtherActor->GetClass() == ADIAVOLOCharacter::StaticClass()) return;
 
 	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(7,7,7),FColor::Cyan,false,5);
-
+	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,
+		OtherActor->GetName() + " // " + ProjectileOwner->GetName());
+	
 	AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
 	if(HitEnemy) OnHitEnemy(HitEnemy);
 	//else OnHitWall();
