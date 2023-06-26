@@ -16,7 +16,7 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp->SetGenerateOverlapEvents(true);
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);// set up a notification for when this component hits something blocking
 
-	PrimaryActorTick.bStartWithTickEnabled = false;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 	
 	// Players can't walk on it
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));

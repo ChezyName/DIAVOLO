@@ -61,7 +61,7 @@ public:
 	
 	void OnHitEnemy(class AEnemy* EnemyHit);
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,EditAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class ADIAVOLOCharacter* ProjectileOwner;
 
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (AllowPrivateAccess = "true"))
