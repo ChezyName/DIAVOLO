@@ -70,15 +70,21 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 		DelayPerTickSpin -= DeltaSeconds;
 		if(DelayPerTickSpin < 0)
 		{
-			DelayPerTickSpin = SpinDamageTick;
-			TArray<AActor*> OverlappingActors;
-			SpinHitbox->GetOverlappingActors(OverlappingActors);
-			for (AActor* Actor : OverlappingActors)
-            {
-                // Do something with each overlapping actor
-				AEnemy* myEnemy = Cast<AEnemy>(Actor);
-				if(myEnemy) myEnemy->Damage(SpinDamage);
-            }
+			if(Mana >= AttackManaConsumption.Skill2)
+			{
+				Mana -= AttackManaConsumption.Skill2;
+				ManaCD = ManaCDOnSkillUse;
+				DelayPerTickSpin = SpinDamageTick;
+				TArray<AActor*> OverlappingActors;
+				SpinHitbox->GetOverlappingActors(OverlappingActors);
+				for (AActor* Actor : OverlappingActors)
+				{
+					// Do something with each overlapping actor
+					AEnemy* myEnemy = Cast<AEnemy>(Actor);
+					if(myEnemy) myEnemy->Damage(SpinDamage);
+				}
+			}
+			else endSkill2();
 		}
 	}
 

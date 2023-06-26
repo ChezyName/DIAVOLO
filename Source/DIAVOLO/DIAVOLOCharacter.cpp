@@ -72,7 +72,11 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 		Skill3CD -= DeltaSeconds;
 		UltimateCD -= DeltaSeconds;
 		ManaCD -= DeltaSeconds;
-		if(ManaCD < 0 && Mana < MaxMana) Mana += AttackManaConsumption.ManaRechargeRate * DeltaSeconds;
+		if(ManaCD < 0 && Mana < MaxMana)
+		{
+			Mana += FMath::Max(AttackManaConsumption.ManaRechargeRate * (1-(Mana/MaxMana)) * 2,
+				AttackManaConsumption.ManaRechargeRate) * DeltaSeconds;
+		}
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Mana: " +
 			FString::SanitizeFloat(Mana) + ". CD: " + FString::SanitizeFloat(ManaCD));
 	}
