@@ -50,6 +50,9 @@ public:
 	UStaticMeshComponent* SpinVFX;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	UStaticMeshComponent* SpinVFX2;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
 	FRotator SpinSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")

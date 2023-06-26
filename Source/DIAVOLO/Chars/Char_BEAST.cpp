@@ -23,6 +23,11 @@ AChar_BEAST::AChar_BEAST()
 	SpinVFX->SetupAttachment(RootComponent);
 	SpinVFX->SetCollisionProfileName("NoCollision");
 	SpinVFX->SetIsReplicated(true);
+
+	SpinVFX2 = CreateDefaultSubobject<UStaticMeshComponent>("SpinVFX2");
+	SpinVFX2->SetupAttachment(RootComponent);
+	SpinVFX2->SetCollisionProfileName("NoCollision");
+	SpinVFX2->SetIsReplicated(true);
 }
 
 void AChar_BEAST::PlayClawTeleportFX_Implementation(FVector Location)
@@ -42,6 +47,7 @@ void AChar_BEAST::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 void AChar_BEAST::BeginPlay()
 {
 	SpinVFX->SetVisibility(false);
+	SpinVFX2->SetVisibility(false);
 	Super::BeginPlay();
 }
 
@@ -52,6 +58,9 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 
 	SpinVFX->AddLocalRotation(SpinSpeed*DeltaSeconds);
 	SpinVFX->SetVisibility(SpinActive);
+
+	SpinVFX2->AddLocalRotation(SpinSpeed*(-DeltaSeconds));
+	SpinVFX2->SetVisibility(SpinActive);
 
 	if(StopOnMinSpin && WaitMinSpin < 0) endSkill2();
 
