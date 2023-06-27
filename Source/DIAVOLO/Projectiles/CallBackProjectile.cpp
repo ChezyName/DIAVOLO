@@ -4,8 +4,13 @@
 #include "CallBackProjectile.h"
 #include "DIAVOLO/DIAVOLOCharacter.h"
 
+void ACallBackProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	FunctionOnDestroy.ExecuteIfBound();
+}
+
 void ACallBackProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(!HasAuthority()) return;
 	if(OtherActor == ProjectileOwner) return;

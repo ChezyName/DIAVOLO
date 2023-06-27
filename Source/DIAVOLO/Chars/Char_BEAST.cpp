@@ -118,15 +118,6 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 		}
 	}
 	
-	if(!IsValid(Claw) && bSpawned && hasDoneCD == false)
-	{
-		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Black,"Reset Cooldown SK1");
-		Skill1CD = AttackCooldowns.Skill1;
-		hasDoneCD = true;
-		bDoing = false;
-		bSpawned = false;
-	}
-	
 	if(GrappleOut && Grapple != nullptr)
 	{
 		GrappleOutT -= DeltaSeconds;
@@ -184,7 +175,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		Claw = nullptr;
 		Mana -= AttackManaConsumption.Skill1;
 		ManaCD = ManaCDOnSkillUse;
-		Skill1CD = AttackCooldowns.Skill1;
+		//Skill1CD = AttackCooldowns.Skill1;
 		hasDoneCD = true;
 	}
 	else
@@ -210,7 +201,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 			bSwapped = false;
 		
 			//Create Projectile Facing Enemy
-			Claw = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,ClawProjectile,FTransform(LookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			Claw = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,ClawProjectile,FTransform(LookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 			if(Claw != nullptr)
 			{
 				//Finalizing Create Projecitle
@@ -218,6 +209,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 				Claw->InitVelocity = ClawVelocity;
 				Claw->Damage = ClawDamage * DamageMultiplier;
 				Claw->SetOwner(this);
+				Claw->FunctionOnDestroy.BindUFunction(this,FName("EndGrappleCallback"));
 						
 				//Spawn The Actor
 				UGameplayStatics::FinishSpawningActor(Claw, FTransform(LookAtRotation,GetActorLocation()));
@@ -238,6 +230,18 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 	}
 	
 	Super::onSkill1_Implementation(Location, Enemy);
+}
+
+void AChar_BEAST::EndGrappleCallback()
+{
+	if(bSpawned && hasDoneCD == false)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Black,"Reset Cooldown SK1");
+		Skill1CD = AttackCooldowns.Skill1 + 5;
+		hasDoneCD = true;
+		bDoing = false;
+		bSpawned = false;
+	}
 }
 
 void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)

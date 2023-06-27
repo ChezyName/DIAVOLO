@@ -22,7 +22,7 @@ public:
 	
 	// SKILL 1
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
-	TSubclassOf<class ABaseProjectile> ClawProjectile;
+	TSubclassOf<class ACallBackProjectile> ClawProjectile;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] Claw // Teleport")
 	UAnimMontage* ClawAnimation;
@@ -92,13 +92,15 @@ public:
 private:
 	//Skill 1 : Q
 	UPROPERTY()
-	ABaseProjectile* Claw = nullptr;
+	ACallBackProjectile* Claw = nullptr;
 	bool bSwapped = false;
 	bool bDoing = false;
 	float TPDelay = 0;
 	FRotator LookAtRotation;
 	bool hasDoneCD = true;
 	bool bSpawned = false;
+	UFUNCTION()
+	void EndGrappleCallback();
 
 	//Skill 2 : W
 	UPROPERTY(Replicated)
