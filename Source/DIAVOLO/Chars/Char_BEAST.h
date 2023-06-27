@@ -88,6 +88,28 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Grapple")
 	UAnimMontage* GrapplePull;
+
+	//Skill 4 : R (Ultimate)
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	float UltRadius = 300;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	FRotator UltSpinSpeed = FRotator(0,80,0);
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	FRotator UltRazorSpinSpeed = FRotator(0,800,0);
+	
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	USceneComponent* UltSpinParent;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	UStaticMeshComponent* UltRazor1;
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	UStaticMeshComponent* UltRazor2;
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	UStaticMeshComponent* UltRazor3;
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	UStaticMeshComponent* UltRazor4;
 	
 private:
 	//Skill 1 : Q
@@ -101,6 +123,8 @@ private:
 	bool bSpawned = false;
 	UFUNCTION()
 	void EndGrappleCallback();
+	UFUNCTION(NetMulticast,Reliable)
+	void PlayClawTeleportFX(FVector Location);
 
 	//Skill 2 : W
 	UPROPERTY(Replicated)
@@ -117,15 +141,17 @@ private:
 	void onGrappleHit(FVector HitImpact, AEnemy* EnemyHit);
 	bool Grappling = false;
 	FVector toLoc = FVector::ZeroVector;
-	
 	float GrappleOutT = 0;
 	bool GrappleOut = false;
 
-	UFUNCTION(NetMulticast,Reliable)
-	void PlayClawTeleportFX(FVector Location);
-
+	//Skill 4 : R (ULTIMATE)
+	UFUNCTION(Server,Reliable)
+	void ChangeRazorLocation();
+	
+	// Other Funcs
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
@@ -134,6 +160,9 @@ protected:
 	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
+
+	UFUNCTION()
+	virtual void UltimateOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	/*
 	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
