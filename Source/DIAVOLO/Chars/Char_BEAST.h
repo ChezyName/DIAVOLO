@@ -94,13 +94,22 @@ public:
 	float UltRadius = 300;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	float UltDamage = 120;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	float DamageTick = 0.1;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	float UltLength = 12;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	FRotator UltSpinSpeed = FRotator(0,80,0);
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	FRotator UltRazorSpinSpeed = FRotator(0,800,0);
-	
-	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
-	USceneComponent* UltSpinParent;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors", meta=(AllowPrivateAccess=true))
+	USceneComponent* RazorParent;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	UStaticMeshComponent* UltRazor1;
@@ -147,6 +156,10 @@ private:
 	//Skill 4 : R (ULTIMATE)
 	UFUNCTION(Server,Reliable)
 	void ChangeRazorLocation();
+	void CheckCollisions();
+	UPROPERTY(Replicated)
+	bool RazorsActive = false;
+	float UltTick = 0;
 	
 	// Other Funcs
 	virtual void BeginPlay() override;
@@ -158,11 +171,9 @@ protected:
 	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
 	virtual void endSkill2() override;
 	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
+	virtual void onUltimate(FVector Location, AEnemy* Enemy) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
-
-	UFUNCTION()
-	virtual void UltimateOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	/*
 	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;

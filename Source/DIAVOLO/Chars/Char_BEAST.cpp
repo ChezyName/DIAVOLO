@@ -30,28 +30,37 @@ AChar_BEAST::AChar_BEAST()
 	SpinVFX2->SetIsReplicated(true);
 
 	//Ultimate Creations
-	UltSpinParent = CreateDefaultSubobject<USceneComponent>("UltParent");
-	UltSpinParent->SetupAttachment(RootComponent);
+	RazorParent = CreateDefaultSubobject<USceneComponent>("UltRazorsParent");
+	RazorParent->SetupAttachment(RootComponent);
+	RazorParent->SetIsReplicated(true);
+	RazorParent->SetMobility(EComponentMobility::Movable);
+	RazorParent->SetUsingAbsoluteRotation(true);
 
 	//Children
 	UltRazor1 = CreateDefaultSubobject<UStaticMeshComponent>("Razor 1");
-	UltRazor1->SetupAttachment(UltSpinParent);
+	UltRazor1->SetupAttachment(RazorParent);
 
 	UltRazor2 = CreateDefaultSubobject<UStaticMeshComponent>("Razor 2");
-	UltRazor2->SetupAttachment(UltSpinParent);
+	UltRazor2->SetupAttachment(RazorParent);
 
 	UltRazor3 = CreateDefaultSubobject<UStaticMeshComponent>("Razor 3");
-	UltRazor3->SetupAttachment(UltSpinParent);
+	UltRazor3->SetupAttachment(RazorParent);
 
 	UltRazor4 = CreateDefaultSubobject<UStaticMeshComponent>("Razor 4");
-	UltRazor4->SetupAttachment(UltSpinParent);
+	UltRazor4->SetupAttachment(RazorParent);
+
+	UltRazor1->SetUsingAbsoluteRotation(true);
+	UltRazor2->SetUsingAbsoluteRotation(true);
+	UltRazor3->SetUsingAbsoluteRotation(true);
+	UltRazor4->SetUsingAbsoluteRotation(true);
 
 	//Collision (CHILDREN)
 	UltRazor1->SetCollisionProfileName("OverlapAll");
 	UltRazor2->SetCollisionProfileName("OverlapAll");
 	UltRazor3->SetCollisionProfileName("OverlapAll");
 	UltRazor4->SetCollisionProfileName("OverlapAll");
-	
+
+	/*
 	UltRazor1->SetGenerateOverlapEvents(true);
 	UltRazor1->OnComponentBeginOverlap.AddDynamic(this, &AChar_BEAST::UltimateOverlap);
 	UltRazor2->SetGenerateOverlapEvents(true);
@@ -60,6 +69,7 @@ AChar_BEAST::AChar_BEAST()
 	UltRazor3->OnComponentBeginOverlap.AddDynamic(this, &AChar_BEAST::UltimateOverlap);
 	UltRazor4->SetGenerateOverlapEvents(true);
 	UltRazor4->OnComponentBeginOverlap.AddDynamic(this, &AChar_BEAST::UltimateOverlap);
+	*/
 
 	ChangeRazorLocation();
 }
@@ -83,6 +93,7 @@ void AChar_BEAST::PlayClawTeleportFX_Implementation(FVector Location)
 void AChar_BEAST::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(AChar_BEAST,SpinActive);
+	DOREPLIFETIME(AChar_BEAST,RazorsActive);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
@@ -90,6 +101,33 @@ void AChar_BEAST::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 {
 	ChangeRazorLocation();
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+void AChar_BEAST::CheckCollisions()
+{
+	if(!HasAuthority() || !RazorsActive || UltTick > 0) return;
+	UltTick = DamageTick;
+	
+	TArray<AActor*> OverlappingActors1;
+	TArray<AActor*> OverlappingActors2;
+	TArray<AActor*> OverlappingActors3;
+	TArray<AActor*> OverlappingActors4;
+	UltRazor1->GetOverlappingActors(OverlappingActors1);
+	UltRazor2->GetOverlappingActors(OverlappingActors2);
+	UltRazor3->GetOverlappingActors(OverlappingActors3);
+	UltRazor4->GetOverlappingActors(OverlappingActors4);
+
+	TArray<AActor*> CombinedArray;
+	CombinedArray.Append(OverlappingActors1);
+	CombinedArray.Append(OverlappingActors2);
+	CombinedArray.Append(OverlappingActors3);
+	CombinedArray.Append(OverlappingActors4);
+	for (AActor* Actor : CombinedArray)
+	{
+		// Do something with each overlapping actor
+		AEnemy* myEnemy = Cast<AEnemy>(Actor);
+		if(myEnemy) myEnemy->Damage(UltDamage);
+	}
 }
 
 void AChar_BEAST::BeginPlay()
@@ -103,12 +141,20 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 {
 	TPDelay -= DeltaSeconds;
 	WaitMinSpin -= DeltaSeconds;
-
-	UltSpinParent->AddLocalRotation(UltSpinSpeed*DeltaSeconds);
+	UltTick -= DeltaSeconds;
+	
+	RazorParent->AddLocalRotation(UltSpinSpeed*DeltaSeconds);
 	UltRazor1->AddLocalRotation(UltRazorSpinSpeed*DeltaSeconds);
 	UltRazor2->AddLocalRotation(UltRazorSpinSpeed*DeltaSeconds);
 	UltRazor3->AddLocalRotation(UltRazorSpinSpeed*DeltaSeconds);
 	UltRazor4->AddLocalRotation(UltRazorSpinSpeed*DeltaSeconds);
+
+	UltRazor1->SetVisibility(RazorsActive);
+	UltRazor2->SetVisibility(RazorsActive);
+	UltRazor3->SetVisibility(RazorsActive);
+	UltRazor4->SetVisibility(RazorsActive);
+	
+	CheckCollisions();
 
 	SpinVFX->AddLocalRotation(SpinSpeed*DeltaSeconds);
 	SpinVFX->SetVisibility(SpinActive);
@@ -424,10 +470,31 @@ void AChar_BEAST::onGrappleHit(FVector HitImpact, AEnemy* EnemyHit)
 	Grapple->EnableProjectileMovement(false);
 };
 
-
-void AChar_BEAST::UltimateOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 {
-	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(8,8,8),FColor::Black,
-		0,60,0,4);
+	if(RazorsActive)
+	{
+		RazorsActive = false;
+		UltimateCD = AttackCooldowns.Ultimate;
+		return;	
+	}
+	if(Mana < AttackManaConsumption.Ultimate || UltimateCD > 0 || RazorsActive) return;
+	RazorsActive = true;
+	Mana -= AttackManaConsumption.Ultimate;
+	ManaCD = ManaCDOnSkillUse;
+
+	//Force End
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([&]
+	{
+		if(RazorsActive)
+		{
+			RazorsActive = false;
+			UltimateCD = AttackCooldowns.Ultimate;
+		}
+	});
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, UltLength, false);
+	Super::onUltimate(Location, Enemy);
 }
