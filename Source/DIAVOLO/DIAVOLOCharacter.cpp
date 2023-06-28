@@ -97,6 +97,11 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
+void ADIAVOLOCharacter::PlaySound_Implementation(USoundWave* SFX)
+{
+	UGameplayStatics::PlaySound2D(GetWorld(),SFX);
+}
+
 void ADIAVOLOCharacter::ServerSetState_Implementation(EPlayerStates State)
 {
 	CharState = State;

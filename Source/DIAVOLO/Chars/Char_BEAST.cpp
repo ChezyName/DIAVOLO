@@ -484,6 +484,14 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 	Mana -= AttackManaConsumption.Ultimate;
 	ManaCD = ManaCDOnSkillUse;
 
+	//Play Random SFX
+	if(VoiceLinesSFXs.Num() > 0)
+	{
+		USoundWave* SoundToPlay = VoiceLinesSFXs[FMath::RandRange(0,VoiceLinesSFXs.Num()-1)];
+		PlaySound(SoundToPlay);
+	}
+	
+
 	//Force End
 	FTimerDelegate TimerDelegate;
 	TimerDelegate.BindLambda([&]

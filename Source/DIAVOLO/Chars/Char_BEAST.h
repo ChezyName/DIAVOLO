@@ -102,6 +102,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	float UltLength = 12;
 
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	TArray<USoundWave*> VoiceLinesSFXs;
+
 	//UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	//int UltManaGetback = 25;
 
