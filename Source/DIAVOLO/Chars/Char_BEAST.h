@@ -102,6 +102,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	float UltLength = 12;
 
+	//UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
+	//int UltManaGetback = 25;
+
 	UPROPERTY(EditAnywhere, Category = "Character Info | [R] Summon: Razors")
 	FRotator UltSpinSpeed = FRotator(0,80,0);
 

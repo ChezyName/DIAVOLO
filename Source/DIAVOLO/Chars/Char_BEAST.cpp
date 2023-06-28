@@ -127,6 +127,7 @@ void AChar_BEAST::CheckCollisions()
 		// Do something with each overlapping actor
 		AEnemy* myEnemy = Cast<AEnemy>(Actor);
 		if(myEnemy) myEnemy->Damage(UltDamage);
+		//if(Mana < MaxMana) Mana = FMath::Min(Mana + UltManaGetback,MaxMana);
 	}
 }
 

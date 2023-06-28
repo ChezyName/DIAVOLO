@@ -112,7 +112,7 @@ UCLASS(Blueprintable)
 class ADIAVOLOCharacter : public ACharacter
 {
 	GENERATED_BODY()
-	
+public:
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
 	float ZoomSpeed = 50;
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
@@ -124,8 +124,7 @@ class ADIAVOLOCharacter : public ACharacter
 	float MaxHealth = 1500;
 	UPROPERTY(EditAnywhere,Category="Character Info | Health // Mana ")
 	float MaxMana = 800;
-
-public:
+	
 	ADIAVOLOCharacter();
 
 	UPROPERTY()
