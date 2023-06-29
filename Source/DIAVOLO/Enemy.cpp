@@ -2,8 +2,7 @@
 
 
 #include "Enemy.h"
-
-#include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -11,31 +10,25 @@ AEnemy::AEnemy()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	/*
 	MouseOver = CreateDefaultSubobject<UCapsuleComponent>("MouseOver");
 	MouseOver->SetCapsuleSize(75,125);
 	MouseOver->SetupAttachment(RootComponent);
 	MouseOver->SetCollisionProfileName("Enemy");
+	*/
+}
+
+void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(AEnemy,Health);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AEnemy::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	Health = MaxHealth;
 }
 
 void AEnemy::Damage_Implementation(float DamageAmount)

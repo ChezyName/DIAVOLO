@@ -173,7 +173,9 @@ private:
 	// Other Funcs
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 	
 protected:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;

@@ -96,12 +96,13 @@ void AChar_BEAST::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(AChar_BEAST,RazorsActive);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
-
+#if WITH_EDITOR
 void AChar_BEAST::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	ChangeRazorLocation();
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+#endif
 
 void AChar_BEAST::CheckCollisions()
 {

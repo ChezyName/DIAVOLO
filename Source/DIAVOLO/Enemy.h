@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
@@ -19,19 +19,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditDefaultsOnly,Category="Enemy",meta = (AllowPrivateAccess = "true"))
-	float Health = 100;
+	UPROPERTY(Replicated)
+	float Health;
 
-	UPROPERTY(EditAnywhere)
-	UCapsuleComponent* MouseOver;
+	UPROPERTY(EditDefaultsOnly,Category="Enemy",meta = (AllowPrivateAccess = "true"))
+	float MaxHealth = 10000;
+
+	//UPROPERTY(EditAnywhere)
+	//UCapsuleComponent* MouseOver;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	UFUNCTION(Server,Reliable)
 	void Damage(float DamageAmount);
 };
