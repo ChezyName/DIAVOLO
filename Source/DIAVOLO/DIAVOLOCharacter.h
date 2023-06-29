@@ -168,7 +168,10 @@ public:
 	void MoveToRange(FVector Position,float Range);
 
 	UFUNCTION(NetMulticast,Reliable)
-	void PlaySound(USoundWave* SFX);
+	void PlaySound(const TArray<USoundWave*>& SFXs);
+
+	UFUNCTION(NetMulticast,Reliable)
+	void PlaySoundSingle(USoundWave* SFX);
 
 	UFUNCTION(Server,Reliable)
 	void ServerSetState(EPlayerStates State);

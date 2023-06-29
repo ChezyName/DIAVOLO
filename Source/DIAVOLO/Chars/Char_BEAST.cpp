@@ -485,11 +485,8 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 	ManaCD = ManaCDOnSkillUse;
 
 	//Play Random SFX
-	if(VoiceLinesSFXs.Num() > 0)
-	{
-		USoundWave* SoundToPlay = VoiceLinesSFXs[FMath::RandRange(0,VoiceLinesSFXs.Num()-1)];
-		PlaySound(SoundToPlay);
-	}
+	PlaySound(UltVoiceLines);
+	PlaySoundSingle(UltSFX);
 	
 
 	//Force End

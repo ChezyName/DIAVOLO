@@ -97,10 +97,19 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
-void ADIAVOLOCharacter::PlaySound_Implementation(USoundWave* SFX)
+void ADIAVOLOCharacter::PlaySoundSingle_Implementation(USoundWave* SFX)
 {
 	UGameplayStatics::PlaySound2D(GetWorld(),SFX);
 }
+void ADIAVOLOCharacter::PlaySound_Implementation(const TArray<USoundWave*>& SFXs)
+{
+	if(SFXs.Num() > 0)
+	{
+		USoundWave* RandomSound = SFXs[
+			FMath::RandRange(0,SFXs.Num() - 1)];
+		UGameplayStatics::PlaySound2D(GetWorld(),RandomSound);
+	}
+} 
 
 void ADIAVOLOCharacter::ServerSetState_Implementation(EPlayerStates State)
 {
