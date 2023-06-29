@@ -17,8 +17,7 @@ void ADIAVOLOGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	//Start Dungeon Generation Using SEED
-	GenerateDungeon();
-
+	//GenerateDungeon()
 }
 
 void ADIAVOLOGameMode::GenerateDungeon()
