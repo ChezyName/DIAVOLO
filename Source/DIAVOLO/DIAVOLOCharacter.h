@@ -156,6 +156,15 @@ public:
 	float UltimateCD = 0;
 	
 	UPROPERTY(Replicated,BlueprintReadOnly)
+	bool Skill1Active = false;
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	bool Skill2Active = false;
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	bool Skill3Active = false;
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	bool UltimateActive = false;
+	
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Health = 0;
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Mana = 0;

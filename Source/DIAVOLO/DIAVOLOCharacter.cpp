@@ -212,6 +212,11 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill2CD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill3CD);
 	DOREPLIFETIME(ADIAVOLOCharacter,UltimateCD);
+
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill1Active);
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill2Active);
+	DOREPLIFETIME(ADIAVOLOCharacter,Skill3Active);
+	DOREPLIFETIME(ADIAVOLOCharacter,UltimateActive);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 

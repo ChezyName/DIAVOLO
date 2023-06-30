@@ -217,6 +217,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			bUsingAbility = false;
 			if(Grapple) Grapple->Destroy();
 			Skill3CD = AttackCooldowns.Skill3;
+			Skill3Active = false;
 		}
 	}
 	
@@ -241,6 +242,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			bUsingAbility = false;
 			if(Grapple) Grapple->Destroy();
 			Skill3CD = AttackCooldowns.Skill3;
+			Skill3Active = false;
 		}
 	}
 	
@@ -287,6 +289,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		CharState = EPlayerStates::E_ABILITY;
 		bUsingAbility = true;
 		hasDoneCD = false;
+		Skill1Active = true;
 		
 		//Stop Movement
 		ParentProxy->MoveToLocation(GetActorLocation());
@@ -339,10 +342,11 @@ void AChar_BEAST::EndGrappleCallback()
 	if(bSpawned && hasDoneCD == false)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Black,"Reset Cooldown SK1");
-		Skill1CD = AttackCooldowns.Skill1 + 5;
+		Skill1CD = AttackCooldowns.Skill1;
 		hasDoneCD = true;
 		bDoing = false;
 		bSpawned = false;
+		Skill1Active = false;
 	}
 }
 
@@ -352,6 +356,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 	if(Mana < AttackManaConsumption.Skill2 || Skill2CD > 0) return;
 	CharState = EPlayerStates::E_ABILITY;
 	bUsingAbility = true;
+	Skill2Active = true;
 
 	//Stop Movement
 	ParentProxy->MoveToLocation(GetActorLocation());
@@ -369,6 +374,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 		bEndedEarly = true;
 		SpinActive = false;
 		Skill2CD = AttackCooldowns.Skill2;
+		Skill2Active = false;
 		Mana -= AttackManaConsumption.Skill2;
 		CharState = EPlayerStates::E_IDLE;
 		bUsingAbility = false;
@@ -393,6 +399,7 @@ void AChar_BEAST::endSkill2()
 		bEndedEarly = true;
 		SpinActive = false;
 		Skill2CD = AttackCooldowns.Skill2;
+		Skill2Active = false;
 		Mana -= AttackManaConsumption.Skill2;
 		CharState = EPlayerStates::E_IDLE;
 		bUsingAbility = false;
@@ -418,6 +425,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 	if(Grapple != nullptr)
 	{
 		if(GrappleStart) PlayAnimationServer(GrappleStart);
+		Skill3Active = true;
 		
 		//Finalizing Create Projecitle
 		Grapple->ProjectileOwner = this;
@@ -478,6 +486,7 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 	{
 		RazorsActive = false;
 		UltimateCD = AttackCooldowns.Ultimate;
+		UltimateActive = false;
 		return;	
 	}
 	if(Mana < AttackManaConsumption.Ultimate || UltimateCD > 0 || RazorsActive) return;
@@ -488,7 +497,7 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 	//Play Random SFX
 	PlaySound(UltVoiceLines);
 	PlaySoundSingle(UltSFX);
-	
+	UltimateActive = true;
 
 	//Force End
 	FTimerDelegate TimerDelegate;
@@ -498,6 +507,7 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 		{
 			RazorsActive = false;
 			UltimateCD = AttackCooldowns.Ultimate;
+			UltimateActive = false;
 		}
 	});
 
