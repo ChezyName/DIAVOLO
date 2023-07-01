@@ -186,15 +186,12 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;
 	
-	/*
-	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
-	
-	virtual void onUltimate(FVector Location, AEnemy* Enemy) override;
+	//SFXs
+	UPROPERTY(EditAnywhere, Category = "Character Info | SFXs")
+	USceneComponent* SFXs;
+	UPROPERTY(EditAnywhere, Category = "Character Info | SFXs")
+	UAudioComponent* RazorSFX;
 
-
-	virtual void endSkill1() override;
-	virtual void endSkill2() override;
-	virtual void endSkill3() override;
-	virtual void endUltimate() override;
-	*/
+	UFUNCTION(NetMulticast,Reliable)
+	void StopPlayRazor(bool Play);
 };

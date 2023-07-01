@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "NiagaraFunctionLibrary.h"
 #include "PhysXInterfaceWrapperCore.h"
+#include "Components/AudioComponent.h"
 #include "DIAVOLO/CharacterProxy.h"
 #include "DIAVOLO/Projectiles/CallBackProjectile.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -60,6 +61,14 @@ AChar_BEAST::AChar_BEAST()
 	UltRazor3->SetCollisionProfileName("OverlapAll");
 	UltRazor4->SetCollisionProfileName("OverlapAll");
 
+	//SFXs
+	SFXs = CreateDefaultSubobject<USceneComponent>("SoundEffects");
+	SFXs->SetupAttachment(RootComponent);
+
+	RazorSFX = CreateDefaultSubobject<UAudioComponent>("Razor Sound");
+	RazorSFX->SetIsReplicated(true);
+	RazorSFX->SetupAttachment(SFXs);
+
 	/*
 	UltRazor1->SetGenerateOverlapEvents(true);
 	UltRazor1->OnComponentBeginOverlap.AddDynamic(this, &AChar_BEAST::UltimateOverlap);
@@ -96,6 +105,7 @@ void AChar_BEAST::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(AChar_BEAST,RazorsActive);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
+
 #if WITH_EDITOR
 void AChar_BEAST::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
@@ -365,6 +375,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 	bEndedEarly = false;
 	StopOnMinSpin = false;
 	WaitMinSpin = MINSpinDuration;
+	StopPlayRazor(true);
 
 	//End Ability
 	FTimerDelegate TimerDelegate;
@@ -380,6 +391,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
 		GetMesh()->SetVisibility(true);
+		StopPlayRazor(false);
 	});
 
 	FTimerHandle TimerHandle;
@@ -405,6 +417,7 @@ void AChar_BEAST::endSkill2()
 		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
 		GetMesh()->SetVisibility(true);
+		StopPlayRazor(false);
 	}
 	Super::endSkill2();
 }
@@ -514,4 +527,10 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, UltLength, false);
 	Super::onUltimate(Location, Enemy);
+}
+
+void AChar_BEAST::StopPlayRazor_Implementation(bool Play)
+{
+	if(Play) RazorSFX->Play();
+	else RazorSFX->Stop();
 }
