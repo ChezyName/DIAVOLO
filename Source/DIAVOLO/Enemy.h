@@ -25,8 +25,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category="Enemy",meta = (AllowPrivateAccess = "true"))
 	float MaxHealth = 10000;
 
-	//UPROPERTY(EditAnywhere)
-	//UCapsuleComponent* MouseOver;
+	UPROPERTY(EditAnywhere)
+	UCapsuleComponent* MouseOver;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 	

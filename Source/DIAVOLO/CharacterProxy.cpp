@@ -106,6 +106,18 @@ void ACharacterProxy::MoveToLocation(const FVector& DestLocation)
 	PlayerAIController->MoveToLocation(DestLocation);
 }
 
+void ACharacterProxy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("Zoom",this,&ACharacterProxy::ZoomCamera);
+}
+
+void ACharacterProxy::ZoomCamera(float Speed)
+{
+	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - (Speed*ZoomSpeed),ZoomMin,ZoomMax);
+}
+
 void ACharacterProxy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

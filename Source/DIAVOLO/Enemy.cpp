@@ -9,13 +9,11 @@ AEnemy::AEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	/*
+	
 	MouseOver = CreateDefaultSubobject<UCapsuleComponent>("MouseOver");
 	MouseOver->SetCapsuleSize(75,125);
 	MouseOver->SetupAttachment(RootComponent);
-	MouseOver->SetCollisionProfileName("Enemy");
-	*/
+	MouseOver->SetCollisionProfileName("Enemy"); 
 }
 
 void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

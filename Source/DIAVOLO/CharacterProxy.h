@@ -15,6 +15,13 @@ class ACharacterProxy : public APawn
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere,Category="CameraZoom")
+	float ZoomSpeed = 50;
+	UPROPERTY(EditAnywhere,Category="CameraZoom")
+	float ZoomMin = 500;
+	UPROPERTY(EditAnywhere,Category="CameraZoom")
+	float ZoomMax = 800;
+	
 	// Sets default values for this character's properties
 	ACharacterProxy(const FObjectInitializer& ObjectInitializer);
 
@@ -32,6 +39,10 @@ public:
 protected:
 	// AIController we will use
 	class AAIController* PlayerAIController;
+
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	void ZoomCamera(float Speed);
 
 	UFUNCTION(Server,Reliable)
 	void onStartSetChar();
