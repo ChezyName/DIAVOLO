@@ -134,6 +134,12 @@ public:
 	void StartEmote();
 	UFUNCTION(Server,Reliable)
 	void StopEmote();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void startEmoteSound();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void stopEmoteSound();
 	
 	ADIAVOLOCharacter();
 

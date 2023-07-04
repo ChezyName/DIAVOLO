@@ -100,7 +100,7 @@ protected:
 	void startEmoteS();
 	UFUNCTION(Reliable,Client)
 	void endEmoteC();
-	UFUNCTION(Reliable,Client)
+	UFUNCTION(Reliable,Server)
 	void endEmoteS();
 	
 

@@ -17,6 +17,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
+
 ADIAVOLOCharacter::ADIAVOLOCharacter()
 {
 	// Set size for player capsule
@@ -241,11 +242,22 @@ void ADIAVOLOCharacter::ZoomCamera(float Speed)
 
 void ADIAVOLOCharacter::StartEmote_Implementation()
 {
-	EmotePlayer->Play();
+	startEmoteSound();
 	PlayAnimationServer(Emote);
 }
 void ADIAVOLOCharacter::StopEmote_Implementation()
 {
-	EmotePlayer->Stop();
+	stopEmoteSound();
 	StopAnimationServer(Emote);
+}
+
+void ADIAVOLOCharacter::startEmoteSound_Implementation()
+{
+	EmotePlayer->Play();
+}
+
+
+void ADIAVOLOCharacter::stopEmoteSound_Implementation()
+{
+	EmotePlayer->Stop();
 }

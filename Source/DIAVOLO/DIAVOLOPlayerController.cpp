@@ -269,6 +269,7 @@ void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVecto
 		{
 			newMoveToLocation = DestLocation;
 			GetProxy()->MoveToLocation(DestLocation);
+			endEmoteS();
 		}
 	}
 }
