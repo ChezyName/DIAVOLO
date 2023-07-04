@@ -94,6 +94,16 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void endUltimate();
 
+	UFUNCTION(Reliable,Client)
+	void startEmoteC();
+	UFUNCTION(Reliable,Server)
+	void startEmoteS();
+	UFUNCTION(Reliable,Client)
+	void endEmoteC();
+	UFUNCTION(Reliable,Client)
+	void endEmoteS();
+	
+
 	ACharacterProxy* GetProxy();
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const;

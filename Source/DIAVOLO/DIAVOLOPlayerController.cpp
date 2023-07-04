@@ -187,6 +187,8 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Skill2",IE_Released,this,&ADIAVOLOPlayerController::endSkill2C);
 	InputComponent->BindAction("Skill3",IE_Released,this,&ADIAVOLOPlayerController::endSkill3C);
 	InputComponent->BindAction("Ultimate",IE_Released,this,&ADIAVOLOPlayerController::endUltimateC);
+
+	InputComponent->BindAction("Dance",IE_Released,this,&ADIAVOLOPlayerController::startEmoteC);
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
@@ -219,6 +221,23 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	}
 }
 
+void ADIAVOLOPlayerController::startEmoteC_Implementation() { startEmoteS(); }
+void ADIAVOLOPlayerController::startEmoteS_Implementation()
+{
+	if(GetProxy() && GetProxy()->Character)
+	{
+		GetProxy()->MoveToLocation(GetProxy()->Character->GetActorLocation());
+		GetProxy()->Character->StartEmote();
+		GetProxy()->Character->CharState = EPlayerStates::E_EMOTE;
+	}
+}
+
+void ADIAVOLOPlayerController::endEmoteC_Implementation() { endEmoteS(); }
+void ADIAVOLOPlayerController::endEmoteS_Implementation()
+{
+	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->StopEmote();
+}
+
 ACharacterProxy* ADIAVOLOPlayerController::GetProxy()
 {
 	if(Proxy) return Proxy;
@@ -240,7 +259,7 @@ void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVecto
 		*(GetProxy() ? "PROXY" : " ___ ") + *(GetProxy()->Character ? "CHARACTER" : " ___ "));
 	else GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"PROXY DONT EXIST!");
 	*/
-	
+	endEmoteS();
 	if (GetProxy() && GetProxy()->Character)
 	{
 		float const Distance = FVector::Dist(DestLocation, GetProxy()->Character->GetActorLocation());
@@ -354,6 +373,7 @@ void ADIAVOLOPlayerController::onSkill1C_Implementation()
 		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill1S(Ground,EnemyAttacking);
+	endEmoteC();
 }
 void ADIAVOLOPlayerController::onSkill2C_Implementation()
 {
@@ -363,6 +383,7 @@ void ADIAVOLOPlayerController::onSkill2C_Implementation()
 		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill2S(Ground,EnemyAttacking);
+	endEmoteC();
 }
 void ADIAVOLOPlayerController::onSkill3C_Implementation()
 {
@@ -372,6 +393,7 @@ void ADIAVOLOPlayerController::onSkill3C_Implementation()
 		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onSkill3S(Ground,EnemyAttacking);
+	endEmoteC();
 }
 void ADIAVOLOPlayerController::onUltimateC_Implementation()
 {
@@ -381,6 +403,7 @@ void ADIAVOLOPlayerController::onUltimateC_Implementation()
 		|| GetProxy()->Character->bUsingAbility) return;
 	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
 	onUltimateS(Ground,EnemyAttacking);
+	endEmoteC();
 }
 
 //===========================================================================================

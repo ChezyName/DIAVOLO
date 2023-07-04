@@ -124,6 +124,16 @@ public:
 	float MaxHealth = 1500;
 	UPROPERTY(EditAnywhere,Category="Character Info | Health // Mana ")
 	float MaxMana = 800;
+
+	UPROPERTY(EditAnywhere,Category="Character Info | Emote ")
+	UAnimMontage* Emote;
+	UPROPERTY(EditAnywhere,Category="Character Info | Emote ")
+	UAudioComponent* EmotePlayer;
+
+	UFUNCTION(Server,Reliable)
+	void StartEmote();
+	UFUNCTION(Server,Reliable)
+	void StopEmote();
 	
 	ADIAVOLOCharacter();
 

@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Components/AudioComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,6 +40,11 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	CameraBoom->TargetArmLength = 1700.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+
+	EmotePlayer = CreateDefaultSubobject<UAudioComponent>("EmoteSFX");
+	EmotePlayer->SetupAttachment(GetMesh());
+	EmotePlayer->SetAutoActivate(false);
+	EmotePlayer->SetIsReplicated(true);
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -231,4 +237,15 @@ void ADIAVOLOCharacter::ZoomCamera(float Speed)
 {
 	CameraBoom->TargetArmLength = FMath::Clamp(CameraBoom->TargetArmLength - (Speed*ZoomSpeed),ZoomMin,ZoomMax);
 	//GEngine->AddOnScreenDebugMessage(-1,1,FColor::Green,FString::SanitizeFloat(FMath::Clamp(CameraBoom->TargetArmLength - (Speed*ZoomSpeed),ZoomMin,ZoomMax)));
+}
+
+void ADIAVOLOCharacter::StartEmote_Implementation()
+{
+	EmotePlayer->Play();
+	PlayAnimationServer(Emote);
+}
+void ADIAVOLOCharacter::StopEmote_Implementation()
+{
+	EmotePlayer->Stop();
+	StopAnimationServer(Emote);
 }
