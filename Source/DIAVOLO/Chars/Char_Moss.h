@@ -13,5 +13,20 @@ UCLASS()
 class DIAVOLO_API AChar_Moss : public ADIAVOLOCharacter
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
+	UAnimMontage* RPGAnimation;
 	
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
+	float RPGTimeBefore = 0.25;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
+	float RPGTimeAfter = 0.25;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
+	float RPGDamage;
+
+
+private:
+	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
 };
