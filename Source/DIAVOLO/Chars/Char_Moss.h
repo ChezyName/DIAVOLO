@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "DIAVOLO/DIAVOLOCharacter.h"
 #include "DIAVOLO/BaseProjectile.h"
+#include "DIAVOLO/Projectiles/ExplosiveProjectile.h"
 #include "Char_Moss.generated.h"
 
 /**
@@ -19,7 +20,7 @@ public:
 	UAnimMontage* RPGAnimation;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
-	TSubclassOf<ABaseProjectile> RPGProjectile;
+	TSubclassOf<AExplosiveProjectile> RPGProjectile;
 	
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
 	float RPGTimeBefore = 0.25;
@@ -36,5 +37,5 @@ public:
 
 private:
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
-	ABaseProjectile* Rocket;
+	AExplosiveProjectile* Rocket;
 };

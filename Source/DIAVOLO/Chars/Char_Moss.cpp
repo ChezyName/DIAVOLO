@@ -2,6 +2,8 @@
 
 
 #include "Char_Moss.h"
+
+#include "DIAVOLO/CharacterProxy.h"
 #include "Kismet/GameplayStatics.h"
 
 void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
@@ -18,13 +20,14 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		CharState = EPlayerStates::E_ABILITY;
 		PlayAnimationServer(RPGAnimation);
 		SetActorRotation(LookAtRotation);
+		ParentProxy->MoveToLocation(GetActorLocation());
 		
 		//Launch Rocket
 		FTimerDelegate TimerBefore;
 		TimerBefore.BindLambda([&]
 		{
 			//Shoot Rocket HERE
-			Rocket = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,RPGProjectile,FTransform(LookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			Rocket = Cast<AExplosiveProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,RPGProjectile,FTransform(GetActorRotation(),GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 			if(RPGProjectile != nullptr)
 			{
 				//Finalizing Create Projecitle
@@ -34,7 +37,7 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 				Rocket->SetOwner(this);
 						
 				//Spawn The Actor
-				UGameplayStatics::FinishSpawningActor(Rocket, FTransform(LookAtRotation,GetActorLocation()));
+				UGameplayStatics::FinishSpawningActor(Rocket, FTransform(GetActorRotation(),GetActorLocation()));
 			}
 			
 			//After Rocket Launched
