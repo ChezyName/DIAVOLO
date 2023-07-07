@@ -25,7 +25,7 @@ void AExplosiveProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
 	if(OtherActor->GetClass() == ProjectileOwner->GetClass()) return;
-	Explode();
+	if(!didExplode) Explode();
 }
 
 void AExplosiveProjectile::Explode()
@@ -37,6 +37,7 @@ void AExplosiveProjectile::Explode()
 		"EXPLOSION! @ SFX:" + DataA + " VFX: " + DataB);
 	*/
 	
+	didExplode = true;
 	GetProjectileMovement()->SetActive(false);
 	if(ExplosionSFX != nullptr) ExplosionSFX->Play();
 	if(ExplosionVFX != nullptr) {
