@@ -40,10 +40,23 @@ public:
 	float HealPerTick = 10;
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Medical Stim")
-	float Tick = 0.1;
-
+	float HealTick = 0.1;
+	
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Medical Stim")
+	float MaxHealthGain = 350;
 
 private:
+	virtual void Tick(float DeltaSeconds) override;
+	
+	//Skill 1
 	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
 	AExplosiveProjectile* Rocket;
+
+	//Skill 2
+	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
+	virtual void endSkill2() override;
+	bool bHealEnabled = false;
+	float cHealTick = 0;
+	bool Canceled = false;
+	float HealthGained = 0;
 };

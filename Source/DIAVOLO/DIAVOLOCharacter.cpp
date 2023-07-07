@@ -60,6 +60,11 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	GetMesh()->SetIsReplicated(true);
 }
 
+void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount)
+{
+	Health -= DamageAmount;
+}
+
 void ADIAVOLOCharacter::BeginPlay()
 {
 	Super::BeginPlay();

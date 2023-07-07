@@ -143,6 +143,9 @@ public:
 	
 	ADIAVOLOCharacter();
 
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	void CharacterTakeDamage(float DamageAmount);
+
 	UPROPERTY()
 	class ACharacterProxy* ParentProxy;
 

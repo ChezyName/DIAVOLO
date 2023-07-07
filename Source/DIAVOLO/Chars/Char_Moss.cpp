@@ -4,11 +4,36 @@
 #include "Char_Moss.h"
 
 #include "DIAVOLO/CharacterProxy.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+
+void AChar_Moss::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if(bHealEnabled && Mana >= AttackManaConsumption.Skill2){
+		cHealTick--;
+		if(cHealTick < 0 && HealthGained < MaxHealthGain)
+		{
+			Mana -= AttackManaConsumption.Skill2;
+			ManaCD = ManaCDOnSkillUse;
+			CharState = EPlayerStates::E_ABILITY;
+			cHealTick = HealTick;
+			Health += HealPerTick;
+			HealthGained += HealPerTick;
+			if(Health >= MaxHealth)
+			{
+				Health = MaxHealth;
+				endSkill2();
+			}
+		}
+		else if(!Canceled) endSkill2();
+	}
+	else if(!Canceled) endSkill2();
+}
 
 void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 {
-	if(Skill1CD < 0 && Mana >= AttackManaConsumption.Skill1)
+	if(Skill1CD < 0 && Mana >= AttackManaConsumption.Skill1 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
 		FVector MyLoc = Location;
 		MyLoc.Z = GetActorLocation().Z;
@@ -21,6 +46,7 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		PlayAnimationServer(RPGAnimation);
 		SetActorRotation(LookAtRotation);
 		ParentProxy->MoveToLocation(GetActorLocation());
+		GetMovementComponent()->Deactivate();
 		
 		//Launch Rocket
 		FTimerDelegate TimerBefore;
@@ -49,6 +75,7 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 				bUsingAbility = false;
 				ManaCD = ManaCDOnSkillUse;
 				CharState = EPlayerStates::E_IDLE;
+				GetMovementComponent()->Activate();
 			});
 			FTimerHandle TimerHandle2;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerAfter, RPGTimeAfter, false);
@@ -59,4 +86,31 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerBefore, RPGTimeBefore, false);
 	}
 	Super::onSkill1(Location, Enemy);
+}
+
+void AChar_Moss::onSkill2(FVector Location, AEnemy* Enemy)
+{
+	Super::onSkill2(Location, Enemy);
+	if(Skill2CD < 0 && Mana >= AttackManaConsumption.Skill2 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility
+		&& Health < MaxHealth)
+	{
+		bHealEnabled = true;
+		Canceled = false;
+		HealthGained = 0;
+		CharState = EPlayerStates::E_ABILITY;
+		cHealTick = -1;
+	}
+}
+
+void AChar_Moss::endSkill2()
+{
+	Super::endSkill2();
+	if(bHealEnabled)
+	{
+		bHealEnabled = false;
+		CharState = EPlayerStates::E_IDLE;
+		bUsingAbility = false;
+		Skill2CD = AttackCooldowns.Skill2;
+		Canceled = true;
+	}
 }
