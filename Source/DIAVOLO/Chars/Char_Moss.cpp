@@ -132,34 +132,47 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 		SetActorRotation(LookAtRotation);
 		ParentProxy->MoveToLocation(GetActorLocation());
 		GetMovementComponent()->Deactivate();
-
-		//Shoot Pellets
-		int Parts = FMath::RoundToInt(TotalAngles/2);
-		for(int i = -Parts; i < Parts; i++)
+		
+		FTimerDelegate TimeBefore;
+		TimeBefore.BindLambda([&]
 		{
-			float ShotAngle = i * AngleInBetween;
-			FRotator ShootAngle = GetActorRotation();
-			ShootAngle.Yaw += ShotAngle;
-			
-			ABaseProjectile* Bullet = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,AutoAttack.Projectile,FTransform(ShootAngle,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
-			if(Bullet != nullptr)
+			//Shoot Pellets
+			int Parts = FMath::RoundToInt(TotalAngles/2);
+			for(int i = -Parts; i < Parts; i++)
 			{
-				//Finalizing Create Projecitle
-				Bullet->ProjectileOwner = this;
-				Bullet->InitVelocity = AutoAttack.ProjectileVelocity;
-				Bullet->Damage = ShotgunDamage * DamageMultiplier;
-				Bullet->SetOwner(this);
-						
-				//Spawn The Actor
-				UGameplayStatics::FinishSpawningActor(Bullet, FTransform(ShootAngle,GetActorLocation()));
+				float ShotAngle = i * AngleInBetween;
+				FRotator ShootAngle = GetActorRotation();
+				ShootAngle.Yaw += ShotAngle;
+				
+				ABaseProjectile* Bullet = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,AutoAttack.Projectile,FTransform(ShootAngle,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+				if(Bullet != nullptr)
+				{
+					//Finalizing Create Projecitle
+					Bullet->ProjectileOwner = this;
+					Bullet->InitVelocity = AutoAttack.ProjectileVelocity;
+					Bullet->Damage = ShotgunDamage * DamageMultiplier;
+					Bullet->SetOwner(this);
+							
+					//Spawn The Actor
+					UGameplayStatics::FinishSpawningActor(Bullet, FTransform(ShootAngle,GetActorLocation()));
+				}
 			}
-		}
-
-		Skill3CD = AttackCooldowns.Skill3;
-		Mana -= AttackManaConsumption.Skill3;
-		bUsingAbility = false;
-		ManaCD = ManaCDOnSkillUse;
-		CharState = EPlayerStates::E_IDLE;
-		GetMovementComponent()->Activate();
+			
+			FTimerDelegate TimerAfter;
+			TimerAfter.BindLambda([&]
+			{
+				Skill3CD = AttackCooldowns.Skill3;
+				Mana -= AttackManaConsumption.Skill3;
+				bUsingAbility = false;
+				ManaCD = ManaCDOnSkillUse;
+				CharState = EPlayerStates::E_IDLE;
+				GetMovementComponent()->Activate();
+				StopAnimationServer(ShotgunAnimation);
+			});
+			FTimerHandle TimerHandle2;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerAfter, ShotgunEndDelay, false);
+		});
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimeBefore, ShotgunEndDelay, false);
 	}
 }

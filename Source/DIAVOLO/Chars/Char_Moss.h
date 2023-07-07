@@ -57,6 +57,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
 	UAnimMontage* ShotgunAnimation;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	float ShotgunBeforeDelay = 0.15;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	float ShotgunEndDelay = 0.15;
 	
 
 private:
