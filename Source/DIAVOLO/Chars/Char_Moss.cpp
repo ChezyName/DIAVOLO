@@ -54,7 +54,7 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		{
 			//Shoot Rocket HERE
 			Rocket = Cast<AExplosiveProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,RPGProjectile,FTransform(GetActorRotation(),GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
-			if(RPGProjectile != nullptr)
+			if(Rocket != nullptr)
 			{
 				//Finalizing Create Projecitle
 				Rocket->ProjectileOwner = this;
@@ -112,5 +112,54 @@ void AChar_Moss::endSkill2()
 		bUsingAbility = false;
 		Skill2CD = AttackCooldowns.Skill2;
 		Canceled = true;
+	}
+}
+
+void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
+{
+	Super::onSkill3(Location, Enemy);
+	if(Skill3CD < 0 && Mana >= AttackManaConsumption.Skill3 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
+	{
+		FVector MyLoc = Location;
+		MyLoc.Z = GetActorLocation().Z;
+		FVector PDir = MyLoc - GetActorLocation();
+		PDir.Normalize();
+
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
+
+		CharState = EPlayerStates::E_ABILITY;
+		PlayAnimationServer(ShotgunAnimation);
+		SetActorRotation(LookAtRotation);
+		ParentProxy->MoveToLocation(GetActorLocation());
+		GetMovementComponent()->Deactivate();
+
+		//Shoot Pellets
+		int Parts = FMath::RoundToInt(TotalAngles/2);
+		for(int i = -Parts; i < Parts; i++)
+		{
+			float ShotAngle = i * AngleInBetween;
+			FRotator ShootAngle = GetActorRotation();
+			ShootAngle.Yaw += ShotAngle;
+			
+			ABaseProjectile* Bullet = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,AutoAttack.Projectile,FTransform(ShootAngle,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			if(Bullet != nullptr)
+			{
+				//Finalizing Create Projecitle
+				Bullet->ProjectileOwner = this;
+				Bullet->InitVelocity = AutoAttack.ProjectileVelocity;
+				Bullet->Damage = ShotgunDamage * DamageMultiplier;
+				Bullet->SetOwner(this);
+						
+				//Spawn The Actor
+				UGameplayStatics::FinishSpawningActor(Bullet, FTransform(ShootAngle,GetActorLocation()));
+			}
+		}
+
+		Skill3CD = AttackCooldowns.Skill3;
+		Mana -= AttackManaConsumption.Skill3;
+		bUsingAbility = false;
+		ManaCD = ManaCDOnSkillUse;
+		CharState = EPlayerStates::E_IDLE;
+		GetMovementComponent()->Activate();
 	}
 }

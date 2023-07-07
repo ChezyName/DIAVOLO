@@ -41,7 +41,7 @@ void AExplosiveProjectile::Explode()
 	if(ExplosionSFX != nullptr) ExplosionSFX->Play();
 	if(ExplosionVFX != nullptr) {
 		UNiagaraComponent* Explo = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),ExplosionVFX,GetActorLocation());
-		Explo->SetFloatParameter("Size",ExplosionRange->GetScaledSphereRadius()*2);
+		if(Explo) Explo->SetFloatParameter("Size",ExplosionRange->GetScaledSphereRadius()*2);
 	}
 	
 	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"EXPLOSION!");

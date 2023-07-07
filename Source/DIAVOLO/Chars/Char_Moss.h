@@ -45,6 +45,20 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Medical Stim")
 	float MaxHealthGain = 350;
 
+	//Skill 3 : Shotgun
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	float ShotgunDamage = 80;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	float TotalAngles = 8;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	float AngleInBetween = 10;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	UAnimMontage* ShotgunAnimation;
+	
+
 private:
 	virtual void Tick(float DeltaSeconds) override;
 	
@@ -59,4 +73,7 @@ private:
 	float cHealTick = 0;
 	bool Canceled = false;
 	float HealthGained = 0;
+
+	//Skill 3
+	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
 };
