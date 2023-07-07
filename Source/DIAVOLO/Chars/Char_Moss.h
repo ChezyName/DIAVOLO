@@ -63,6 +63,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
 	float ShotgunEndDelay = 0.15;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
+	USoundWave* ShotgunSFX;
 	
 
 private:

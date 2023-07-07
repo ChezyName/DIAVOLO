@@ -157,6 +157,7 @@ void ADIAVOLOCharacter::StopAnimationClient_Implementation(UAnimMontage* Animati
 void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 {
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Enemy->GetActorLocation()));
+	PlaySoundSingle(AutoAttack.AttackSFX);
 	if(AutoAttack.AutoType == EAutoType::E_MELEE)
 	{
 		Enemy->Damage(AutoAttack.AttackDamage * DamageMultiplier);

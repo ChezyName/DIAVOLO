@@ -136,6 +136,8 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 		FTimerDelegate TimeBefore;
 		TimeBefore.BindLambda([&]
 		{
+			PlaySoundSingle(ShotgunSFX);
+			
 			//Shoot Pellets
 			int Parts = FMath::RoundToInt(TotalAngles/2);
 			for(int i = -Parts; i < Parts; i++)

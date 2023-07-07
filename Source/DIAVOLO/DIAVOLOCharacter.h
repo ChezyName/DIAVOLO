@@ -93,6 +93,9 @@ struct FAutoAttack
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* Animation;
 
+	UPROPERTY(EditAnywhere)
+	USoundWave* AttackSFX;
+	
 	//Delay Before Dealing / Calculating Damage
 	UPROPERTY(EditAnywhere)
 	float TimeBeforeAttack = 0;
