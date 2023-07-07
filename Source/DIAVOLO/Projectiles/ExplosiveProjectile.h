@@ -15,18 +15,16 @@ UCLASS()
 class DIAVOLO_API AExplosiveProjectile : public ABaseProjectile
 {
 	GENERATED_BODY()
-public:
+private:
 	AExplosiveProjectile();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* ExplosionRange;
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* ExplosionSFX;
-	UPROPERTY(EditDefaultsOnly)
-	UNiagaraComponent* ExplosionVFX;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UNiagaraSystem* ExplosionVFX;
 	
 	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
-	UFUNCTION(Server,Reliable)
 	void Explode();
 };

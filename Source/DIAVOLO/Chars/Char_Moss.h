@@ -16,6 +16,7 @@ class DIAVOLO_API AChar_Moss : public ADIAVOLOCharacter
 {
 	GENERATED_BODY()
 public:
+	//Skill 1 : [Q] RPG (Rocket Propelled GUN?)
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
 	UAnimMontage* RPGAnimation;
 
@@ -33,6 +34,13 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Character Info | [Q] RPG")
 	float RPGSpeed = 8;
+
+	//Skill 2 : Stim Shot
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Medical Stim")
+	float HealPerTick = 10;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Medical Stim")
+	float Tick = 0.1;
 
 
 private:

@@ -2,7 +2,8 @@
 
 
 #include "ExplosiveProjectile.h"
-
+#include "DrawDebugHelpers.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include "DIAVOLO/DIAVOLOCharacter.h"
 
@@ -15,41 +16,60 @@ AExplosiveProjectile::AExplosiveProjectile()
 	ExplosionSFX = CreateDefaultSubobject<UAudioComponent>("Explosion SFX");
 	ExplosionSFX->SetupAttachment(RootComponent);
 	ExplosionSFX->SetAutoActivate(false);
-
-	ExplosionVFX = CreateDefaultSubobject<UNiagaraComponent>("Explosion VFX");
-	ExplosionVFX->SetupAttachment(RootComponent);
-	ExplosionVFX->SetAutoActivate(false);
 }
 
 void AExplosiveProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
                                      UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::OnOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
 	if(!HasAuthority()) return;
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
+	if(OtherActor->GetClass() == ProjectileOwner->GetClass()) return;
 	Explode();
 }
 
-void AExplosiveProjectile::Explode_Implementation()
+void AExplosiveProjectile::Explode()
 {
+	/*
+	FString DataA = (ExplosionSFX != nullptr ? "FR" : "N/A");
+	FString DataB = (ExplosionSFX != nullptr ? "FR" : "N/A");
+	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,
+		"EXPLOSION! @ SFX:" + DataA + " VFX: " + DataB);
+	*/
+	
 	GetProjectileMovement()->SetActive(false);
-	ExplosionSFX->Play();
-	ExplosionVFX->BeginPlay();
-
-	TArray<AActor*> OverlapingActors;
-	ExplosionRange->GetOverlappingActors(OverlapingActors);
-	for (AActor* OverlappingActor : OverlapingActors)
+	if(ExplosionSFX != nullptr) ExplosionSFX->Play();
+	if(ExplosionVFX != nullptr) {
+		UNiagaraComponent* Explo = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),ExplosionVFX,GetActorLocation());
+		Explo->SetFloatParameter("Size",ExplosionRange->GetScaledSphereRadius()*2);
+	}
+	
+	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"EXPLOSION!");
+	DrawDebugSphere(GetWorld(),GetActorLocation(),ExplosionRange->GetScaledSphereRadius(), 24,
+		FColor::Red,false, 5,0,2);
+	
+	if(ExplosionRange)
 	{
-		//Check if Overlapping is Enemy
-		AEnemy* Enemy = Cast<AEnemy>(OverlappingActor);
-		if(Enemy)
+		//GEngine->AddOnScreenDebugMessage(-1,8,FColor::Red,"---------------------");
+		TArray<AActor*> OverlapingActors;
+		ExplosionRange->GetOverlappingActors(OverlapingActors);
+		for (AActor* OverlappingActor : OverlapingActors)
 		{
-			float Distance = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
-			float NormalizedDistance = FMath::Clamp(Distance / ExplosionRange->GetScaledSphereRadius(), 0.0f, 1.0f);
-			float DealingDamage = Damage * (1.0f - NormalizedDistance);
-			Enemy->Damage(DealingDamage);
+			//GEngine->AddOnScreenDebugMessage(-1,8,FColor::Yellow,OverlappingActor->GetName());
+			//Check if Overlapping is Enemy
+			AEnemy* Enemy = Cast<AEnemy>(OverlappingActor);
+			if(Enemy)
+			{
+				float Distance = FVector::Dist(GetActorLocation(), Enemy->GetActorLocation());
+				float NormalizedDistance = FMath::Clamp(Distance / ExplosionRange->GetScaledSphereRadius(), 0.0f, 1.0f);
+				float DealingDamage = Damage * (1.0f - NormalizedDistance);
+				Enemy->Damage(DealingDamage);
+			}
 		}
+		//GEngine->AddOnScreenDebugMessage(-1,8,FColor::Red,"---------------------");
+
+
+		//Destroy Actor in 3s
+		SetLifeSpan(4);
 	}
 }
