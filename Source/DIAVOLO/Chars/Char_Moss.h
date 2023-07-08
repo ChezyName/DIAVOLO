@@ -67,6 +67,24 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character Info | [E] Shotgun")
 	USoundWave* ShotgunSFX;
 	
+	//Ultimate SKill : AMERICAN BOMB
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] NUKE")
+	TSubclassOf<AExplosiveProjectile> NukeProjectile;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] NUKE")
+	float NukeSpeed = 9.75;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] NUKE")
+	float NukeDamage = 1800;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] NUKE")
+	float NukeRange = 12;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] NUKE")
+	float NukesCount = 6;
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [R] NUKE")
+	FVector2D MinMaxDelayPerSpawn = FVector2D(0.05,0.125);
 
 private:
 	virtual void Tick(float DeltaSeconds) override;
@@ -85,4 +103,8 @@ private:
 
 	//Skill 3
 	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
+	
+	//Ultimate
+	virtual void onUltimate(FVector Location, AEnemy* Enemy) override;
+	void SpawnNuke(FVector Location,float Delay=0);
 };

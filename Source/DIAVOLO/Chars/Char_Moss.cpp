@@ -178,3 +178,55 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimeBefore, ShotgunEndDelay, false);
 	}
 }
+
+void AChar_Moss::onUltimate(FVector Location, AEnemy* Enemy)
+{
+	Super::onUltimate(Location, Enemy);
+
+	FVector MyLoc = Location;
+	MyLoc.Z = GetActorLocation().Z;
+	FVector PDir = MyLoc - GetActorLocation();
+	PDir.Normalize();
+
+	FRotator LookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
+
+	/*
+	CharState = EPlayerStates::E_ABILITY;
+	//PlayAnimationServer(RPGAnimation);
+	SetActorRotation(LookAtRotation);
+	ParentProxy->MoveToLocation(GetActorLocation());
+	GetMovementComponent()->Deactivate();
+	*/
+
+	float HalfRange = NukeRange/2;
+	for(int i = 0; i < NukesCount; i++)
+	{
+		FVector NukeStartLoc = Location;
+		NukeStartLoc.Z += 1500;
+		NukeStartLoc.X += FMath::FRandRange(-HalfRange,HalfRange);
+		NukeStartLoc.Y += FMath::FRandRange(-HalfRange,HalfRange);
+		SpawnNuke(NukeStartLoc,FMath::FRandRange(MinMaxDelayPerSpawn.X,MinMaxDelayPerSpawn.Y));
+	}
+}
+
+void AChar_Moss::SpawnNuke(FVector Location,float Delay)
+{
+	FTimerDelegate NukeTime;
+	NukeTime.BindLambda([Location, this]()
+	{
+		AExplosiveProjectile* Nuke = Cast<AExplosiveProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,NukeProjectile,FTransform(FRotationMatrix::MakeFromX(-GetActorUpVector()).Rotator(),Location),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			if(Nuke != nullptr)
+			{
+				//Finalizing Create Projecitle
+				Nuke->ProjectileOwner = this;
+				Nuke->InitVelocity = NukeSpeed;
+				Nuke->Damage = NukeDamage * DamageMultiplier;
+				Nuke->SetOwner(this);
+						
+				//Spawn The Actor
+				UGameplayStatics::FinishSpawningActor(Nuke, FTransform(FRotationMatrix::MakeFromX(-GetActorUpVector()).Rotator(),Location));
+			}
+	});
+	FTimerHandle NukeHandleSpawner;
+	GetWorld()->GetTimerManager().SetTimer(NukeHandleSpawner, NukeTime, Delay, false);
+}

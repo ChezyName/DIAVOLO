@@ -15,7 +15,7 @@ UCLASS()
 class DIAVOLO_API AExplosiveProjectile : public ABaseProjectile
 {
 	GENERATED_BODY()
-private:
+public:
 	AExplosiveProjectile();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
@@ -32,4 +32,7 @@ private:
 
 	UFUNCTION(NetMulticast,Reliable)
 	void ExplodeFXs();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void onExplode();
 };

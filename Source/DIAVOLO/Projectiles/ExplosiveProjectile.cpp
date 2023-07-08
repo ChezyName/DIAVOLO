@@ -40,6 +40,7 @@ void AExplosiveProjectile::Explode()
 	didExplode = true;
 	GetProjectileMovement()->SetActive(false);
 	ExplodeFXs();
+	onExplode();
 	
 	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"EXPLOSION!");
 	DrawDebugSphere(GetWorld(),GetActorLocation(),ExplosionRange->GetScaledSphereRadius(), 24,
