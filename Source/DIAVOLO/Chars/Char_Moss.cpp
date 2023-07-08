@@ -182,30 +182,39 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 void AChar_Moss::onUltimate(FVector Location, AEnemy* Enemy)
 {
 	Super::onUltimate(Location, Enemy);
-
-	FVector MyLoc = Location;
-	MyLoc.Z = GetActorLocation().Z;
-	FVector PDir = MyLoc - GetActorLocation();
-	PDir.Normalize();
-
-	FRotator LookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
-
-	/*
-	CharState = EPlayerStates::E_ABILITY;
-	//PlayAnimationServer(RPGAnimation);
-	SetActorRotation(LookAtRotation);
-	ParentProxy->MoveToLocation(GetActorLocation());
-	GetMovementComponent()->Deactivate();
-	*/
-
-	float HalfRange = NukeRange/2;
-	for(int i = 0; i < NukesCount; i++)
+	if(UltimateCD < 0 && Mana >= AttackManaConsumption.Ultimate && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
-		FVector NukeStartLoc = Location;
-		NukeStartLoc.Z += 1500;
-		NukeStartLoc.X += FMath::FRandRange(-HalfRange,HalfRange);
-		NukeStartLoc.Y += FMath::FRandRange(-HalfRange,HalfRange);
-		SpawnNuke(NukeStartLoc,FMath::FRandRange(MinMaxDelayPerSpawn.X,MinMaxDelayPerSpawn.Y));
+		FVector MyLoc = Location;
+		MyLoc.Z = GetActorLocation().Z;
+		FVector PDir = MyLoc - GetActorLocation();
+		PDir.Normalize();
+
+		FRotator LookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
+	
+		CharState = EPlayerStates::E_ABILITY;
+		//PlayAnimationServer(RPGAnimation);
+		SetActorRotation(LookAtRotation);
+		ParentProxy->MoveToLocation(GetActorLocation());
+		GetMovementComponent()->Deactivate(); 
+
+		float HalfRange = NukeRange/2;
+		for(int i = 0; i < NukesCount; i++)
+		{
+			FVector NukeStartLoc = Location;
+			NukeStartLoc.Z += 1500;
+			NukeStartLoc.X += FMath::FRandRange(-HalfRange,HalfRange);
+			NukeStartLoc.Y += FMath::FRandRange(-HalfRange,HalfRange);
+			SpawnNuke(NukeStartLoc,FMath::FRandRange(MinMaxDelayPerSpawn.X,MinMaxDelayPerSpawn.Y));
+		}
+
+		//After Ability Usage
+		UltimateCD = AttackCooldowns.Ultimate;
+		Mana -= AttackManaConsumption.Ultimate;
+		bUsingAbility = false;
+		ManaCD = ManaCDOnSkillUse;
+		CharState = EPlayerStates::E_IDLE;
+		GetMovementComponent()->Activate();
+		//StopAnimationServer(ShotgunAnimation);
 	}
 }
 
