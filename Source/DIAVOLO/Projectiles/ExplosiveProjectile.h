@@ -29,4 +29,7 @@ private:
 	
 	virtual void OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	void Explode();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void ExplodeFXs();
 };

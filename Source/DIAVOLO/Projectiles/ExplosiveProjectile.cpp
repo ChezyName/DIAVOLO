@@ -39,11 +39,7 @@ void AExplosiveProjectile::Explode()
 	
 	didExplode = true;
 	GetProjectileMovement()->SetActive(false);
-	if(ExplosionSFX != nullptr) ExplosionSFX->Play();
-	if(ExplosionVFX != nullptr) {
-		UNiagaraComponent* Explo = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),ExplosionVFX,GetActorLocation());
-		if(Explo) Explo->SetFloatParameter("Size",ExplosionRange->GetScaledSphereRadius()*2);
-	}
+	ExplodeFXs();
 	
 	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"EXPLOSION!");
 	DrawDebugSphere(GetWorld(),GetActorLocation(),ExplosionRange->GetScaledSphereRadius(), 24,
@@ -72,5 +68,14 @@ void AExplosiveProjectile::Explode()
 
 		//Destroy Actor in 3s
 		SetLifeSpan(4);
+	}
+}
+
+void AExplosiveProjectile::ExplodeFXs_Implementation()
+{
+	if(ExplosionSFX != nullptr) ExplosionSFX->Play();
+	if(ExplosionVFX != nullptr) {
+		UNiagaraComponent* Explo = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(),ExplosionVFX,GetActorLocation());
+		if(Explo) Explo->SetFloatParameter("Size",ExplosionRange->GetScaledSphereRadius()*2);
 	}
 }
