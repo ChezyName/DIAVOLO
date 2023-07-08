@@ -17,13 +17,14 @@ public:
 	AEnemy();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated,BlueprintReadOnly)
 	float Health;
 
-	UPROPERTY(EditDefaultsOnly,Category="Enemy",meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly,Category="Enemy",meta = (AllowPrivateAccess = "true"),BlueprintReadOnly)
 	float MaxHealth = 10000;
+	
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere)
 	UCapsuleComponent* MouseOver;
