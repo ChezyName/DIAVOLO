@@ -15,7 +15,7 @@ enum class EPlayerStates : uint8
 	E_ATTACK_WINDUP = 3 UMETA(DisplayName="Charging Auto Attack"),
 	E_ATTACK_FULL = 3 UMETA(DisplayName="After Attack Hit"),
 	E_ABILITY = 4 UMETA(DisplayName="Ability"),
-	E_EMOTE = 5 UMETA(DisplayName="Emote"),
+	E_EMOTE = 5 UMETA(DisplayName="Emote        "),
 };
 
 /**
@@ -33,6 +33,9 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void ChangeCharState(EPlayerStates NewState);
+
+	UPROPERTY(Replicated,BlueprintReadWrite,Category="Lobby")
+	bool bCharReady = false;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

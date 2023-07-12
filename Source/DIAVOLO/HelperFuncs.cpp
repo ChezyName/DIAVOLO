@@ -12,3 +12,12 @@ void UHelperFuncs::SetPlayerName(APlayerController* PlayerController, FString Pl
 		PlayerController->PlayerState->SetPlayerName(PlayerName);
 	}
 }
+
+FString UHelperFuncs::GetPlayerName(APlayerController* PlayerController)
+{
+	if (PlayerController != nullptr && PlayerController->PlayerState != nullptr)
+	{
+		return PlayerController->PlayerState->GetPlayerName();
+	}
+	return FString("");
+}

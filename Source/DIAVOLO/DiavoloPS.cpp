@@ -22,6 +22,7 @@ void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
 void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(ADiavoloPS,CharState);
+	DOREPLIFETIME(ADiavoloPS,bCharReady);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
