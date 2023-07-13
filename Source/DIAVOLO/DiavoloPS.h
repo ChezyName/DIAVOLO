@@ -27,9 +27,14 @@ class DIAVOLO_API ADiavoloPS : public APlayerState
 	GENERATED_BODY()
 
 private:
+	virtual void CopyProperties(APlayerState* PlayerState) override;
+	virtual void BeginPlay() override;
 public:
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
+
+	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
+	FString CharName = "[UNKNOWN]";
 
 	UFUNCTION(Server,Reliable)
 	void ChangeCharState(EPlayerStates NewState);

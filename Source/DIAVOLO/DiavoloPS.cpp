@@ -22,7 +22,32 @@ void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
 void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(ADiavoloPS,CharState);
+	DOREPLIFETIME(ADiavoloPS,CharName);
 	DOREPLIFETIME(ADiavoloPS,bCharReady);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
+void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
+{   
+	Super::CopyProperties(PlayerState);
+
+	if(PlayerState)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Green,"Replacing Name: "+GetPlayerName());
+		PlayerState->SetPlayerName(GetPlayerName());
+		ADiavoloPS* State = Cast<ADiavoloPS>(PlayerState);
+		if(State)
+		{
+			CharName = State->CharName;
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"No Name To Change To!");
+	}
+}
+
+void ADiavoloPS::BeginPlay()
+{
+	Super::BeginPlay();
+}

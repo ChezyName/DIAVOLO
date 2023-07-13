@@ -18,5 +18,8 @@ class DIAVOLO_API UHelperFuncs : public UBlueprintFunctionLibrary
 	static void SetPlayerName(APlayerController *PlayerController, FString PlayerName);
 
 	UFUNCTION(BlueprintCallable, Category = "HelperClass")
+	static void SetPlayerNameC(AController *Controller, FString PlayerName);
+
+	UFUNCTION(BlueprintCallable, Category = "HelperClass")
 	static FString GetPlayerName(APlayerController *PlayerController);
 };
