@@ -29,3 +29,19 @@ FString UHelperFuncs::GetPlayerName(APlayerController* PlayerController)
 	}
 	return FString("");
 }
+
+void UHelperFuncs::SeamlessTravel(const UObject* WorldContextObject,const TSoftObjectPtr<UWorld> Level)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	const FString LevelName = FString(*FPackageName::ObjectPathToPackageName(Level.ToString()));
+	if (World == nullptr)
+	{
+		return;
+	}
+
+	if(World->IsServer())
+	{
+		World->ServerTravel(LevelName,true,false);
+		//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Server Travel C++!");
+	}
+}

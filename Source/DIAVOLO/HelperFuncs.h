@@ -22,4 +22,7 @@ class DIAVOLO_API UHelperFuncs : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, Category = "HelperClass")
 	static FString GetPlayerName(APlayerController *PlayerController);
+
+	UFUNCTION(BlueprintCallable, meta=(WorldContext="WorldContextObject", AdvancedDisplay = "2", DisplayName = "ServerTravel"), Category="Game")
+	static void SeamlessTravel(const UObject* WorldContextObject,const TSoftObjectPtr<UWorld> Level);
 };
