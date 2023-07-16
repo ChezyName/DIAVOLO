@@ -1,7 +1,11 @@
+
 # DIAVOLO : Multiplayer Boss Battles
 
 Diablo IV Came Out A Few Days, So I Decided To Remake The Game As A Dungeon Crawler. Think Of League of Legends x Binding Of Issac.
 
+# Main Menu & Lobby
+This game uses a simple lobby system where the player sets thier username at the start of the game and is able to host or join from that menu.
+> This game also uses *Listen Servers* Where The Hosting Player Is The Server and A Client. If Hosting, Host On Port 7777 // Port Forward On Port 7777
   
 
 # Movement
@@ -42,3 +46,11 @@ E_MOVE.
 
 |The Beast Sends Out Shadow Claws In Aimed Direction (Mouse) That Will Damage Enemies. ReActivating The Key Will Teleport The User To The Claws If Claws Have Not Hit Enemy|The Beast Starts Spinning At High Speeds Damaging Enemies All Around Them|The Beast Sends Out A Grapple Hook, If Hits Wall Or Enemy, The Beast Pulls Himself Towards The Hook|The Beast Releases 4 Spinning Blades That Rotate Around Them Damaging All Enemies It omes In Contact With|
 |---|---|---|---|
+
+## **Micheal Moss** : Weapon Master
+Former Ex-Military now Gun For Hire, Micheal Moss is a playable ranged character in Diavolo. His play style is semi-ranged, the player should keep thier distance from enemies but close enough to be in range.
+
+### Abilities
+|![Rocket-Propelled Grenade](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/Moss_Q.png)|![Combat Stim](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/Moss_W.png)|![Combat Shotty](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/Moss_E.png)|![Air Strike](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/Moss_R.png)|
+|---|---|---|---|
+|Moss Pulls His Rocket Launcher From His Back, and Launches An Explosive That Deal Massive Damage|While Holding This Ability, Moss Uses This Stim To Heal Himself Constently|Moss Equips His Shotgun And Shoots In A Large Arc Aimed At The Mouse|Moss Calls An Airstrike At Mouse Location |
