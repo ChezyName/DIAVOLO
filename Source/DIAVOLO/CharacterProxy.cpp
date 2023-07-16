@@ -54,6 +54,20 @@ void ACharacterProxy::onStartSetChar_Implementation()
 	SpawnParams.bNoFail = true;
 
 	// spawn actual player
+	ADiavoloPS* State = Cast<ADiavoloPS>(GetPlayerState());
+	if(State && State->CharacterToSpawn)
+	{
+		CharacterClass = State->CharacterToSpawn;
+		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"Spawning: " + CharacterClass->GetName());
+	}
+	
+	if(State)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Emerald,FString("Player State Loaded:\n") +
+			"bReady: " + FString(State->bCharReady ? "true" : "false") + "\nSpawnedCharacter:" +
+			FString(State->CharacterToSpawn ? State->CharacterToSpawn->GetName() : "NULL") + "\nCharacterName: " + State->GetPlayerName());
+	}
+	
 	Character = Cast<ADIAVOLOCharacter>(GetWorld()->SpawnActor(CharacterClass, &Location, &Rotation, SpawnParams));
 
 	//GEngine->AddOnScreenDebugMessage(-1,8,FColor::Turquoise,Character ? "Spawned!" : "Not Spawned?!?");

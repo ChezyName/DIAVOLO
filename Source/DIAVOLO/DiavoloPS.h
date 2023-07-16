@@ -36,8 +36,14 @@ public:
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	FString CharName = "[UNKNOWN]";
 
+	UPROPERTY(Replicated,BlueprintReadWrite,Category="Character State")
+	TSubclassOf<class ADIAVOLOCharacter> CharacterToSpawn = nullptr;
+	
 	UFUNCTION(Server,Reliable)
 	void ChangeCharState(EPlayerStates NewState);
+
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	void SetSpawnable(TSubclassOf<class ADIAVOLOCharacter> NewSpawnable);
 
 	UPROPERTY(Replicated,BlueprintReadWrite,Category="Lobby")
 	bool bCharReady = false;

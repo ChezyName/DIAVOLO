@@ -2,7 +2,7 @@
 
 
 #include "DiavoloPS.h"
-
+#include "DIAVOLOCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
@@ -19,11 +19,19 @@ void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
 	CharState = NewState;
 }
 
+void ADiavoloPS::SetSpawnable_Implementation(TSubclassOf<ADIAVOLOCharacter> NewSpawnable)
+{
+	CharacterToSpawn = NewSpawnable;
+	CharName = CharacterToSpawn->GetName();
+	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Spawnable: "+NewSpawnable->GetName());
+}
+
 void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(ADiavoloPS,CharState);
 	DOREPLIFETIME(ADiavoloPS,CharName);
 	DOREPLIFETIME(ADiavoloPS,bCharReady);
+	DOREPLIFETIME(ADiavoloPS,CharacterToSpawn);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
@@ -39,6 +47,10 @@ void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
 		if(State)
 		{
 			CharName = State->CharName;
+			CharacterToSpawn = State->CharacterToSpawn;
+			GEngine->AddOnScreenDebugMessage(-1,25,FColor::Orange,"Replacing Class: "+
+				FString(State->CharacterToSpawn ? CharacterToSpawn->GetName() : "NULL"));
+			GEngine->AddOnScreenDebugMessage(-1,25,FColor::Orange,"Class Name: "+CharName);
 		}
 	}
 	else

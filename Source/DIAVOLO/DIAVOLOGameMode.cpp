@@ -3,6 +3,7 @@
 #include "DIAVOLOGameMode.h"
 #include "DIAVOLOPlayerController.h"
 #include "DIAVOLOCharacter.h"
+#include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "Algo/RandomShuffle.h"
 #include "Kismet/KismetArrayLibrary.h"
@@ -10,6 +11,7 @@
 #include "UObject/ConstructorHelpers.h"
 
 ADIAVOLOGameMode::ADIAVOLOGameMode(){
+	bUseSeamlessTravel = true;
 }
 
 void ADIAVOLOGameMode::BeginPlay()
