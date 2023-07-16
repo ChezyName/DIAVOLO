@@ -13,3 +13,7 @@ Each of these states determine what the player is currently doing.
 IE: If the player is moving to a point on the map, thier state would be
 E_MOVE.
 
+# Characters
+
+## The Beast : Spiderman 2099 ReImagined
+The Beast
