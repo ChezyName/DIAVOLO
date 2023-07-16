@@ -22,18 +22,53 @@ void ADiavoloPS::ChangeCharState_Implementation(EPlayerStates NewState)
 void ADiavoloPS::SetSpawnable_Implementation(TSubclassOf<ADIAVOLOCharacter> NewSpawnable)
 {
 	CharacterToSpawn = NewSpawnable;
-	CharName = CharacterToSpawn->GetName();
-	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Spawnable: "+NewSpawnable->GetName());
+	CharName = CharacterToSpawn->GetPathName();
+	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Spawnable: "+NewSpawnable->GetName()+"//"+CharName);
+}
+
+void ADiavoloPS::ChangeReadyState_Implementation()
+{
+	bCharReady = !bCharReady;
 }
 
 void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(ADiavoloPS,CharState);
-	DOREPLIFETIME(ADiavoloPS,CharName);
 	DOREPLIFETIME(ADiavoloPS,bCharReady);
-	DOREPLIFETIME(ADiavoloPS,CharacterToSpawn);
+	DOREPLIFETIME(ADiavoloPS, CharName);
+	DOREPLIFETIME(ADiavoloPS, CharacterToSpawn);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
+
+/*
+void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
+{
+	if (PlayerState != nullptr)
+	{
+		Super::CopyProperties(PlayerState);
+
+		ADiavoloPS* State = Cast<ADiavoloPS>(PlayerState);
+		if (State)
+		{
+			CharName = State->CharName;
+			CharacterToSpawn = State->CharacterToSpawn;
+			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Orange, "Replacing Class: " +
+				FString(State->CharacterToSpawn ? CharacterToSpawn->GetName() : "NULL"));
+			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Orange, "Class Name: " + CharName);
+			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Orange, "isReady: " +
+				FString(State->bCharReady ? "TRUE" : "FALSE"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Red, "Failed to cast PlayerState to ADiavoloPS!");
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Red, "No PlayerState provided!");
+	}
+}
+*/
 
 void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
 {   
@@ -41,21 +76,14 @@ void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
 
 	if(PlayerState)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Green,"Replacing Name: "+GetPlayerName());
-		PlayerState->SetPlayerName(GetPlayerName());
-		ADiavoloPS* State = Cast<ADiavoloPS>(PlayerState);
-		if(State)
+		ADiavoloPS* ShooterPlayer = Cast<ADiavoloPS>(PlayerState);
+		if (ShooterPlayer)
 		{
-			CharName = State->CharName;
-			CharacterToSpawn = State->CharacterToSpawn;
-			GEngine->AddOnScreenDebugMessage(-1,25,FColor::Orange,"Replacing Class: "+
-				FString(State->CharacterToSpawn ? CharacterToSpawn->GetName() : "NULL"));
-			GEngine->AddOnScreenDebugMessage(-1,25,FColor::Orange,"Class Name: "+CharName);
+			ShooterPlayer->CharName = CharName;
+			ShooterPlayer->bCharReady = bCharReady;
+			ShooterPlayer->CharacterToSpawn = CharacterToSpawn;
+			GEngine->AddOnScreenDebugMessage(-1,5,FColor::Turquoise,"Copied Properties!");
 		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"No Name To Change To!");
 	}
 }
 

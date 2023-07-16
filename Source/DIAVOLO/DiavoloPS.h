@@ -26,17 +26,17 @@ class DIAVOLO_API ADiavoloPS : public APlayerState
 {
 	GENERATED_BODY()
 
-private:
+public:
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 	virtual void BeginPlay() override;
-public:
+
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
 
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	FString CharName = "[UNKNOWN]";
 
-	UPROPERTY(Replicated,BlueprintReadWrite,Category="Character State")
+	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	TSubclassOf<class ADIAVOLOCharacter> CharacterToSpawn = nullptr;
 	
 	UFUNCTION(Server,Reliable)
@@ -45,7 +45,10 @@ public:
 	UFUNCTION(Server,Reliable,BlueprintCallable)
 	void SetSpawnable(TSubclassOf<class ADIAVOLOCharacter> NewSpawnable);
 
-	UPROPERTY(Replicated,BlueprintReadWrite,Category="Lobby")
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	void ChangeReadyState();
+
+	UPROPERTY(Replicated,BlueprintReadOnly,Category="Lobby")
 	bool bCharReady = false;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

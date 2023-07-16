@@ -41,7 +41,7 @@ void UHelperFuncs::SeamlessTravel(const UObject* WorldContextObject,const TSoftO
 
 	if(World->IsServer())
 	{
-		World->ServerTravel(LevelName,true,false);
+		World->ServerTravel(LevelName,false,false);
 		//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Server Travel C++!");
 	}
 }
