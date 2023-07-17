@@ -38,6 +38,9 @@ public:
 
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	TSubclassOf<class ADIAVOLOCharacter> CharacterToSpawn = nullptr;
+
+	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
+	UTexture2D* ClassIcon;
 	
 	UFUNCTION(Server,Reliable)
 	void ChangeCharState(EPlayerStates NewState);
@@ -46,7 +49,10 @@ public:
 	void SetSpawnable(TSubclassOf<class ADIAVOLOCharacter> NewSpawnable);
 
 	UFUNCTION(Server,Reliable,BlueprintCallable)
-	void ChangeReadyState();
+	void ChangeReadyState(bool isReady);
+
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	void SetClassIcon(UTexture2D* NewIcon);
 
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Lobby")
 	bool bCharReady = false;

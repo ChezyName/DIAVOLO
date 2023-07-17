@@ -26,9 +26,14 @@ void ADiavoloPS::SetSpawnable_Implementation(TSubclassOf<ADIAVOLOCharacter> NewS
 	GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Spawnable: "+NewSpawnable->GetName()+"//"+CharName);
 }
 
-void ADiavoloPS::ChangeReadyState_Implementation()
+void ADiavoloPS::ChangeReadyState_Implementation(bool isReady)
 {
-	bCharReady = !bCharReady;
+	bCharReady = isReady;
+}
+
+void ADiavoloPS::SetClassIcon_Implementation(UTexture2D* NewIcon)
+{
+	ClassIcon = NewIcon;
 }
 
 void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -37,38 +42,9 @@ void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME(ADiavoloPS,bCharReady);
 	DOREPLIFETIME(ADiavoloPS, CharName);
 	DOREPLIFETIME(ADiavoloPS, CharacterToSpawn);
+	DOREPLIFETIME(ADiavoloPS, ClassIcon);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
-
-/*
-void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
-{
-	if (PlayerState != nullptr)
-	{
-		Super::CopyProperties(PlayerState);
-
-		ADiavoloPS* State = Cast<ADiavoloPS>(PlayerState);
-		if (State)
-		{
-			CharName = State->CharName;
-			CharacterToSpawn = State->CharacterToSpawn;
-			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Orange, "Replacing Class: " +
-				FString(State->CharacterToSpawn ? CharacterToSpawn->GetName() : "NULL"));
-			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Orange, "Class Name: " + CharName);
-			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Orange, "isReady: " +
-				FString(State->bCharReady ? "TRUE" : "FALSE"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Red, "Failed to cast PlayerState to ADiavoloPS!");
-		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 25, FColor::Red, "No PlayerState provided!");
-	}
-}
-*/
 
 void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
 {   
@@ -82,6 +58,7 @@ void ADiavoloPS::CopyProperties(APlayerState* PlayerState)
 			ShooterPlayer->CharName = CharName;
 			ShooterPlayer->bCharReady = bCharReady;
 			ShooterPlayer->CharacterToSpawn = CharacterToSpawn;
+			ShooterPlayer->ClassIcon = ClassIcon;
 			GEngine->AddOnScreenDebugMessage(-1,5,FColor::Turquoise,"Copied Properties!");
 		}
 	}
