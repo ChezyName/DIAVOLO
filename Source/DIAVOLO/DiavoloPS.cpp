@@ -34,6 +34,7 @@ void ADiavoloPS::ChangeReadyState_Implementation(bool isReady)
 void ADiavoloPS::SetClassIcon_Implementation(UTexture2D* NewIcon)
 {
 	ClassIcon = NewIcon;
+	GEngine->AddOnScreenDebugMessage(-1,60,FColor::Yellow,NewIcon->GetName());
 }
 
 void ADiavoloPS::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

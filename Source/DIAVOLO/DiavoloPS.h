@@ -40,7 +40,7 @@ public:
 	TSubclassOf<class ADIAVOLOCharacter> CharacterToSpawn = nullptr;
 
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
-	UTexture2D* ClassIcon;
+	UTexture2D* ClassIcon = nullptr;
 	
 	UFUNCTION(Server,Reliable)
 	void ChangeCharState(EPlayerStates NewState);
