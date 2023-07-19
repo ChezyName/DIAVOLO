@@ -45,10 +45,12 @@ protected:
 	void ZoomCamera(float Speed);
 
 	UFUNCTION(Server,Reliable)
-	void onStartSetChar();
+	void onStartSetChar(AController* NewController);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void PossessedBy(AController* NewController) override;
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;

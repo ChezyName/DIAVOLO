@@ -42,7 +42,7 @@ ACharacterProxy::ACharacterProxy(const class FObjectInitializer& ObjectInitializ
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void ACharacterProxy::onStartSetChar_Implementation()
+void ACharacterProxy::onStartSetChar_Implementation(AController* NewController)
 {
 	// get current location of player proxy
 	FVector Location = GetActorLocation();
@@ -54,11 +54,11 @@ void ACharacterProxy::onStartSetChar_Implementation()
 	SpawnParams.bNoFail = true;
 
 	// spawn actual player
-	ADiavoloPS* State = Cast<ADiavoloPS>(GetPlayerState());
+	ADiavoloPS* State = Cast<ADiavoloPS>(NewController->PlayerState);
 	if(State && State->CharacterToSpawn)
 	{
 		CharacterClass = State->CharacterToSpawn;
-		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"Spawning: " + CharacterClass->GetName());
+		GEngine->AddOnScreenDebugMessage(-1,55,FColor::Red,"Spawning: " + CharacterClass->GetName());
 	}
 	
 	if(State)
@@ -81,8 +81,14 @@ void ACharacterProxy::onStartSetChar_Implementation()
 // Called when the game starts or when spawned
 void ACharacterProxy::BeginPlay()
 {
-	if(GetLocalRole() == ENetRole::ROLE_Authority) onStartSetChar();
+	//if(GetLocalRole() == ENetRole::ROLE_Authority) onStartSetChar();
 	Super::BeginPlay();
+}
+
+void ACharacterProxy::PossessedBy(AController* NewController)
+{
+	if(HasAuthority()) onStartSetChar(NewController);
+	Super::PossessedBy(NewController);
 }
 
 // Called every frame
