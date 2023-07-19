@@ -91,6 +91,12 @@ void ACharacterProxy::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 }
 
+void ACharacterProxy::Destroyed()
+{
+	Character->Destroy();
+	Super::Destroyed();
+}
+
 // Called every frame
 void ACharacterProxy::Tick( float DeltaTime )
 {
