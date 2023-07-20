@@ -3,6 +3,8 @@
 #include "DIAVOLOCharacter.h"
 #include "DIAVOLOPlayerController.h"
 #include "AIController.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
@@ -76,6 +78,7 @@ void ACharacterProxy::onStartSetChar_Implementation(AController* NewController)
 	PlayerAIController = GetWorld()->SpawnActor<AAIController>(GetActorLocation(), GetActorRotation());
 	PlayerAIController->Possess(Character);
 	Character->ParentProxy = this;
+	Character->OnDeathFunction.BindUFunction(this,FName("onCharacterDeath"));
 }
 
 // Called when the game starts or when spawned
@@ -93,8 +96,29 @@ void ACharacterProxy::PossessedBy(AController* NewController)
 
 void ACharacterProxy::Destroyed()
 {
-	Character->Destroy();
+	if(Character) Character->Destroy();
 	Super::Destroyed();
+}
+
+void ACharacterProxy::onCharacterDeath_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"Character Has Been Killed");
+	//Character->Destroy();
+	Died = true;
+
+	//Spawn Spectator Class
+	FVector Location = TopDownCameraComponent->GetComponentLocation();
+	FRotator Rotation = TopDownCameraComponent->GetComponentRotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.bNoFail = true;
+	APawn* NewChar = Cast<APawn>(GetWorld()->SpawnActor(SpectatorClass, &Location, &Rotation, SpawnParams));
+	GetController()->Possess(NewChar);
+	NewChar->SetPlayerState(GetPlayerState());
+	DestroyMyHUD();
+	Destroy();
 }
 
 // Called every frame
@@ -130,6 +154,11 @@ void ACharacterProxy::MoveToLocation(const FVector& DestLocation)
 		return;
 	};
 	PlayerAIController->MoveToLocation(DestLocation);
+}
+
+void ACharacterProxy::DestroyMyHUD_Implementation()
+{
+	DestroyMyHUDClient();
 }
 
 void ACharacterProxy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

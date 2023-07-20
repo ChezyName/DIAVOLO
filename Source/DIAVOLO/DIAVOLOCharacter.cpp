@@ -63,6 +63,12 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount)
 {
 	Health -= DamageAmount;
+	if(Health <= 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"Character Died, Running Back Numbers!");
+		OnDeathFunction.ExecuteIfBound();
+		onDeath();
+	}
 }
 
 void ADIAVOLOCharacter::BeginPlay()
@@ -107,6 +113,19 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 
 	const FVector Target = Position - (Dir * Range);
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
+}
+
+void ADIAVOLOCharacter::onDeath()
+{
+	GetCharacterMovement()->DisableMovement();
+
+	GetCapsuleComponent()->SetEnableGravity(false);
+	GetCapsuleComponent()->SetCollisionProfileName("OverlapAll");
+	GetCapsuleComponent()->Deactivate();
+
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->WakeAllRigidBodies();
 }
 
 void ADIAVOLOCharacter::PlaySoundSingle_Implementation(USoundWave* SFX)

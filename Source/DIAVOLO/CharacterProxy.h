@@ -29,12 +29,25 @@ public:
 	UPROPERTY(EditDefaultsOnly,Category="Class Info")
 	TSubclassOf<AActor> CharacterClass;
 
+	UPROPERTY(EditDefaultsOnly,Category="Class Info")
+	TSubclassOf<APawn> SpectatorClass;
+
 	// pointer to actual character
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	class ADIAVOLOCharacter* Character;
 
 	// used by controller to get the moving to work
 	void MoveToLocation(const FVector& DestLocation);
+
+	UFUNCTION(Server,Reliable)
+	void onCharacterDeath();
+	bool Died = false;
+
+	UFUNCTION(Client,Reliable)
+	void DestroyMyHUD();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DestroyMyHUDClient();
 	
 protected:
 	// AIController we will use

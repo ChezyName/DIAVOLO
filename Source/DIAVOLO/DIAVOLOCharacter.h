@@ -217,7 +217,10 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void StopAnimationClient(UAnimMontage* Animation);
 
+	DECLARE_DELEGATE(DOnDeath)
+	DOnDeath OnDeathFunction;
 
+	void onDeath();
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	EPlayerStates CharState = EPlayerStates::E_IDLE;
