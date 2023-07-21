@@ -30,6 +30,9 @@ protected:
 	UCapsuleComponent* MouseOver;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
+
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	bool bUsingAbility = false;
 	
 public:	
 	UFUNCTION(Server,Reliable)

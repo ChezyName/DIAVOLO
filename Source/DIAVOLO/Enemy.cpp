@@ -21,6 +21,7 @@ AEnemy::AEnemy()
 void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(AEnemy,Health);
+	DOREPLIFETIME(AEnemy,bUsingAbility);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
