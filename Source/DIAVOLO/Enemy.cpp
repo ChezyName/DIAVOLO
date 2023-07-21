@@ -2,6 +2,8 @@
 
 
 #include "Enemy.h"
+
+#include "GameFramework/GameModeBase.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
