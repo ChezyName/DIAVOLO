@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SphereComponent.h"
 #include "DIAVOLO/Enemy.h"
 #include "CrimsonQueen.generated.h"
 
@@ -13,5 +14,9 @@ UCLASS()
 class DIAVOLO_API ACrimsonQueen : public AEnemy
 {
 	GENERATED_BODY()
-	
+
+	ACrimsonQueen();
+
+	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	USphereComponent* SpinAttackRadius;
 };
