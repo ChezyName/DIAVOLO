@@ -175,6 +175,8 @@ void ADIAVOLOCharacter::StopAnimationClient_Implementation(UAnimMontage* Animati
 
 void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 {
+	if(bUsingAbility) return;
+	bUsingAbility = true;
 	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Enemy->GetActorLocation()));
 	PlaySoundSingle(AutoAttack.AttackSFX);
 	if(AutoAttack.AutoType == EAutoType::E_MELEE)
@@ -203,6 +205,16 @@ void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 			UGameplayStatics::FinishSpawningActor(Projectile, FTransform(LookAtRotation,GetActorLocation()));
 		}
 	}
+
+	//Reset After Time After For Basic Attack
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([&]
+	{
+		bUsingAbility = false;
+	});
+		
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, AutoAttack.TimeAfterAttack, false);
 }
 void ADIAVOLOCharacter::onSkill1_Implementation(FVector Location,AEnemy* Enemy)
 {

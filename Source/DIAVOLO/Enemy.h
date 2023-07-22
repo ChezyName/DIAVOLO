@@ -33,6 +33,16 @@ protected:
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	bool bUsingAbility = false;
+
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	virtual void CallRandomAbility();
+
+	UFUNCTION(Server,Reliable)
+	void PlayAnimationServer(UAnimMontage* Animation);
+
+private:
+	UFUNCTION(NetMulticast,Reliable)
+	void PlayAnimationClient(UAnimMontage* Animation);
 	
 public:	
 	UFUNCTION(Server,Reliable)

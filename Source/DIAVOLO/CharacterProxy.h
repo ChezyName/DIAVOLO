@@ -66,6 +66,8 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void Destroyed() override;
+
+	bool SpawnedNew = false;
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;

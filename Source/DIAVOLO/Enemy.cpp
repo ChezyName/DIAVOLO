@@ -25,6 +25,21 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
+void AEnemy::PlayAnimationServer_Implementation(UAnimMontage* Animation)
+{
+	PlayAnimMontage(Animation);
+	PlayAnimationClient(Animation);
+}
+
+void AEnemy::PlayAnimationClient_Implementation(UAnimMontage* Animation)
+{
+	PlayAnimMontage(Animation);
+}
+
+void AEnemy::CallRandomAbility_Implementation()
+{
+}
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {

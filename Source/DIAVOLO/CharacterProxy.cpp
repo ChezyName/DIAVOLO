@@ -96,7 +96,7 @@ void ACharacterProxy::PossessedBy(AController* NewController)
 
 void ACharacterProxy::Destroyed()
 {
-	if(Character) Character->Destroy();
+	if(Character && SpawnedNew == false) Character->Destroy();
 	Super::Destroyed();
 }
 
@@ -109,6 +109,8 @@ void ACharacterProxy::onCharacterDeath_Implementation()
 	//Spawn Spectator Class
 	FVector Location = TopDownCameraComponent->GetComponentLocation();
 	FRotator Rotation = TopDownCameraComponent->GetComponentRotation();
+	
+	SpawnedNew = true;
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;

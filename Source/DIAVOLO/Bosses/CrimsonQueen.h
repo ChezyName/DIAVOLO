@@ -17,6 +17,25 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 
 	ACrimsonQueen();
 
-	UPROPERTY(EditAnywhere, Category = "Character Info | [W] Spin")
+	//Spin Attack
+	//========================================================================
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Spin")
 	USphereComponent* SpinAttackRadius;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Spin")
+	UAnimMontage* SpinAnimation;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Spin")
+	float SpinAttackLength = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Spin")
+	float SpinAttackDamage = 300;
+
+	
+	//Functions
+	//========================================================================
+	virtual void CallRandomAbility_Implementation() override;
+
+	UFUNCTION(Server,Reliable)
+	void Ability1();
 };
