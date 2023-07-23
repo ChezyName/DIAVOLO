@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SphereComponent.h"
 #include "DIAVOLO/Enemy.h"
+#include "DIAVOLO/OtherEnemies/ChaseEnemy.h"
 #include "CrimsonQueen.generated.h"
 
 /**
@@ -31,6 +32,17 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Spin")
 	float SpinAttackDamage = 300;
 
+	//Summon Hounds Attack
+	//========================================================================
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
+	TSubclassOf<AChaseEnemy> Hounds;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
+	FVector2D MinMaxSpawnHounds = FVector2D(2,5);
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
+	float HoundBiteDamage = 800;
+
 	
 	//Functions
 	//========================================================================
@@ -38,4 +50,7 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 
 	UFUNCTION(Server,Reliable)
 	void Ability1();
+
+	UFUNCTION(Server,Reliable)
+	void Ability2();
 };
