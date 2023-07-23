@@ -221,6 +221,7 @@ public:
 	DOnDeath OnDeathFunction;
 
 	void onDeath();
+	bool isDead = false;
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	EPlayerStates CharState = EPlayerStates::E_IDLE;

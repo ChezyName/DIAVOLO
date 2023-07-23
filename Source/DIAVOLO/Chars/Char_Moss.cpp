@@ -33,6 +33,7 @@ void AChar_Moss::Tick(float DeltaSeconds)
 
 void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 {
+	Super::onSkill1(Location, Enemy);
 	if(Skill1CD < 0 && Mana >= AttackManaConsumption.Skill1 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
 		FVector MyLoc = Location;
@@ -85,7 +86,6 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerBefore, RPGTimeBefore, false);
 	}
-	Super::onSkill1(Location, Enemy);
 }
 
 void AChar_Moss::onSkill2(FVector Location, AEnemy* Enemy)

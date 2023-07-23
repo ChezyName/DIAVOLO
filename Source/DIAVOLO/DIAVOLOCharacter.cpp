@@ -126,6 +126,7 @@ void ADIAVOLOCharacter::onDeath()
 	GetMesh()->SetCollisionProfileName("Ragdoll");
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->WakeAllRigidBodies();
+	isDead = true;
 }
 
 void ADIAVOLOCharacter::PlaySoundSingle_Implementation(USoundWave* SFX)
@@ -218,15 +219,19 @@ void ADIAVOLOCharacter::onBasicSkill_Implementation(AEnemy* Enemy)
 }
 void ADIAVOLOCharacter::onSkill1_Implementation(FVector Location,AEnemy* Enemy)
 {
+	if(isDead) return;
 }
 void ADIAVOLOCharacter::onSkill2_Implementation(FVector Location,AEnemy* Enemy)
 {
+	if(isDead) return;
 }
 void ADIAVOLOCharacter::onSkill3_Implementation(FVector Location,AEnemy* Enemy)
 {
+	if(isDead) return;
 }
 void ADIAVOLOCharacter::onUltimate_Implementation(FVector Location,AEnemy* Enemy)
 {
+	if(isDead) return;
 }
 
 void ADIAVOLOCharacter::endSkill1_Implementation()
