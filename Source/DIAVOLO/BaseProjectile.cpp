@@ -69,13 +69,12 @@ void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
                                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(5,5,5),FColor::Red,false,5);
-
-	USkeletalMeshComponent* MeshHit = Cast<USkeletalMeshComponent>(OtherComp);
-	if(!MeshHit) return;
 	
 	if(!HasAuthority()) return;
 	if(bEnemyProjectile)
 	{
+		USkeletalMeshComponent* MeshHit = Cast<USkeletalMeshComponent>(OtherComp);
+		if(!MeshHit) return;
 		ADIAVOLOCharacter* HitPlayer = Cast<ADIAVOLOCharacter>(OtherActor);
 		AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
 		if(HitPlayer)

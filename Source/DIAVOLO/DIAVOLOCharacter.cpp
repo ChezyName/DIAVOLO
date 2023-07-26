@@ -18,6 +18,41 @@
 #include "Net/UnrealNetwork.h"
 
 
+void ADIAVOLOCharacter::DodgeRoll_Implementation(FVector MouseLocation)
+{
+	if(bisDodging || bUsingAbility) return;
+	bisDodging = true;
+	bUsingAbility = true;
+	PlayAnimationClient(DodgeAnim);
+	PlaySoundSingle(DodgeSound);
+
+	FVector TargetDirection = MouseLocation - GetActorLocation();
+	TargetDirection.Normalize();
+	FRotator TargetRotation = TargetDirection.Rotation();
+	SetActorRotation(TargetRotation);
+	DodgeDirection = TargetDirection;
+
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindLambda([&]
+	{
+		bisDodging = false;
+	});
+
+	FTimerDelegate TimerDelegateB;
+	TimerDelegateB.BindLambda([&]
+	{
+		StopAnimationClient(DodgeAnim);
+		bisDodging = false;
+		bUsingAbility = false;
+	});
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, DodgeFrames, false);
+
+	FTimerHandle TimerHandleB;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandleB, TimerDelegateB, DodgeFrames+RestFrames, false);
+}
+
 ADIAVOLOCharacter::ADIAVOLOCharacter()
 {
 	// Set size for player capsule
@@ -62,6 +97,11 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 
 void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount)
 {
+	if(bisDodging)
+	{
+		//Do Effect
+		return;
+	}
 	Health -= DamageAmount;
 	if(Health <= 0)
 	{
@@ -97,6 +137,16 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 		}
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Mana: " +
 			FString::SanitizeFloat(Mana) + ". CD: " + FString::SanitizeFloat(ManaCD));
+
+		if(bisDodging)
+		{
+			GetCharacterMovement()->Launch(DodgeDirection * 1500);
+		}
+
+		FRotator CharRot = GetActorRotation();
+		CharRot.Pitch = 0;
+		CharRot.Roll = 0;
+		SetActorRotation(CharRot);
 	}
 
 	//if(HasAuthority()) GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red, "SERVER ON " + GetController()->GetName());

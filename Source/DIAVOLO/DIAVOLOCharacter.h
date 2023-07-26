@@ -133,6 +133,21 @@ public:
 	UPROPERTY(EditAnywhere,Category="Character Info | Emote ")
 	UAudioComponent* EmotePlayer;
 
+	UPROPERTY(EditAnywhere,Category="Character Info | DodgeRoll ")
+	UAnimMontage* DodgeAnim;
+	UPROPERTY(EditAnywhere,Category="Character Info | DodgeRoll ")
+	USoundWave* DodgeSound;
+	UPROPERTY(EditAnywhere,Category="Character Info | DodgeRoll ")
+	float DodgeFrames = 0.2;
+	UPROPERTY(EditAnywhere,Category="Character Info | DodgeRoll ")
+	float RestFrames = 0.12;
+	
+	UFUNCTION(Server,Reliable)
+	void DodgeRoll(FVector MouseLocation);
+
+	bool bisDodging = false;
+	FVector DodgeDirection;
+
 	UFUNCTION(Server,Reliable)
 	void StartEmote();
 	UFUNCTION(Server,Reliable)

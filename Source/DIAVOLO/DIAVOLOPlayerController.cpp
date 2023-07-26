@@ -189,6 +189,7 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Ultimate",IE_Released,this,&ADIAVOLOPlayerController::endUltimateC);
 
 	InputComponent->BindAction("Dance",IE_Released,this,&ADIAVOLOPlayerController::startEmoteC);
+	InputComponent->BindAction("Dodge",IE_Pressed,this,&ADIAVOLOPlayerController::onDodgeC);
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
@@ -326,7 +327,8 @@ void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewS
 
 void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 {
-	if(EnemyAttacking == nullptr || GetProxy()->Character == nullptr || GetProxy()->Character->bUsingAbility) return;
+	if(EnemyAttacking == nullptr || GetProxy()->Character == nullptr || GetProxy()->Character->bUsingAbility
+		|| GetProxy()->Character->isDead || GetProxy()->Character->bUsingAbility) return;
 	//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,GetName() + " USING BASIC ATTACK!");
 
 	//Face Enemy
@@ -407,24 +409,39 @@ void ADIAVOLOPlayerController::onUltimateC_Implementation()
 	endEmoteC();
 }
 
+void ADIAVOLOPlayerController::onDodgeC_Implementation()
+{
+	FVector Ground = getMousePositionGround();
+	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
+		|| GetProxy()->Character->bUsingAbility) return;
+	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
+	onDodgeS(Ground);
+	endEmoteC();
+}
+
 //===========================================================================================
 //                                SERVER
 
 void ADIAVOLOPlayerController::onSkill1S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onSkill2S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill2(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onSkill2(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onSkill3S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onSkill3(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onSkill3(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onUltimateS_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->onUltimate(MouseLoc,Enemy);
+	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onUltimate(MouseLoc,Enemy);
+}
+
+void ADIAVOLOPlayerController::onDodgeS_Implementation(FVector MouseLoc)
+{
+	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->DodgeRoll(MouseLoc);
 }
 
 //===========================================================================================

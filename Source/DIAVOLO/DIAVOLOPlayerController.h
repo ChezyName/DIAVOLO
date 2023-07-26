@@ -66,6 +66,8 @@ protected:
 	void onSkill3C();
 	UFUNCTION(Client,Reliable)
 	void onUltimateC();
+	UFUNCTION(Client,Reliable)
+	void onDodgeC();
 
 	UFUNCTION(Server,Reliable)
 	void onSkill1S(FVector MouseLoc,AEnemy* Enemy);
@@ -75,6 +77,8 @@ protected:
 	void onSkill3S(FVector MouseLoc,AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
 	void onUltimateS(FVector MouseLoc,AEnemy* Enemy);
+	UFUNCTION(Server,Reliable)
+	void onDodgeS(FVector MouseLoc);
 
 	UFUNCTION(Client,Reliable)
 	void endSkill1C();
