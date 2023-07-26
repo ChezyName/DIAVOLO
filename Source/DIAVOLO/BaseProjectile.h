@@ -40,6 +40,7 @@ public:
 	bool HasHit;
 	bool Destroying;
 	float Damage = 0;
+	bool bEnemyProjectile = false;
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetupForDestroy();

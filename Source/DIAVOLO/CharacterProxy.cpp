@@ -3,10 +3,7 @@
 #include "DIAVOLOCharacter.h"
 #include "DIAVOLOPlayerController.h"
 #include "AIController.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Net/UnrealNetwork.h"
-#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 
 

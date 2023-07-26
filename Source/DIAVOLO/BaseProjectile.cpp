@@ -69,8 +69,23 @@ void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
                                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	DrawDebugBox(GetWorld(),SweepResult.ImpactPoint,FVector(5,5,5),FColor::Red,false,5);
+
+	USkeletalMeshComponent* MeshHit = Cast<USkeletalMeshComponent>(OtherComp);
+	if(!MeshHit) return;
 	
 	if(!HasAuthority()) return;
+	if(bEnemyProjectile)
+	{
+		ADIAVOLOCharacter* HitPlayer = Cast<ADIAVOLOCharacter>(OtherActor);
+		AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
+		if(HitPlayer)
+		{
+			HitPlayer->CharacterTakeDamage(Damage);
+			Destroy();
+		}
+		if(!HitEnemy) Destroy();
+		return;
+	}
 	if(OtherActor == ProjectileOwner) return;
 	if(OtherActor->GetClass() == this->GetClass()) return;
 	if(OtherActor->GetClass() == ADIAVOLOCharacter::StaticClass()) return;
@@ -81,7 +96,7 @@ void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	
 	AEnemy* HitEnemy = Cast<AEnemy>(OtherActor);
 	if(HitEnemy) OnHitEnemy(HitEnemy);
-	//else OnHitWall();
+	else Destroy();
 }
 
 void ABaseProjectile::OnHitEnemy(AEnemy* EnemyHit)

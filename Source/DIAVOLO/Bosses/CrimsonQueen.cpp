@@ -17,7 +17,7 @@ void ACrimsonQueen::CallRandomAbility_Implementation()
 {
 	Super::CallRandomAbility_Implementation();
 	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::White,"is Using Ability on Crimson Queen! [SERVER]");
-	int Random = FMath::RandRange(0,1);
+	int Random = FMath::RandRange(0,2);
 
 	switch (Random)
 	{
@@ -25,6 +25,8 @@ void ACrimsonQueen::CallRandomAbility_Implementation()
 			Ability1();
 		case 1:
 			Ability2();
+		case 2:
+			Ability3();
 	}
 }
 
@@ -69,5 +71,31 @@ void ACrimsonQueen::Ability2_Implementation()
 		}
 	}
 
+	bUsingAbility = false;
+}
+
+void ACrimsonQueen::Ability3_Implementation()
+{
+	if(bUsingAbility) return;
+	bUsingAbility = true;
+	for(int i = 0; i < TotalAngles; i++)
+	{
+		float ShotAngle = i * AngleInBetween;
+		FRotator ShootAngle = GetActorRotation();
+		ShootAngle.Yaw += ShotAngle;
+				
+		ABaseProjectile* Bullet = Cast<ABaseProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,BulletProjectile,FTransform(ShootAngle,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+		if(Bullet != nullptr)
+		{
+			//Finalizing Create Projecitle
+			Bullet->InitVelocity = BulletVelocity;
+			Bullet->bEnemyProjectile = true;
+			Bullet->Damage = BulletDamage;
+			Bullet->SetOwner(this);
+							
+			//Spawn The Actor
+			UGameplayStatics::FinishSpawningActor(Bullet, FTransform(ShootAngle,GetActorLocation()));
+		}
+	}
 	bUsingAbility = false;
 }

@@ -55,6 +55,7 @@ void AEnemy::Damage_Implementation(float DamageAmount)
 	if(Health <= 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,1,FColor::Red,GetName() + " Has Died!");
+		Destroy();
 	}
 }
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SphereComponent.h"
+#include "DIAVOLO/BaseProjectile.h"
 #include "DIAVOLO/Enemy.h"
 #include "DIAVOLO/OtherEnemies/ChaseEnemy.h"
 #include "CrimsonQueen.generated.h"
@@ -43,6 +44,23 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
 	float HoundBiteDamage = 800;
 
+	//Multi Shoot Attack
+	//========================================================================
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Multi Shot")
+	float BulletDamage = 120;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Multi Shot")
+	float BulletVelocity = 12;
+	
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Multi Shot")
+	float TotalAngles = 8;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Multi Shot")
+	float AngleInBetween = 10;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Multi Shot")
+	TSubclassOf<ABaseProjectile> BulletProjectile;
+
 	
 	//Functions
 	//========================================================================
@@ -53,4 +71,7 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 
 	UFUNCTION(Server,Reliable)
 	void Ability2();
+	
+	UFUNCTION(Server,Reliable)
+	void Ability3();
 };
