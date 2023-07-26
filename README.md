@@ -5,6 +5,7 @@
   - [**Table Of Contents**](#table-of-contents)
 - [Main Menu and Lobby](#main-menu-and-lobby)
 - [Movement System (Top Down)](#movement-system-top-down)
+- [Controls](#controls)
 - [Character States](#character-states)
 - [Characters](#characters)
   - [**The Beast** Spiderman 2099 ReImagined](#the-beast-spiderman-2099-reimagined)
@@ -22,6 +23,17 @@ Once the player either joins or hosts a game `Can Join Locally [LAN] By Using 12
 # Movement System (Top Down)
 
 The Movement in this game is a bit sketch. Basically The *Player Controller* Controls A Pawn That Was Spawned For The Player That Controls Another Pawn (**Server Pawn**) That Holds All The Abilities And Animations. The **SERVER** Pawn Is Controlled By An AI Controller In Order To Use The "Move To" Function. This Allows The Player To Move Their Character (TOP-DOWN) While Replicating To The Server
+
+# Controls
+In game controls take a mix from **Diablo** and **League of Legends**
+**Movement:** To move the Character, You hold or press **LMB** `Left Mouse Button` Where You Want To Move.
+Additionally The Player Has A ***Dodge Roll*** Ability Where The Player Gains *I-Frames* `Invisibility Frames` During 80% of the Roll.
+The Players Also Have 4 Abilities, 3 Basic Abilities **(Q W E)** and an Ultimate Ability, **R**.
+
+**Full Control List:**
+| Q  W  E  | R | LMB | SPACE |
+|---|---|---|---|---|---|
+| Basic Ability | Ultimate Ability | Movement | Dodge |
 
   
 
