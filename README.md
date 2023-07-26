@@ -32,7 +32,7 @@ The Players Also Have 4 Abilities, 3 Basic Abilities **(Q W E)** and an Ultimate
 
 **Full Control List:**
 | Q  W  E  | R | LMB | SPACE |
-|---|---|---|---|---|---|
+|---|---|---|---|---|
 | Basic Ability | Ultimate Ability | Movement | Dodge |
 
   
