@@ -36,6 +36,8 @@ protected:
 
 	UFUNCTION(Server,Reliable,BlueprintCallable)
 	virtual void CallRandomAbility();
+	UFUNCTION(Server,Reliable,BlueprintCallable)
+	virtual void CallRandomAbilityNonMoveNeed();
 
 	UFUNCTION(Server,Reliable)
 	void PlayAnimationServer(UAnimMontage* Animation);

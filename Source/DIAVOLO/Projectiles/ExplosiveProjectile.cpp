@@ -12,6 +12,7 @@ AExplosiveProjectile::AExplosiveProjectile()
 	ExplosionRange = CreateDefaultSubobject<USphereComponent>("ExplosionRange");
 	ExplosionRange->InitSphereRadius(50);
 	ExplosionRange->SetupAttachment(RootComponent);
+	ExplosionRange->BodyInstance.SetCollisionProfileName("Projectile");
 
 	ExplosionSFX = CreateDefaultSubobject<UAudioComponent>("Explosion SFX");
 	ExplosionSFX->SetupAttachment(RootComponent);

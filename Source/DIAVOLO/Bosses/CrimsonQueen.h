@@ -65,6 +65,7 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	//Functions
 	//========================================================================
 	virtual void CallRandomAbility_Implementation() override;
+	virtual void CallRandomAbilityNonMoveNeed_Implementation() override;
 
 	UFUNCTION(Server,Reliable)
 	void Ability1();

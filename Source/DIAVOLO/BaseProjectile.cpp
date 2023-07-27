@@ -12,7 +12,7 @@ ABaseProjectile::ABaseProjectile()
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("Hitbox"));
 	CollisionComp->InitBoxExtent(FVector(5,5,5));
-	CollisionComp->BodyInstance.SetCollisionProfileName("OverlapAll");
+	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->SetGenerateOverlapEvents(true);
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);// set up a notification for when this component hits something blocking
 

@@ -17,12 +17,26 @@ void ACrimsonQueen::CallRandomAbility_Implementation()
 {
 	Super::CallRandomAbility_Implementation();
 	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::White,"is Using Ability on Crimson Queen! [SERVER]");
-	int Random = FMath::RandRange(0,2);
+	/*
+	int Random = FMath::RandRange(1,1);
 
 	switch (Random)
 	{
 		case 0:
 			Ability1();
+	}
+	*/
+	Ability1();
+}
+
+void ACrimsonQueen::CallRandomAbilityNonMoveNeed_Implementation()
+{
+	Super::CallRandomAbilityNonMoveNeed_Implementation();
+
+	int Random = FMath::RandRange(1,2);
+
+	switch (Random)
+	{
 		case 1:
 			Ability2();
 		case 2:
