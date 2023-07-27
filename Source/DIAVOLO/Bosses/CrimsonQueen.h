@@ -39,6 +39,9 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	TSubclassOf<AChaseEnemy> Hounds;
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
+	float SummonDistAway = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
 	FVector2D MinMaxSpawnHounds = FVector2D(2,5);
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")

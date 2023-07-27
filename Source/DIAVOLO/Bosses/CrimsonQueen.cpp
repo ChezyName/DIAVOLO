@@ -76,12 +76,13 @@ void ACrimsonQueen::Ability2_Implementation()
 	int spawnCount = FMath::RandRange(MinMaxSpawnHounds.X,MinMaxSpawnHounds.Y);
 	for(int i = 0; i < spawnCount; i++)
 	{
-		AChaseEnemy* NewHound = Cast<AChaseEnemy>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,Hounds,FTransform(GetActorRotation(),GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+		FVector RandomDirection = FVector(FMath::FRandRange(-1,1),FMath::FRandRange(-1,1),0) * SummonDistAway;
+		AChaseEnemy* NewHound = Cast<AChaseEnemy>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,Hounds,FTransform(GetActorRotation(),GetActorLocation() + RandomDirection),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 		if(NewHound != nullptr)
 		{
 			//Spawn The Actor
 			NewHound->AttackDamage = HoundBiteDamage;
-			UGameplayStatics::FinishSpawningActor(NewHound, FTransform(GetActorRotation(),GetActorLocation()));
+			UGameplayStatics::FinishSpawningActor(NewHound, FTransform(GetActorRotation(),GetActorLocation() + RandomDirection));
 		}
 	}
 
