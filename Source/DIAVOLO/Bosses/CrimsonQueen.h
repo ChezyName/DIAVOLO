@@ -39,10 +39,10 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	TSubclassOf<AChaseEnemy> Hounds;
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
-	float SummonDistAway = 100;
+	float SummonDistAway = 500;
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
-	FVector2D MinMaxSpawnHounds = FVector2D(2,5);
+	FVector2D MinMaxSpawnHounds = FVector2D(2,8);
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Hounds")
 	float HoundBiteDamage = 800;
@@ -64,11 +64,28 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | Multi Shot")
 	TSubclassOf<ABaseProjectile> BulletProjectile;
 
+	//Summon Hellstrike Attack
+	//========================================================================
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
+	FVector2D MinMaxSummonHell = FVector2D(6,12);
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
+	TSubclassOf<AActor> HellStrike;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
+	float TooCloseRange = 500;
+
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
+	float Range = 500;
+
 	
 	//Functions
 	//========================================================================
 	virtual void CallRandomAbility_Implementation() override;
 	virtual void CallRandomAbilityNonMoveNeed_Implementation() override;
+	virtual void BeginPlay() override;
+
+	FVector StartingPostion;
 
 	UFUNCTION(Server,Reliable)
 	void Ability1();
@@ -78,4 +95,7 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	
 	UFUNCTION(Server,Reliable)
 	void Ability3();
+
+	UFUNCTION(Server,Reliable)
+	void Ability4();
 };

@@ -33,7 +33,7 @@ void ACrimsonQueen::CallRandomAbilityNonMoveNeed_Implementation()
 {
 	Super::CallRandomAbilityNonMoveNeed_Implementation();
 
-	int Random = FMath::RandRange(1,2);
+	int Random = FMath::RandRange(1,3);
 
 	switch (Random)
 	{
@@ -41,7 +41,15 @@ void ACrimsonQueen::CallRandomAbilityNonMoveNeed_Implementation()
 			Ability2();
 		case 2:
 			Ability3();
+		case 3:
+			Ability4();
 	}
+}
+
+void ACrimsonQueen::BeginPlay()
+{
+	StartingPostion = GetActorLocation();
+	Super::BeginPlay();
 }
 
 void ACrimsonQueen::Ability1_Implementation()
@@ -112,5 +120,56 @@ void ACrimsonQueen::Ability3_Implementation()
 			UGameplayStatics::FinishSpawningActor(Bullet, FTransform(ShootAngle,GetActorLocation()));
 		}
 	}
+	bUsingAbility = false;
+}
+
+void ACrimsonQueen::Ability4_Implementation()
+{
+	if(bUsingAbility) return;
+	bUsingAbility = true;
+
+	TArray<FVector> RandomPositions;
+
+	int NumPositions = FMath::RandRange(MinMaxSummonHell.X,MinMaxSummonHell.Y);
+	for (int32 i = 0; i < NumPositions; ++i)
+	{
+		FVector NewPosition;
+		bool Overlaps = true;
+		int32 NumAttempts = 0;
+        
+		while (Overlaps && NumAttempts < 100) // Add a maximum number of attempts to avoid infinite loops
+			{
+			// Generate a random position within the specified range
+			float RandomX = FMath::RandRange(-Range, Range);
+			float RandomY = FMath::RandRange(-Range, Range);
+			NewPosition = StartingPostion + FVector(RandomX, RandomY, 0.0f);
+            
+			// Check for overlap with existing positions
+			Overlaps = false;
+			for (const FVector& ExistingPosition : RandomPositions)
+			{
+				if (FVector::DistSquared2D(NewPosition, ExistingPosition) < FMath::Square(TooCloseRange))
+				{
+					Overlaps = true;
+					break;
+				}
+			}
+
+			++NumAttempts;
+			}
+
+		if (!Overlaps)
+		{
+			RandomPositions.Add(NewPosition);
+			//Spawn New Object Here
+			AActor* BeamAttack = Cast<AActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,HellStrike,FTransform(FRotator::ZeroRotator,NewPosition),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			if(BeamAttack != nullptr)
+			{
+				//Spawn The Actor
+				UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(FRotator::ZeroRotator,NewPosition));
+			}
+		}
+	}
+
 	bUsingAbility = false;
 }
