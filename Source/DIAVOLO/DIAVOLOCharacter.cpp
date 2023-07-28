@@ -108,7 +108,13 @@ void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount)
 		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"Character Died, Running Back Numbers!");
 		OnDeathFunction.ExecuteIfBound();
 		onDeath();
+		ClientDeathNonBP();
 	}
+}
+
+void ADIAVOLOCharacter::ClientDeathNonBP_Implementation()
+{
+	ClientDeath();
 }
 
 void ADIAVOLOCharacter::BeginPlay()

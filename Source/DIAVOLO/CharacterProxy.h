@@ -48,7 +48,7 @@ public:
 	UFUNCTION(Client,Reliable)
 	void DestroyMyHUD();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void DestroyMyHUDClient();
 	
 protected:

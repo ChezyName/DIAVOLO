@@ -164,6 +164,10 @@ void ACharacterProxy::DestroyMyHUD_Implementation()
 	DestroyMyHUDClient();
 }
 
+void ACharacterProxy::DestroyMyHUDClient_Implementation()
+{
+}
+
 void ACharacterProxy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

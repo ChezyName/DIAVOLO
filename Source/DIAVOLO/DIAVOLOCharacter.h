@@ -145,6 +145,12 @@ public:
 	UFUNCTION(Server,Reliable)
 	void DodgeRoll(FVector MouseLocation);
 
+	UFUNCTION(Client,Reliable)
+	void ClientDeathNonBP();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ClientDeath();
+
 	bool IFRAMES = false;
 	bool bisDodging = false;
 	FVector DodgeDirection;
