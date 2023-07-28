@@ -70,7 +70,7 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	FVector2D MinMaxSummonHell = FVector2D(6,12);
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
-	TSubclassOf<AActor> HellStrike;
+	TArray<TSubclassOf<AActor>> HellStrike;
 
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
 	float TooCloseRange = 500;

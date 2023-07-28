@@ -230,7 +230,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 void ADIAVOLOPlayerController::startEmoteC_Implementation() { startEmoteS(); }
 void ADIAVOLOPlayerController::startEmoteS_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character)
+	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead)
 	{
 		GetProxy()->MoveToLocation(GetProxy()->Character->GetActorLocation());
 		GetProxy()->Character->StartEmote();

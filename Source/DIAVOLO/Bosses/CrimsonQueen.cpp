@@ -126,6 +126,7 @@ void ACrimsonQueen::Ability3_Implementation()
 void ACrimsonQueen::Ability4_Implementation()
 {
 	if(bUsingAbility) return;
+	if(HellStrike.Num() < 1) return;
 	bUsingAbility = true;
 
 	TArray<FVector> RandomPositions;
@@ -162,7 +163,8 @@ void ACrimsonQueen::Ability4_Implementation()
 		{
 			RandomPositions.Add(NewPosition);
 			//Spawn New Object Here
-			AActor* BeamAttack = Cast<AActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,HellStrike,FTransform(FRotator::ZeroRotator,NewPosition),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			AActor* BeamAttack = Cast<AActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,
+				HellStrike[FMath::RandRange(0,HellStrike.Num()-1)],FTransform(FRotator::ZeroRotator,NewPosition),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 			if(BeamAttack != nullptr)
 			{
 				//Spawn The Actor
