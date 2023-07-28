@@ -34,6 +34,6 @@ void ARealGamemode::ResetGame()
 {
 	bUseSeamlessTravel = true;
 	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"RESET MAP HOLD ON!");
-	UGameplayStatics::OpenLevel(GetWorld(), *GetWorld()->GetName(), false);
+	//UGameplayStatics::OpenLevel(GetWorld(), *GetWorld()->GetName(), false);
 	GetWorld()->ServerTravel(*GetWorld()->GetName(),false,false);
 }
