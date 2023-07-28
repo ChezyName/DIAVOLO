@@ -44,6 +44,10 @@ void AEnemy::CallRandomAbilityNonMoveNeed_Implementation()
 {
 }
 
+void AEnemy::CallRandomUltimate_Implementation()
+{
+}
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {

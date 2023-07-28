@@ -46,6 +46,13 @@ void ACrimsonQueen::CallRandomAbilityNonMoveNeed_Implementation()
 	}
 }
 
+void ACrimsonQueen::CallRandomUltimate_Implementation()
+{
+	Super::CallRandomUltimate_Implementation();
+
+	Ability5();
+}
+
 void ACrimsonQueen::BeginPlay()
 {
 	StartingPostion = GetActorLocation();
@@ -171,6 +178,22 @@ void ACrimsonQueen::Ability4_Implementation()
 				UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(FRotator::ZeroRotator,NewPosition));
 			}
 		}
+	}
+
+	bUsingAbility = false;
+}
+
+void ACrimsonQueen::Ability5_Implementation()
+{
+	if(bUsingAbility) return;
+	bUsingAbility = true;
+
+	AActor* BeamAttack = Cast<AActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,
+				DeathRay,FTransform(FRotator::ZeroRotator,FVector::ZeroVector),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+	if(BeamAttack != nullptr)
+	{
+		//Spawn The Actor
+		UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(FRotator::ZeroRotator,FVector::ZeroVector));
 	}
 
 	bUsingAbility = false;

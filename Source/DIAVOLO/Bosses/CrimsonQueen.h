@@ -78,11 +78,16 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	UPROPERTY(EditAnywhere, Category = "Character Attacks | HellStrike")
 	float Range = 500;
 
+	//Summon Large Beam
+	//========================================================================
+	UPROPERTY(EditAnywhere, Category = "Character Attacks | DEATHRAY")
+	TSubclassOf<AActor> DeathRay;
 	
 	//Functions
 	//========================================================================
 	virtual void CallRandomAbility_Implementation() override;
 	virtual void CallRandomAbilityNonMoveNeed_Implementation() override;
+	virtual void CallRandomUltimate_Implementation() override;
 	virtual void BeginPlay() override;
 
 	FVector StartingPostion;
@@ -98,4 +103,7 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 
 	UFUNCTION(Server,Reliable)
 	void Ability4();
+
+	UFUNCTION(Server,Reliable)
+	void Ability5();
 };

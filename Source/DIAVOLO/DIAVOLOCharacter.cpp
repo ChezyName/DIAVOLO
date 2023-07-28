@@ -1,17 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DIAVOLOCharacter.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/AudioComponent.h"
-#include "Materials/Material.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -95,9 +91,9 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	GetMesh()->SetIsReplicated(true);
 }
 
-void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount)
+void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount, bool IgnoreIFrames)
 {
-	if(bisDodging || IFRAMES)
+	if((bisDodging || IFRAMES) && !IgnoreIFrames)
 	{
 		//Do Effect
 		return;
