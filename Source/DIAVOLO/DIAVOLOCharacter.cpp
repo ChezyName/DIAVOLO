@@ -97,7 +97,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 
 void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount)
 {
-	if(bisDodging)
+	if(bisDodging || IFRAMES)
 	{
 		//Do Effect
 		return;

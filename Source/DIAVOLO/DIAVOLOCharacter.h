@@ -145,6 +145,7 @@ public:
 	UFUNCTION(Server,Reliable)
 	void DodgeRoll(FVector MouseLocation);
 
+	bool IFRAMES = false;
 	bool bisDodging = false;
 	FVector DodgeDirection;
 

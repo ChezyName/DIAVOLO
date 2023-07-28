@@ -3,6 +3,7 @@
 #include "DIAVOLOCharacter.h"
 #include "DIAVOLOPlayerController.h"
 #include "AIController.h"
+#include "RealGamemode.h"
 #include "Net/UnrealNetwork.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 
@@ -102,6 +103,9 @@ void ACharacterProxy::onCharacterDeath_Implementation()
 	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"Character Has Been Killed");
 	//Character->Destroy();
 	Died = true;
+	Character->isDead = true;
+	ARealGamemode* GM = Cast<ARealGamemode>(GetWorld()->GetAuthGameMode());
+	if(GM) GM->onCharacterDeath();
 
 	//Spawn Spectator Class
 	FVector Location = TopDownCameraComponent->GetComponentLocation();

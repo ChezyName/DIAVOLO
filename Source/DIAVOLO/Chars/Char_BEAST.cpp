@@ -369,6 +369,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 	CharState = EPlayerStates::E_ABILITY;
 	bUsingAbility = true;
 	Skill2Active = true;
+	IFRAMES = true;
 
 	//Stop Movement
 	ParentProxy->MoveToLocation(GetActorLocation());
@@ -392,6 +393,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 		CharState = EPlayerStates::E_IDLE;
 		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
+		IFRAMES = false;
 		GetMesh()->SetVisibility(true);
 		StopPlayRazor(false);
 	});
@@ -419,6 +421,7 @@ void AChar_BEAST::endSkill2()
 		ManaCD = ManaCDOnSkillUse;
 		GetMesh()->SetVisibility(true);
 		StopPlayRazor(false);
+		IFRAMES = false;
 	}
 	Super::endSkill2();
 }
