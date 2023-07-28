@@ -122,18 +122,23 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	}
 	
 	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor && GetProxy() && GetProxy()->Character && !GetProxy()->Character->bUsingAbility)
+	if (bMoveToMouseCursor)
 	{
-		if(getMousePositionEnemy() != FVector::ZeroVector)
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,"Mouse is Active!");
+		if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->bUsingAbility)
 		{
-			if(GetCharState() != EPlayerStates::E_ATTACK_WINDUP && 
-			GetCharState() != EPlayerStates::E_ATTACK_FULL)
+			
+			if(getMousePositionEnemy() != FVector::ZeroVector)
 			{
-				ServerAttackMove(getMousePositionEnemy(),GetProxy()->Character->AutoAttack.AttackRange);
+				if(GetCharState() != EPlayerStates::E_ATTACK_WINDUP && 
+				GetCharState() != EPlayerStates::E_ATTACK_FULL)
+				{
+					ServerAttackMove(getMousePositionEnemy(),GetProxy()->Character->AutoAttack.AttackRange);
+				}
+				//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
 			}
-			//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
+			else MoveToMouseCursor();
 		}
-		else MoveToMouseCursor();
 	}
 
 	ServerUpdateState();
@@ -215,7 +220,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	if (Hit.bBlockingHit) // && GetCharState() && GetCharState()->CharState != EPlayerStates::E_ABILITY && GetCharState()->CharState != EPlayerStates::E_ATTACK_FULL)
 	{
 		// We hit something, move there
-		//GEngine->AddOnScreenDebugMessage(-1,5,FColor::Orange,"Moving!");
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,"Moving!");
 		EnemyAttacking = nullptr;
 		ChangeCharState(EPlayerStates::E_MOVE);
 		ServerMove(Hit.ImpactPoint);

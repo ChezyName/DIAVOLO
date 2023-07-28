@@ -41,6 +41,8 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void onCharacterDeath();
+
+	UPROPERTY(BlueprintReadOnly)
 	bool Died = false;
 
 	UFUNCTION(Client,Reliable)

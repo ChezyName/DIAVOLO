@@ -8,8 +8,7 @@
 
 void ARealGamemode::onCharacterDeath()
 {
-	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"SOMEONE DIED!!!");
-	
+	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"SOMEONE DIED!!!");
 	TArray<AActor*> Characters;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADIAVOLOCharacter::StaticClass(), Characters);
 	bool isDead = true;
@@ -18,7 +17,7 @@ void ARealGamemode::onCharacterDeath()
 		ADIAVOLOCharacter* CharDiavolo = Cast<ADIAVOLOCharacter>(Char);
 		if(CharDiavolo && CharDiavolo->isDead == false)
 		{
-			GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,CharDiavolo->GetName() + " has not died!");
+			//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,CharDiavolo->GetName() + " has not died!");
 			isDead = false;
 			break;
 		}
@@ -34,6 +33,7 @@ void ARealGamemode::onCharacterDeath()
 void ARealGamemode::ResetGame()
 {
 	bUseSeamlessTravel = true;
-	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"RESET MAP HOLD ON!");
+	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"RESET MAP HOLD ON!");
 	UGameplayStatics::OpenLevel(GetWorld(), *GetWorld()->GetName(), false);
+	GetWorld()->ServerTravel(*GetWorld()->GetName(),false,false);
 }
