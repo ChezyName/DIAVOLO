@@ -1,6 +1,6 @@
 
 # DIAVOLO : Multiplayer Boss Battles
-## [Wiki](https://github.com/ChezyName/DIAVOLO/wiki)
+## [Read The Wiki Pages](https://github.com/ChezyName/DIAVOLO/wiki)
 ## **Table Of Contents**
 - [DIAVOLO : Multiplayer Boss Battles](#diavolo--multiplayer-boss-battles)
   - [**Table Of Contents**](#table-of-contents)
