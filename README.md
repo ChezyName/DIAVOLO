@@ -91,6 +91,7 @@ Now that you understand Crimson Queens Attacks, you can try and beat her. Good L
 ## Copyright & Music Used
 - [Diablo IV Main Menu Theme](https://www.youtube.com/watch?v=5Eae_WdwxVA&ab_channel=Ceburekas)
 - [Super Smash Bros Melee Character Select Theme](https://www.youtube.com/watch?v=0q_MSMUEhoU&ab_channel=VideoGameSoundtracks)
+- [NOOT NOOT Boss Theme](https://www.youtube.com/watch?v=9X7WME84NZo&t=9s&ab_channel=Carameii)
 
 ## Copyright
 If anyone wants to use this games code or anything like that, please read the [licence](https://github.com/ChezyName/DIAVOLO/blob/main/LICENSE).
