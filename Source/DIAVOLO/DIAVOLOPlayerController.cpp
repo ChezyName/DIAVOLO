@@ -9,7 +9,6 @@
 #include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "DiavoloPS.h"
-#include "ToolBuilderUtil.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
