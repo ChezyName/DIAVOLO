@@ -4,6 +4,7 @@
 #include "CrimsonQueen.h"
 
 #include "DIAVOLO/DIAVOLOCharacter.h"
+#include "DIAVOLO/HelperFuncs.h"
 #include "Kismet/GameplayStatics.h"
 
 ACrimsonQueen::ACrimsonQueen()
@@ -50,7 +51,7 @@ void ACrimsonQueen::CallRandomUltimate_Implementation()
 {
 	Super::CallRandomUltimate_Implementation();
 
-	Ability5();
+	Ultimate1();
 }
 
 void ACrimsonQueen::BeginPlay()
@@ -170,12 +171,15 @@ void ACrimsonQueen::Ability4_Implementation()
 		{
 			RandomPositions.Add(NewPosition);
 			//Spawn New Object Here
+			FRotator RandRot = UHelperFuncs::GetRandomRotator();
+            RandRot.Pitch = 0;
+            RandRot.Roll = 0;
 			AActor* BeamAttack = Cast<AActor>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,
-				HellStrike[FMath::RandRange(0,HellStrike.Num()-1)],FTransform(FRotator::ZeroRotator,NewPosition),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+				HellStrike[FMath::RandRange(0,HellStrike.Num()-1)],FTransform(RandRot,NewPosition),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 			if(BeamAttack != nullptr)
 			{
 				//Spawn The Actor
-				UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(FRotator::ZeroRotator,NewPosition));
+				UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(RandRot,NewPosition));
 			}
 		}
 	}
@@ -183,7 +187,7 @@ void ACrimsonQueen::Ability4_Implementation()
 	bUsingAbility = false;
 }
 
-void ACrimsonQueen::Ability5_Implementation()
+void ACrimsonQueen::Ultimate1_Implementation()
 {
 	if(bUsingAbility) return;
 	bUsingAbility = true;
@@ -193,7 +197,10 @@ void ACrimsonQueen::Ability5_Implementation()
 	if(BeamAttack != nullptr)
 	{
 		//Spawn The Actor
-		UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(FRotator::ZeroRotator,FVector::ZeroVector));
+		FRotator RandRot = UHelperFuncs::GetRandomRotator();
+		RandRot.Pitch = 0;
+		RandRot.Roll = 0;
+		UGameplayStatics::FinishSpawningActor(BeamAttack, FTransform(RandRot,FVector::ZeroVector));
 	}
 
 	bUsingAbility = false;

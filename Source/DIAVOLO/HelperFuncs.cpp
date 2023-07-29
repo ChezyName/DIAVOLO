@@ -45,3 +45,12 @@ void UHelperFuncs::SeamlessTravel(const UObject* WorldContextObject,const TSoftO
 		//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,"Server Travel C++!");
 	}
 }
+
+FRotator UHelperFuncs::GetRandomRotator()
+{
+	float pitch = FMath::RandRange(-180.0f, 180.0f);
+	float yaw = FMath::RandRange(-180.0f, 180.0f);
+	float roll = FMath::RandRange(-180.0f, 180.0f);
+
+	return FRotator(pitch, yaw, roll);
+}

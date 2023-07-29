@@ -13,7 +13,7 @@ UCLASS()
 class DIAVOLO_API UHelperFuncs : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+public:
 	UFUNCTION(BlueprintCallable, Category = "HelperClass")
 	static void SetPlayerName(APlayerController *PlayerController, FString PlayerName);
 
@@ -25,4 +25,6 @@ class DIAVOLO_API UHelperFuncs : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, meta=(WorldContext="WorldContextObject", AdvancedDisplay = "2", DisplayName = "ServerTravel"), Category="Game")
 	static void SeamlessTravel(const UObject* WorldContextObject,const TSoftObjectPtr<UWorld> Level);
+
+	static FRotator GetRandomRotator();
 };

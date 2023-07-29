@@ -105,5 +105,5 @@ class DIAVOLO_API ACrimsonQueen : public AEnemy
 	void Ability4();
 
 	UFUNCTION(Server,Reliable)
-	void Ability5();
+	void Ultimate1();
 };
