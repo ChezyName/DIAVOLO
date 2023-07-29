@@ -121,7 +121,7 @@ public:
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
 	float ZoomMin = 500;
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
-	float ZoomMax = 800;
+	float ZoomMax = 3000;
 
 	UPROPERTY(EditAnywhere,Category="Character Info | Health // Mana ")
 	float MaxHealth = 1500;

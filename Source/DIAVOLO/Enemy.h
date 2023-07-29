@@ -51,4 +51,7 @@ private:
 public:	
 	UFUNCTION(Server,Reliable)
 	void Damage(float DamageAmount);
+
+	UPROPERTY(EditAnywhere)
+	bool bIsBoss = false;
 };

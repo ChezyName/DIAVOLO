@@ -6,10 +6,10 @@
 #include "CharacterProxy.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
-#include "CharacterProxy.h"
+#include "DiavoloPS.h"
+#include "ToolBuilderUtil.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -70,7 +70,7 @@ FVector ADIAVOLOPlayerController::getMousePositionEnemy()
 
 EPlayerStates ADIAVOLOPlayerController::GetCharState()
 {
-	if(GetProxy() && GetProxy()->Character) return GetProxy()->Character->CharState;
+	if(SpawnedCharacter) return SpawnedCharacter->CharState;
 	return EPlayerStates::E_IDLE;
 }
 
@@ -105,6 +105,12 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	if(IsLocalController() && !bController)
+	{
+		LookAtMouse();
+	}
+
+	/*
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + ": " +
 		(GetCharState() == EPlayerStates::E_IDLE ? "IDLE" :
 		GetCharState() == EPlayerStates::E_MOVE ? "MOVE" :
@@ -112,12 +118,14 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 		GetCharState() == EPlayerStates::E_ATTACK_FULL ? "ATTACK HIT" :
 		GetCharState() == EPlayerStates::E_MOVE_ATTACK ? "MOVE -> ATTACK" :
 		GetCharState() == EPlayerStates::E_ABILITY ? "ABILITY" : "N/A"));
+	*/
 
+	/*
 	if(EnemyAttacking)
 	{
 		FVector TempLoc = EnemyAttacking->GetActorLocation();
 		TempLoc.Z = 0;
-		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),GetProxy()->Character->AutoAttack.AttackRange,
+		DrawDebugCylinder(GetWorld(),TempLoc,TempLoc + FVector(0,0,1),Character->AutoAttack.AttackRange,
 			32,FColor::Emerald,false,-1,0,2);
 	}
 	
@@ -125,7 +133,7 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	if (bMoveToMouseCursor)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,"Mouse is Active!");
-		if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->bUsingAbility)
+		if(Character && !Character->bUsingAbility)
 		{
 			
 			if(getMousePositionEnemy() != FVector::ZeroVector)
@@ -133,13 +141,14 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 				if(GetCharState() != EPlayerStates::E_ATTACK_WINDUP && 
 				GetCharState() != EPlayerStates::E_ATTACK_FULL)
 				{
-					ServerAttackMove(getMousePositionEnemy(),GetProxy()->Character->AutoAttack.AttackRange);
+					ServerAttackMove(getMousePositionEnemy(),Character->AutoAttack.AttackRange);
 				}
 				//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Green,"Move To Enemy!");
 			}
 			else MoveToMouseCursor();
 		}
 	}
+	*/
 
 	ServerUpdateState();
 }
@@ -168,7 +177,7 @@ void ADIAVOLOPlayerController::ServerUpdateState_Implementation()
 		else if(EnemyAttacking)
 		{
 			ChangeCharState(EPlayerStates::E_MOVE_ATTACK);
-			ServerAttackMove(EnemyAttacking->GetActorLocation(),GetProxy()->Character->AutoAttack.AttackRange);
+			ServerAttackMove(EnemyAttacking->GetActorLocation(),SpawnedCharacter->AutoAttack.AttackRange);
 			//GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green, GetName() + "MOVE//ATTACK");
 		}
 		break;
@@ -195,14 +204,65 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Dance",IE_Released,this,&ADIAVOLOPlayerController::startEmoteC);
 	InputComponent->BindAction("Dodge",IE_Pressed,this,&ADIAVOLOPlayerController::onDodgeC);
+
+	InputComponent->BindAxis("UpMovement",this,&ADIAVOLOPlayerController::SetUpMovementC);
+	InputComponent->BindAxis("RightMovement",this,&ADIAVOLOPlayerController::SetRightMovementC);
+
+	InputComponent->BindAxis("LookX",this,&ADIAVOLOPlayerController::SetControllerX);
+	InputComponent->BindAxis("LookY",this,&ADIAVOLOPlayerController::SetControllerY);
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
 {
-	Proxy = GetProxy();
+	onStartSetChar();
 	Super::BeginPlay();
 }
 
+void ADIAVOLOPlayerController::onStartSetChar_Implementation()
+{
+	// get current location of player proxy
+	TArray<AActor*> FoundEnemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), FoundEnemies);
+	for(AActor* Enemy : FoundEnemies)
+	{
+		AEnemy* BossChar = Cast<AEnemy>(Enemy);
+		if(BossChar->bIsBoss)
+		{
+			BossCharacter = BossChar;
+			break;
+		}
+	}
+	
+	AActor* StartLoc = nullptr;
+	if(GetWorld() && GetWorld()->GetAuthGameMode())
+		StartLoc = GetWorld()->GetAuthGameMode()->FindPlayerStart(this,FString("None"));
+	FVector Location;
+	FRotator Rotation;
+
+	if(StartLoc != nullptr)
+	{
+		Location = StartLoc->GetActorLocation();
+		Rotation = StartLoc->GetActorRotation();
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.bNoFail = true;
+
+	// spawn actual player
+	if(GetState())
+	{
+		SpawnedCharacter = Cast<ADIAVOLOCharacter>(GetWorld()->SpawnActor(GetState()->CharacterToSpawn, &Location, &Rotation, SpawnParams));
+
+		//GEngine->AddOnScreenDebugMessage(-1,8,FColor::Turquoise,Character ? "Spawned!" : "Not Spawned?!?");
+
+		// we use AI to control the player character for navigation
+		Possess(SpawnedCharacter);
+		//Character->ParentProxy = this;
+		///Character->OnDeathFunction.BindUFunction(this,FName("onCharacterDeath"));
+	}
+}
 
 void ADIAVOLOPlayerController::MoveToMouseCursor()
 {
@@ -213,7 +273,7 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 	if(GetCharState() == EPlayerStates::E_ATTACK_WINDUP)
 	{
 		WindUpCanceled = true;
-		GetProxy()->Character->StopAnimationServer(GetProxy()->Character->AutoAttack.Animation);
+		SpawnedCharacter->StopAnimationServer(SpawnedCharacter->AutoAttack.Animation);
 		ChangeCharState(EPlayerStates::E_IDLE);
 	}
 	
@@ -230,18 +290,18 @@ void ADIAVOLOPlayerController::MoveToMouseCursor()
 void ADIAVOLOPlayerController::startEmoteC_Implementation() { startEmoteS(); }
 void ADIAVOLOPlayerController::startEmoteS_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead)
+	if(SpawnedCharacter && !SpawnedCharacter->isDead)
 	{
-		GetProxy()->MoveToLocation(GetProxy()->Character->GetActorLocation());
-		GetProxy()->Character->StartEmote();
-		GetProxy()->Character->CharState = EPlayerStates::E_EMOTE;
+		GetProxy()->MoveToLocation(SpawnedCharacter->GetActorLocation());
+		SpawnedCharacter->StartEmote();
+		SpawnedCharacter->CharState = EPlayerStates::E_EMOTE;
 	}
 }
 
 void ADIAVOLOPlayerController::endEmoteC_Implementation() { endEmoteS(); }
 void ADIAVOLOPlayerController::endEmoteS_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->StopEmote();
+	if(SpawnedCharacter) SpawnedCharacter->StopEmote();
 }
 
 ACharacterProxy* ADIAVOLOPlayerController::GetProxy()
@@ -255,6 +315,9 @@ void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	DOREPLIFETIME(ADIAVOLOPlayerController,EnemyAttacking);
 	DOREPLIFETIME(ADIAVOLOPlayerController,MousePosition);
+	DOREPLIFETIME(ADIAVOLOPlayerController,SpawnedCharacter);
+	DOREPLIFETIME(ADIAVOLOPlayerController,BossCharacter);
+	DOREPLIFETIME(ADIAVOLOPlayerController,bController);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
@@ -262,13 +325,13 @@ void ADIAVOLOPlayerController::SetNewMoveDestination_Implementation(const FVecto
 {
 	/*
 	if(GetProxy()) GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"Pawn Moving > " +
-		*(GetProxy() ? "PROXY" : " ___ ") + *(GetProxy()->Character ? "CHARACTER" : " ___ "));
+		*(GetProxy() ? "PROXY" : " ___ ") + *(Character ? "CHARACTER" : " ___ "));
 	else GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"PROXY DONT EXIST!");
 	*/
 	endEmoteS();
-	if (GetProxy() && GetProxy()->Character)
+	if (SpawnedCharacter)
 	{
-		float const Distance = FVector::Dist(DestLocation, GetProxy()->Character->GetActorLocation());
+		float const Distance = FVector::Dist(DestLocation, SpawnedCharacter->GetActorLocation());
 		UE_LOG(LogTemp, Warning, TEXT("%s is doing an Auto Attack."),*GetName());
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > 32.0f))
@@ -289,9 +352,9 @@ void ADIAVOLOPlayerController::ServerMove_Implementation(FVector NewLoc)
 
 void ADIAVOLOPlayerController::ServerAttackMove_Implementation(FVector NewLoc,float Range)
 {
-	if(GetProxy() == nullptr || GetProxy()->Character == nullptr) return;
+	if(GetProxy() == nullptr || SpawnedCharacter == nullptr) return;
 	ChangeCharState(EPlayerStates::E_MOVE_ATTACK);
-	const FVector plr = GetProxy()->Character->GetActorLocation();
+	const FVector plr = SpawnedCharacter->GetActorLocation();
 	FVector Dir = NewLoc - plr;
 	Dir.Normalize();
 
@@ -326,24 +389,24 @@ void ADIAVOLOPlayerController::ChangeCharState_Implementation(EPlayerStates NewS
 	if(GetState() && HasAuthority())
 	{
 		GetState()->ChangeCharState(NewState);
-		GetProxy()->Character->ServerSetState(NewState);
+		SpawnedCharacter->ServerSetState(NewState);
 	}
 }
 
 void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 {
-	if(EnemyAttacking == nullptr || GetProxy()->Character == nullptr || GetProxy()->Character->bUsingAbility
-		|| GetProxy()->Character->isDead || GetProxy()->Character->bUsingAbility) return;
+	if(EnemyAttacking == nullptr || SpawnedCharacter == nullptr || SpawnedCharacter->bUsingAbility
+		|| SpawnedCharacter->isDead || SpawnedCharacter->bUsingAbility) return;
 	//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Magenta,GetName() + " USING BASIC ATTACK!");
 
 	//Face Enemy
-	if(GetProxy()->Character) GetProxy()->Character->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(Proxy->Character->GetActorLocation(),
+	if(SpawnedCharacter) SpawnedCharacter->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(Proxy->Character->GetActorLocation(),
 		EnemyAttacking->GetActorLocation()));
 
-	UAnimMontage* AttackAnim = GetProxy()->Character->AutoAttack.Animation;
+	UAnimMontage* AttackAnim = SpawnedCharacter->AutoAttack.Animation;
 	if(AttackAnim)
 	{
-		GetProxy()->Character->PlayAnimationServer(AttackAnim);
+		SpawnedCharacter->PlayAnimationServer(AttackAnim);
 	}
 	ChangeCharState(EPlayerStates::E_ATTACK_WINDUP);
 	WindUpCanceled = false;
@@ -355,7 +418,7 @@ void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 		if(!WindUpCanceled)
 		{
 			if(EnemyAttacking){
-				if(GetProxy()->Character) GetProxy()->Character->onBasicSkill(EnemyAttacking);
+				if(SpawnedCharacter) SpawnedCharacter->onBasicSkill(EnemyAttacking);
 				ChangeCharState(EPlayerStates::E_IDLE);
 			}
 			else
@@ -367,7 +430,7 @@ void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 	});
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, GetProxy()->Character->AutoAttack.TimeBeforeAttack, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, SpawnedCharacter->AutoAttack.TimeBeforeAttack, false);
 }
 
 //===========================================================================================
@@ -375,52 +438,43 @@ void ADIAVOLOPlayerController::DoAutoAttack_Implementation()
 
 void ADIAVOLOPlayerController::onSkill1C_Implementation()
 {
-	FVector Ground = getMousePositionGround();
-	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
-		|| GetProxy()->Character->bUsingAbility) return;
-	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
-	onSkill1S(Ground,EnemyAttacking);
+	if(SpawnedCharacter) onSkill1S(SpawnedCharacter->GetActorForwardVector(),BossCharacter);
 	endEmoteC();
 }
 void ADIAVOLOPlayerController::onSkill2C_Implementation()
 {
-	FVector Ground = getMousePositionGround();
-	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
-		|| GetProxy()->Character->bUsingAbility) return;
-	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
-	onSkill2S(Ground,EnemyAttacking);
+	if(SpawnedCharacter) onSkill2S(SpawnedCharacter->GetActorForwardVector(),BossCharacter);
 	endEmoteC();
 }
 void ADIAVOLOPlayerController::onSkill3C_Implementation()
 {
-	FVector Ground = getMousePositionGround();
-	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
-		|| GetProxy()->Character->bUsingAbility) return;
-	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
-	onSkill3S(Ground,EnemyAttacking);
+	if(SpawnedCharacter) onSkill3S(SpawnedCharacter->GetActorForwardVector(),BossCharacter);
 	endEmoteC();
 }
 void ADIAVOLOPlayerController::onUltimateC_Implementation()
 {
-	FVector Ground = getMousePositionGround();
-	getMousePositionEnemy();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
-		|| GetProxy()->Character->bUsingAbility) return;
-	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
-	onUltimateS(Ground,EnemyAttacking);
+	if(SpawnedCharacter) onUltimateS(SpawnedCharacter->GetActorForwardVector(),BossCharacter);
 	endEmoteC();
 }
 
 void ADIAVOLOPlayerController::onDodgeC_Implementation()
 {
-	FVector Ground = getMousePositionGround();
-	if(!GetProxy() || !GetProxy()->Character || GetProxy()->Character->CharState == EPlayerStates::E_ABILITY
-		|| GetProxy()->Character->bUsingAbility) return;
-	if(GetProxy() && GetProxy()->Character) SetNewMoveDestination(GetProxy()->Character->GetActorLocation());
-	onDodgeS(Ground);
+	if(SpawnedCharacter)
+	{
+		if(bController)
+		{
+			FVector Direction = SpawnedCharacter->GetVelocity().GetSafeNormal();
+			if(Direction == FVector::ZeroVector)
+			{
+				Direction = SpawnedCharacter->GetActorForwardVector();
+			}
+			onDodgeS(Direction);
+		}
+		else
+		{
+			onDodgeS(SpawnedCharacter->GetActorForwardVector());
+		}
+	}
 	endEmoteC();
 }
 
@@ -429,24 +483,24 @@ void ADIAVOLOPlayerController::onDodgeC_Implementation()
 
 void ADIAVOLOPlayerController::onSkill1S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onSkill1(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill1(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onSkill2S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onSkill2(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill2(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onSkill3S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onSkill3(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill3(MouseLoc,Enemy);
 }
 void ADIAVOLOPlayerController::onUltimateS_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->onUltimate(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onUltimate(MouseLoc,Enemy);
 }
 
 void ADIAVOLOPlayerController::onDodgeS_Implementation(FVector MouseLoc)
 {
-	if(GetProxy() && GetProxy()->Character && !GetProxy()->Character->isDead) GetProxy()->Character->DodgeRoll(MouseLoc);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->DodgeRoll(MouseLoc);
 }
 
 //===========================================================================================
@@ -462,17 +516,97 @@ void ADIAVOLOPlayerController::endUltimateC_Implementation(){ endUltimate(); }
 
 void ADIAVOLOPlayerController::endSkill1_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endSkill1();
+	if(SpawnedCharacter) SpawnedCharacter->endSkill1();
 }
 void ADIAVOLOPlayerController::endSkill2_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endSkill2();
+	if(SpawnedCharacter) SpawnedCharacter->endSkill2();
 }
 void ADIAVOLOPlayerController::endSkill3_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endSkill3();
+	if(SpawnedCharacter) SpawnedCharacter->endSkill3();
 }
 void ADIAVOLOPlayerController::endUltimate_Implementation()
 {
-	if(GetProxy() && GetProxy()->Character) GetProxy()->Character->endUltimate();
+	if(SpawnedCharacter) SpawnedCharacter->endUltimate();
+}
+
+//===========================================================================================
+//                                MOVEMENT
+
+void ADIAVOLOPlayerController::SetUpMovementC_Implementation(float Value)
+{
+	SetUpMovementS(Value);
+}
+
+void ADIAVOLOPlayerController::SetRightMovementC_Implementation(float Value)
+{
+	SetRightMovementS(Value);
+}
+
+void ADIAVOLOPlayerController::SetUpMovementS_Implementation(float Value)
+{
+	if(SpawnedCharacter && !SpawnedCharacter->isDead &&
+		!SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging)
+			SpawnedCharacter->AddMovementInput(FVector::ForwardVector * Value,1,false);
+}
+
+void ADIAVOLOPlayerController::SetRightMovementS_Implementation(float Value)
+{
+	if(SpawnedCharacter && !SpawnedCharacter->isDead &&
+		!SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging)
+			SpawnedCharacter->AddMovementInput(FVector::RightVector * Value,1,false);
+}
+
+void ADIAVOLOPlayerController::LookAtMouse()
+{
+	if (SpawnedCharacter)
+	{
+		// Calculate the direction the character should look at (ignoring Z-axis)
+		FVector CharacterLocation = SpawnedCharacter->GetActorLocation();
+		FVector LookDirection = getMousePositionGround() - CharacterLocation;
+		LookDirection.Z = 0.0f;
+
+		if (!LookDirection.IsNearlyZero())
+		{
+			// Calculate the rotation for the player character (only on the yaw axis)
+			FRotator NewRotation = FRotationMatrix::MakeFromX(LookDirection).Rotator();
+			NewRotation.Pitch = 0.0f;
+			NewRotation.Roll = 0.0f;
+
+			// Set the actor rotation with the new rotation
+			SpawnedCharacter->SetActorRotation(NewRotation);
+		}
+
+		GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Orange,
+			"Mouse Angle: " + FString::SanitizeFloat(SpawnedCharacter->GetActorRotation().Yaw));
+	}
+}
+
+void ADIAVOLOPlayerController::LookAtController()
+{
+	if (SpawnedCharacter)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,
+			"Controller Pos: " + FString::SanitizeFloat(ControllerAimDir.X) + " , " + 
+			FString::SanitizeFloat(ControllerAimDir.Y) + ".");
+		float AngleRadians = FMath::Atan2(ControllerAimDir.Y, ControllerAimDir.X);
+		float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
+
+		// Set the rotation for the player character
+		FRotator NewRotation = FRotator(0.0f, AngleDegrees+90, 0.0f);
+		SpawnedCharacter->SetActorRotation(NewRotation);
+	}
+}
+
+void ADIAVOLOPlayerController::SetControllerX(float X)
+{
+	ControllerAimDir.X = X;
+	if(bController) LookAtController();
+}
+
+void ADIAVOLOPlayerController::SetControllerY(float Y)
+{
+	ControllerAimDir.Y = Y;
+	if(bController) LookAtController();
 }

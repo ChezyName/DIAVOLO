@@ -22,7 +22,8 @@ void ADIAVOLOCharacter::DodgeRoll_Implementation(FVector MouseLocation)
 	PlayAnimationClient(DodgeAnim);
 	PlaySoundSingle(DodgeSound);
 
-	FVector TargetDirection = MouseLocation - GetActorLocation();
+	//FVector TargetDirection = MouseLocation - GetActorLocation();
+	FVector TargetDirection = GetVelocity();
 	TargetDirection.Normalize();
 	FRotator TargetRotation = TargetDirection.Rotation();
 	SetActorRotation(TargetRotation);
@@ -60,7 +61,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Rotate character to moving direction
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
@@ -69,7 +70,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 1700.f;
+	CameraBoom->TargetArmLength = 2000.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
@@ -143,6 +144,18 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 		if(bisDodging)
 		{
 			GetCharacterMovement()->Launch(DodgeDirection * 1500);
+			FVector TargetDirection = DodgeDirection;
+			TargetDirection.Z = 0.0f;
+			TargetDirection.Normalize();
+
+			// Calculate the yaw angle between the character's forward vector and the target direction
+			FRotator TargetYawRotation = TargetDirection.Rotation();
+			FRotator CharacterYawRotation = GetActorForwardVector().Rotation();
+			float YawAngle = TargetYawRotation.Yaw - CharacterYawRotation.Yaw;
+
+			// Set the character's yaw rotation to face the target direction
+			FRotator NewRotation = FRotator(0.0f, YawAngle, 0.0f);
+			AddActorLocalRotation(NewRotation);
 		}
 
 		FRotator CharRot = GetActorRotation();

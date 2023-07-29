@@ -23,6 +23,9 @@ public:
 
 	//Auto Attack
 	bool WindUpCanceled;
+
+	UPROPERTY(BlueprintReadWrite,Replicated)
+	bool bController = false;
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -32,14 +35,33 @@ protected:
 
 	UPROPERTY()
 	class ACharacterProxy* Proxy;
-
+	
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	class ADIAVOLOCharacter* SpawnedCharacter;
+	
 	FVector newMoveToLocation = FVector::ZeroVector;
 
 	UPROPERTY(Replicated)
 	AEnemy* EnemyAttacking;
 
 	UPROPERTY(Replicated)
+	AEnemy* BossCharacter;
+
+	UPROPERTY(Replicated)
 	FVector MousePosition;
+
+	FVector MouseLookDir = FVector::ForwardVector;
+
+	UFUNCTION(Server,Reliable)
+	void onStartSetChar();
+	
+	void LookAtMouse();
+
+	FVector2D ControllerAimDir;
+	void LookAtController();
+
+	void SetControllerX(float X);
+	void SetControllerY(float Y);
 	
 	bool CloseEnough();
 
@@ -57,6 +79,15 @@ protected:
 	/** Navigate player to the given world location. */
 	UFUNCTION(Server,Reliable)
 	void SetNewMoveDestination(const FVector DestLocation);
+
+	UFUNCTION(Client,Reliable)
+	void SetUpMovementC(float Value);
+	UFUNCTION(Client,Reliable)
+	void SetRightMovementC(float Value);
+	UFUNCTION(Server,Reliable)
+	void SetUpMovementS(float Value);
+	UFUNCTION(Server,Reliable)
+	void SetRightMovementS(float Value);
 
 	UFUNCTION(Client,Reliable)
 	void onSkill1C();

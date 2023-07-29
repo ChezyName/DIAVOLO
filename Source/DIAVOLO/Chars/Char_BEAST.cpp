@@ -276,7 +276,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 	if(IsValid(Claw) && bSwapped == false && Claw->Destroying == false && TPDelay < 0)
 	{
 		//Stop Movement
-		ParentProxy->MoveToLocation(GetActorLocation());
+		//ParentProxy->MoveToLocation(GetActorLocation());
 		
 		//Swap Spots With Claw
 		const FTransform ClawTransform = Claw->GetActorTransform();
@@ -304,7 +304,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		Skill1Active = true;
 		
 		//Stop Movement
-		ParentProxy->MoveToLocation(GetActorLocation());
+		//ParentProxy->MoveToLocation(GetActorLocation());
 		
 		SetActorRotation(LookAtRotation);
 		
@@ -372,7 +372,7 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 	IFRAMES = true;
 
 	//Stop Movement
-	ParentProxy->MoveToLocation(GetActorLocation());
+	//ParentProxy->MoveToLocation(GetActorLocation());
 	SpinActive = true;
 	GetMesh()->SetVisibility(false);
 	bEndedEarly = false;
@@ -438,7 +438,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 
 	FRotator NewLookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
 	SetActorRotation(NewLookAtRotation);
-	ParentProxy->MoveToLocation(GetActorLocation());
+	//ParentProxy->MoveToLocation(GetActorLocation());
 	
 	Grapple = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,GrappleProjectile,FTransform(NewLookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 	if(Grapple != nullptr)
