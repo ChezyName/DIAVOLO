@@ -1,6 +1,5 @@
 
 # DIAVOLO : Multiplayer Boss Battles
-## [Read The Wiki Pages](https://github.com/ChezyName/DIAVOLO/wiki)
 ## **Table Of Contents**
 - [DIAVOLO : Multiplayer Boss Battles](#diavolo--multiplayer-boss-battles)
   - [**Table Of Contents**](#table-of-contents)
@@ -14,6 +13,9 @@
   - [**Micheal Moss**  Weapon Master](#micheal-moss--weapon-master)
     - [Abilities](#abilities-1)
 - [Crimson Queen: The First Boss](#crimson-queen-the-first-boss)
+  - [Copyright \& Music Used](#copyright--music-used)
+  - [Copyright](#copyright)
+      - [Copyright © 2023 ChezyName](#copyright--2023-chezyname)
 
 # Main Menu and Lobby
 This game uses a simple lobby system where the player sets thier username at the start of the game and is able to host or join from that menu.
@@ -67,7 +69,7 @@ E_MOVE.
 ### Abilities
 |![Shadow Claws](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/2099_Q.png)|![Demonic Spin](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/2099_W.png)|![Grapple](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/2099_E.png)|![True Power](https://raw.githubusercontent.com/ChezyName/DIAVOLO/main/GitImages/2099_R.png)|
 |---|---|---|---|
-|The Beast Sends Out Shadow Claws In Aimed Direction (Mouse) That Will Damage Enemies. ReActivating The Key Will Teleport The User To The Claws If Claws Have Not Hit Enemy|The Beast Starts Spinning At High Speeds Damaging Enemies All Around Them Additionally Granting `Invisibility` During The Duration|The Beast Sends Out A Grapple Hook, If Hits Wall Or Enemy, The Beast Pulls Himself Towards The Hook|The Beast Releases 4 Spinning Blades That Rotate Around Them Damaging All Enemies It omes In Contact With|
+|The Beast Sends Out Shadow Claws In Aimed Direction (Mouse) That Will Damage Enemies. ReActivating The Key Will Teleport The User To The Claws If Claws Have Not Hit Enemy|The Beast Starts Spinning At High Speeds Damaging Enemies All Around Them Additionally Granting `Invisibility` During The Duration|The Beast Sends Out A Grapple Hook, If Hits Wall Or Enemy, The Beast Pulls Himself Towards The Hook|The Beast Releases 4 Spinning Blades That Rotate Around Them Damaging All Enemies It comes In Contact With|
 
 ## **Micheal Moss**  Weapon Master
 Former Ex-Military now Gun For Hire, Micheal Moss is a playable ranged character in Diavolo. His play style is semi-ranged, the player should keep thier distance from enemies but close enough to be in range.
@@ -86,3 +88,12 @@ As a character, Crimson Queen uses a ton of projectiles and beam attacks. When f
 
 Now that you understand Crimson Queens Attacks, you can try and beat her. Good Luck Gamers!
 
+## Copyright & Music Used
+- [Diablo IV Main Menu Theme](https://www.youtube.com/watch?v=5Eae_WdwxVA&ab_channel=Ceburekas)
+- [Super Smash Bros Melee Character Select Theme](https://www.youtube.com/watch?v=0q_MSMUEhoU&ab_channel=VideoGameSoundtracks)
+
+## Copyright
+If anyone wants to use this games code or anything like that, please read the [licence](https://github.com/ChezyName/DIAVOLO/blob/main/LICENSE).
+
+
+#### Copyright © 2023 ChezyName
