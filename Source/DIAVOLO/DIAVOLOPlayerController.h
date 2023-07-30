@@ -21,6 +21,12 @@ public:
 	FVector getMousePositionGround();
 	FVector getMousePositionEnemy();
 
+	UPROPERTY(EditDefaultsOnly,Category="Class Info")
+	TSubclassOf<APawn> SpectatorClass;
+
+	UFUNCTION(Server,Reliable)
+	void onDeath();
+
 	//Auto Attack
 	bool WindUpCanceled;
 

@@ -9,6 +9,7 @@
 #include "DIAVOLOCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "DiavoloPS.h"
+#include "RealGamemode.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -71,6 +72,25 @@ EPlayerStates ADIAVOLOPlayerController::GetCharState()
 {
 	if(SpawnedCharacter) return SpawnedCharacter->CharState;
 	return EPlayerStates::E_IDLE;
+}
+
+void ADIAVOLOPlayerController::onDeath_Implementation()
+{
+	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"Character Has Been Killed");
+	ARealGamemode* GM = Cast<ARealGamemode>(GetWorld()->GetAuthGameMode());
+	if(GM) GM->onCharacterDeath();
+
+	//Spawn Spectator Class
+	FVector Location = SpawnedCharacter->GetCameraBoom()->GetComponentLocation();
+	FRotator Rotation = SpawnedCharacter->GetCameraBoom()->GetComponentRotation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.bNoFail = true;
+	APawn* NewChar = Cast<APawn>(GetWorld()->SpawnActor(SpectatorClass, &Location, &Rotation, SpawnParams));
+	Possess(NewChar);
+	NewChar->SetPlayerState(GetState());
 }
 
 ADiavoloPS* ADIAVOLOPlayerController::GetState()
@@ -258,6 +278,7 @@ void ADIAVOLOPlayerController::onStartSetChar_Implementation()
 
 		// we use AI to control the player character for navigation
 		Possess(SpawnedCharacter);
+		SpawnedCharacter->OnDeathFunction.BindUFunction(this,FName("onDeath"));
 		//Character->ParentProxy = this;
 		///Character->OnDeathFunction.BindUFunction(this,FName("onCharacterDeath"));
 	}
