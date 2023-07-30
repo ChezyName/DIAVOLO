@@ -566,16 +566,22 @@ void ADIAVOLOPlayerController::SetRightMovementC_Implementation(float Value)
 
 void ADIAVOLOPlayerController::SetUpMovementS_Implementation(float Value)
 {
+	if(!SpawnedCharacter) return;
 	if(SpawnedCharacter && !SpawnedCharacter->isDead &&
 		!SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging)
 			SpawnedCharacter->AddMovementInput(FVector::ForwardVector * Value,1,false);
+	if(abs(Value) > 0) SpawnedCharacter->CharState = EPlayerStates::E_MOVE;
+	else SpawnedCharacter->CharState = EPlayerStates::E_IDLE;
 }
 
 void ADIAVOLOPlayerController::SetRightMovementS_Implementation(float Value)
 {
+	if(!SpawnedCharacter) return;
 	if(SpawnedCharacter && !SpawnedCharacter->isDead &&
 		!SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging)
 			SpawnedCharacter->AddMovementInput(FVector::RightVector * Value,1,false);
+	if(abs(Value) > 0) SpawnedCharacter->CharState = EPlayerStates::E_MOVE;
+	else SpawnedCharacter->CharState = EPlayerStates::E_IDLE;
 }
 
 void ADIAVOLOPlayerController::LookAtMouse()
