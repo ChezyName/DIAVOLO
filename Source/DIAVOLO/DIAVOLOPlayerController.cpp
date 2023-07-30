@@ -291,7 +291,7 @@ void ADIAVOLOPlayerController::startEmoteS_Implementation()
 {
 	if(SpawnedCharacter && !SpawnedCharacter->isDead)
 	{
-		GetProxy()->MoveToLocation(SpawnedCharacter->GetActorLocation());
+		//GetProxy()->MoveToLocation(SpawnedCharacter->GetActorLocation());
 		SpawnedCharacter->StartEmote();
 		SpawnedCharacter->CharState = EPlayerStates::E_EMOTE;
 	}
@@ -482,19 +482,19 @@ void ADIAVOLOPlayerController::onDodgeC_Implementation()
 
 void ADIAVOLOPlayerController::onSkill1S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill1(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill1(SpawnedCharacter->GetActorForwardVector(),Enemy);
 }
 void ADIAVOLOPlayerController::onSkill2S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill2(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill2(SpawnedCharacter->GetActorForwardVector(),Enemy);
 }
 void ADIAVOLOPlayerController::onSkill3S_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill3(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onSkill3(SpawnedCharacter->GetActorForwardVector(),Enemy);
 }
 void ADIAVOLOPlayerController::onUltimateS_Implementation(FVector MouseLoc,AEnemy* Enemy)
 {
-	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onUltimate(MouseLoc,Enemy);
+	if(SpawnedCharacter && !SpawnedCharacter->isDead) SpawnedCharacter->onUltimate(SpawnedCharacter->GetActorForwardVector(),Enemy);
 }
 
 void ADIAVOLOPlayerController::onDodgeS_Implementation(FVector MouseLoc)

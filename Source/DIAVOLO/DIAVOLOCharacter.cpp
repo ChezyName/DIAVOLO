@@ -23,7 +23,7 @@ void ADIAVOLOCharacter::DodgeRoll_Implementation(FVector MouseLocation)
 	PlaySoundSingle(DodgeSound);
 
 	//FVector TargetDirection = MouseLocation - GetActorLocation();
-	FVector TargetDirection = GetVelocity();
+	FVector TargetDirection = MouseLocation;
 	TargetDirection.Normalize();
 	FRotator TargetRotation = TargetDirection.Rotation();
 	SetActorRotation(TargetRotation);

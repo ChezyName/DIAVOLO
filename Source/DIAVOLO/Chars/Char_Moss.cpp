@@ -46,7 +46,7 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		CharState = EPlayerStates::E_ABILITY;
 		PlayAnimationServer(RPGAnimation);
 		SetActorRotation(LookAtRotation);
-		ParentProxy->MoveToLocation(GetActorLocation());
+		//ParentProxy->MoveToLocation(GetActorLocation());
 		GetMovementComponent()->Deactivate();
 		
 		//Launch Rocket
@@ -130,7 +130,7 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 		CharState = EPlayerStates::E_ABILITY;
 		PlayAnimationServer(ShotgunAnimation);
 		SetActorRotation(LookAtRotation);
-		ParentProxy->MoveToLocation(GetActorLocation());
+		//ParentProxy->MoveToLocation(GetActorLocation());
 		GetMovementComponent()->Deactivate();
 		
 		FTimerDelegate TimeBefore;
@@ -181,26 +181,30 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 
 void AChar_Moss::onUltimate(FVector Location, AEnemy* Enemy)
 {
+	GEngine->AddOnScreenDebugMessage(-1,45,FColor::Blue,"Using Moss ULTIMATE!");
 	Super::onUltimate(Location, Enemy);
-	if(UltimateCD < 0 && Mana >= AttackManaConsumption.Ultimate && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
+	// && UltimateCD < 0 && Mana >= AttackManaConsumption.Ultimate && !bUsingAbility
+	if(Enemy != nullptr)
 	{
-		FVector MyLoc = Location;
+		//FVector MyLoc = Enemy->GetActorLocation();
+		/*
 		MyLoc.Z = GetActorLocation().Z;
 		FVector PDir = MyLoc - GetActorLocation();
 		PDir.Normalize();
 
 		FRotator LookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
+		*/
 	
 		CharState = EPlayerStates::E_ABILITY;
 		//PlayAnimationServer(RPGAnimation);
-		SetActorRotation(LookAtRotation);
-		ParentProxy->MoveToLocation(GetActorLocation());
-		GetMovementComponent()->Deactivate(); 
+		//SetActorRotation(LookAtRotation);
+		//ParentProxy->MoveToLocation(GetActorLocation());
+		//GetMovementComponent()->Deactivate(); 
 
 		float HalfRange = NukeRange/2;
 		for(int i = 0; i < NukesCount; i++)
 		{
-			FVector NukeStartLoc = Location;
+			FVector NukeStartLoc = Enemy->GetActorLocation();
 			NukeStartLoc.Z += 1500;
 			NukeStartLoc.X += FMath::FRandRange(-HalfRange,HalfRange);
 			NukeStartLoc.Y += FMath::FRandRange(-HalfRange,HalfRange);
