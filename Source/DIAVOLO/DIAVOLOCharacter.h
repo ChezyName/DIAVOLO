@@ -145,14 +145,17 @@ public:
 	UFUNCTION(Server,Reliable)
 	void DodgeRoll(FVector MouseLocation);
 
-	UFUNCTION(Client,Reliable)
-	void SetUpMovementC(float Value);
-	UFUNCTION(Client,Reliable)
-	void SetRightMovementC(float Value);
+	//UFUNCTION(Client,Reliable)
+	void SetUpMovement(float Value);
+	//FUNCTION(Client,Reliable)
+	void SetRightMovement(float Value);
+
+	/*
 	UFUNCTION(Server,Reliable)
 	void SetUpMovementS(float Value);
 	UFUNCTION(Server,Reliable)
 	void SetRightMovementS(float Value);
+	*/
 
 	UFUNCTION(Client,Reliable)
 	void ClientDeathNonBP();
@@ -186,6 +189,7 @@ public:
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
 	
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }

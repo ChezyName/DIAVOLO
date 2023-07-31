@@ -117,8 +117,20 @@ void ADIAVOLOCharacter::ClientDeathNonBP_Implementation()
 void ADIAVOLOCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	Health = MaxHealth;
-	Mana = MaxMana;
+	if(HasAuthority())
+	{
+		Health = MaxHealth;
+		Mana = MaxMana;
+	}
+}
+
+void ADIAVOLOCharacter::PossessedBy(AController* NewController)
+{
+	if(NewController)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,60,FColor::Red,"This Pawn Controller: " + NewController->GetName());
+	}
+	Super::PossessedBy(NewController);
 }
 
 void ADIAVOLOCharacter::Tick(float DeltaSeconds)
@@ -339,8 +351,8 @@ void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("Zoom",this,&ADIAVOLOCharacter::ZoomCamera);
-	PlayerInputComponent->BindAxis("UpMovement",this,&ADIAVOLOCharacter::SetUpMovementC);
-	PlayerInputComponent->BindAxis("RightMovement",this,&ADIAVOLOCharacter::SetRightMovementC);
+	PlayerInputComponent->BindAxis("UpMovement",this,&ADIAVOLOCharacter::SetUpMovement);
+	PlayerInputComponent->BindAxis("RightMovement",this,&ADIAVOLOCharacter::SetRightMovement);
 }
 
 void ADIAVOLOCharacter::ZoomCamera(float Speed)
@@ -374,32 +386,22 @@ void ADIAVOLOCharacter::stopEmoteSound_Implementation()
 //===========================================================================================
 //                                MOVEMENT
 
-void ADIAVOLOCharacter::SetUpMovementC_Implementation(float Value)
+void ADIAVOLOCharacter::SetUpMovement(float Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,"Client Y: " + FString::SanitizeFloat(Value));
-	SetUpMovementS(Value);
-}
-
-void ADIAVOLOCharacter::SetRightMovementC_Implementation(float Value)
-{
-	SetRightMovementS(Value);
-}
-
-void ADIAVOLOCharacter::SetUpMovementS_Implementation(float Value)
-{
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Movement Y: " + FString::SanitizeFloat(Value));
 	if(Value != 0.0f)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green,"Movement Y: " + FString::SanitizeFloat(Value));
 		AddMovementInput(FVector::ForwardVector * Value,1,false);
 	}
-		
+	//SetRightMovementS(Value);
 }
 
-void ADIAVOLOCharacter::SetRightMovementS_Implementation(float Value)
+void ADIAVOLOCharacter::SetRightMovement(float Value)
 {
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Movement X: " + FString::SanitizeFloat(Value));
 	if(Value != 0.0f)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green,"Movement X: " + FString::SanitizeFloat(Value));
 		AddMovementInput(FVector::RightVector * Value,1,false);
 	}
+		
 }

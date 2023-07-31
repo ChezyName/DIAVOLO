@@ -38,6 +38,7 @@ void ARealGamemode::ResetGame()
 	GetWorld()->ServerTravel(*GetWorld()->GetName(),false,false);
 }
 
+/*
 void ARealGamemode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
@@ -81,7 +82,6 @@ void ARealGamemode::HandleStartingNewPlayer_Implementation(APlayerController* Ne
 	}
 }
 
-/*
 UClass* ARealGamemode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
 	ADiavoloPS* PS = InController->GetPlayerState<ADiavoloPS>();
