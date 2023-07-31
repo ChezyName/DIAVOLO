@@ -146,6 +146,15 @@ public:
 	void DodgeRoll(FVector MouseLocation);
 
 	UFUNCTION(Client,Reliable)
+	void SetUpMovementC(float Value);
+	UFUNCTION(Client,Reliable)
+	void SetRightMovementC(float Value);
+	UFUNCTION(Server,Reliable)
+	void SetUpMovementS(float Value);
+	UFUNCTION(Server,Reliable)
+	void SetRightMovementS(float Value);
+
+	UFUNCTION(Client,Reliable)
 	void ClientDeathNonBP();
 
 	UFUNCTION(BlueprintImplementableEvent)

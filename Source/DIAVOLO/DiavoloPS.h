@@ -36,7 +36,7 @@ public:
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
 	FString CharName = "[UNKNOWN]";
 
-	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")
+	UPROPERTY(Replicated,EditDefaultsOnly,BlueprintReadOnly,Category="Character State")
 	TSubclassOf<class ADIAVOLOCharacter> CharacterToSpawn = nullptr;
 
 	UPROPERTY(Replicated,BlueprintReadOnly,Category="Character State")

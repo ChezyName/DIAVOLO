@@ -339,6 +339,8 @@ void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("Zoom",this,&ADIAVOLOCharacter::ZoomCamera);
+	PlayerInputComponent->BindAxis("UpMovement",this,&ADIAVOLOCharacter::SetUpMovementC);
+	PlayerInputComponent->BindAxis("RightMovement",this,&ADIAVOLOCharacter::SetRightMovementC);
 }
 
 void ADIAVOLOCharacter::ZoomCamera(float Speed)
@@ -367,4 +369,37 @@ void ADIAVOLOCharacter::startEmoteSound_Implementation()
 void ADIAVOLOCharacter::stopEmoteSound_Implementation()
 {
 	EmotePlayer->Stop();
+}
+
+//===========================================================================================
+//                                MOVEMENT
+
+void ADIAVOLOCharacter::SetUpMovementC_Implementation(float Value)
+{
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,"Client Y: " + FString::SanitizeFloat(Value));
+	SetUpMovementS(Value);
+}
+
+void ADIAVOLOCharacter::SetRightMovementC_Implementation(float Value)
+{
+	SetRightMovementS(Value);
+}
+
+void ADIAVOLOCharacter::SetUpMovementS_Implementation(float Value)
+{
+	if(Value != 0.0f)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green,"Movement Y: " + FString::SanitizeFloat(Value));
+		AddMovementInput(FVector::ForwardVector * Value,1,false);
+	}
+		
+}
+
+void ADIAVOLOCharacter::SetRightMovementS_Implementation(float Value)
+{
+	if(Value != 0.0f)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green,"Movement X: " + FString::SanitizeFloat(Value));
+		AddMovementInput(FVector::RightVector * Value,1,false);
+	}
 }

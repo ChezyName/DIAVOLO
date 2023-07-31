@@ -32,6 +32,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite,Replicated)
 	bool bController = false;
+
+	UPROPERTY(Replicated,BlueprintReadOnly)
+	class ADIAVOLOCharacter* SpawnedCharacter;
+
+	virtual void OnPossess(APawn* InPawn) override;
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -41,9 +46,6 @@ protected:
 
 	UPROPERTY()
 	class ACharacterProxy* Proxy;
-	
-	UPROPERTY(Replicated,BlueprintReadOnly)
-	class ADIAVOLOCharacter* SpawnedCharacter;
 	
 	FVector newMoveToLocation = FVector::ZeroVector;
 
@@ -85,15 +87,6 @@ protected:
 	/** Navigate player to the given world location. */
 	UFUNCTION(Server,Reliable)
 	void SetNewMoveDestination(const FVector DestLocation);
-
-	UFUNCTION(Client,Reliable)
-	void SetUpMovementC(float Value);
-	UFUNCTION(Client,Reliable)
-	void SetRightMovementC(float Value);
-	UFUNCTION(Server,Reliable)
-	void SetUpMovementS(float Value);
-	UFUNCTION(Server,Reliable)
-	void SetRightMovementS(float Value);
 
 	UFUNCTION(Client,Reliable)
 	void onSkill1C();

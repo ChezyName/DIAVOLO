@@ -93,6 +93,14 @@ void ADIAVOLOPlayerController::onDeath_Implementation()
 	NewChar->SetPlayerState(GetState());
 }
 
+void ADIAVOLOPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	ADIAVOLOCharacter* InChar = Cast<ADIAVOLOCharacter>(InPawn);
+	if(InChar) SpawnedCharacter = InChar;
+}
+
 ADiavoloPS* ADIAVOLOPlayerController::GetState()
 {
 	return GetPlayerState<ADiavoloPS>();
@@ -127,6 +135,8 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	if(IsLocalController() && !bController)
 	{
 		LookAtMouse();
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,
+			GetName() + " @ " + FString(SpawnedCharacter == nullptr ? "isNull" : "Not Null!"));
 	}
 
 	/*
@@ -224,16 +234,13 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Dance",IE_Released,this,&ADIAVOLOPlayerController::startEmoteC);
 	InputComponent->BindAction("Dodge",IE_Pressed,this,&ADIAVOLOPlayerController::onDodgeC);
 
-	InputComponent->BindAxis("UpMovement",this,&ADIAVOLOPlayerController::SetUpMovementC);
-	InputComponent->BindAxis("RightMovement",this,&ADIAVOLOPlayerController::SetRightMovementC);
-
 	InputComponent->BindAxis("LookX",this,&ADIAVOLOPlayerController::SetControllerX);
 	InputComponent->BindAxis("LookY",this,&ADIAVOLOPlayerController::SetControllerY);
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
 {
-	onStartSetChar();
+	//onStartSetChar();
 	Super::BeginPlay();
 }
 
@@ -274,13 +281,16 @@ void ADIAVOLOPlayerController::onStartSetChar_Implementation()
 	{
 		SpawnedCharacter = Cast<ADIAVOLOCharacter>(GetWorld()->SpawnActor(GetState()->CharacterToSpawn, &Location, &Rotation, SpawnParams));
 
-		//GEngine->AddOnScreenDebugMessage(-1,8,FColor::Turquoise,Character ? "Spawned!" : "Not Spawned?!?");
-
-		// we use AI to control the player character for navigation
-		Possess(SpawnedCharacter);
-		SpawnedCharacter->OnDeathFunction.BindUFunction(this,FName("onDeath"));
-		//Character->ParentProxy = this;
-		///Character->OnDeathFunction.BindUFunction(this,FName("onCharacterDeath"));
+		if (SpawnedCharacter)
+		{
+			Possess(SpawnedCharacter);
+			GEngine->AddOnScreenDebugMessage(-1, 160, FColor::Green, "Possession Successful!");
+			SpawnedCharacter->OnDeathFunction.BindUFunction(this,FName("onDeath"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 160, FColor::Red, "SpawnedCharacter is nullptr! Possession failed!");
+		}
 	}
 }
 
@@ -333,9 +343,11 @@ ACharacterProxy* ADIAVOLOPlayerController::GetProxy()
 
 void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	DOREPLIFETIME(ADIAVOLOPlayerController,EnemyAttacking);
-	DOREPLIFETIME(ADIAVOLOPlayerController,MousePosition);
 	DOREPLIFETIME(ADIAVOLOPlayerController,SpawnedCharacter);
+	
+	//DOREPLIFETIME(ADIAVOLOPlayerController,EnemyAttacking);
+	//DOREPLIFETIME(ADIAVOLOPlayerController,MousePosition);
+	
 	DOREPLIFETIME(ADIAVOLOPlayerController,BossCharacter);
 	DOREPLIFETIME(ADIAVOLOPlayerController,bController);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -549,39 +561,6 @@ void ADIAVOLOPlayerController::endSkill3_Implementation()
 void ADIAVOLOPlayerController::endUltimate_Implementation()
 {
 	if(SpawnedCharacter) SpawnedCharacter->endUltimate();
-}
-
-//===========================================================================================
-//                                MOVEMENT
-
-void ADIAVOLOPlayerController::SetUpMovementC_Implementation(float Value)
-{
-	SetUpMovementS(Value);
-}
-
-void ADIAVOLOPlayerController::SetRightMovementC_Implementation(float Value)
-{
-	SetRightMovementS(Value);
-}
-
-void ADIAVOLOPlayerController::SetUpMovementS_Implementation(float Value)
-{
-	if(!SpawnedCharacter) return;
-	if(SpawnedCharacter && !SpawnedCharacter->isDead &&
-		!SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging)
-			SpawnedCharacter->AddMovementInput(FVector::ForwardVector * Value,1,false);
-	if(abs(Value) > 0) SpawnedCharacter->CharState = EPlayerStates::E_MOVE;
-	else SpawnedCharacter->CharState = EPlayerStates::E_IDLE;
-}
-
-void ADIAVOLOPlayerController::SetRightMovementS_Implementation(float Value)
-{
-	if(!SpawnedCharacter) return;
-	if(SpawnedCharacter && !SpawnedCharacter->isDead &&
-		!SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging)
-			SpawnedCharacter->AddMovementInput(FVector::RightVector * Value,1,false);
-	if(abs(Value) > 0) SpawnedCharacter->CharState = EPlayerStates::E_MOVE;
-	else SpawnedCharacter->CharState = EPlayerStates::E_IDLE;
 }
 
 void ADIAVOLOPlayerController::LookAtMouse()
