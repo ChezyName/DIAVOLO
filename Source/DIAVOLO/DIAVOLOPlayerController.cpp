@@ -565,7 +565,7 @@ void ADIAVOLOPlayerController::endUltimate_Implementation()
 
 void ADIAVOLOPlayerController::LookAtMouse()
 {
-	if (SpawnedCharacter && !SpawnedCharacter->bUsingAbility &&  !SpawnedCharacter->bisDodging)
+	if (SpawnedCharacter && !SpawnedCharacter->bUsingAbility &&  !SpawnedCharacter->bisDodging && !SpawnedCharacter->isDead)
 	{
 		// Calculate the direction the character should look at (ignoring Z-axis)
 		FVector CharacterLocation = SpawnedCharacter->GetActorLocation();
@@ -596,7 +596,7 @@ void ADIAVOLOPlayerController::SetLookAtRot_Implementation(FRotator NewRot)
 
 void ADIAVOLOPlayerController::LookAtController()
 {
-	if (SpawnedCharacter && !SpawnedCharacter->bUsingAbility &&  !SpawnedCharacter->bisDodging)
+	if (SpawnedCharacter && !SpawnedCharacter->bUsingAbility && !SpawnedCharacter->bisDodging && !SpawnedCharacter->isDead)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,
 			"Controller Pos: " + FString::SanitizeFloat(ControllerAimDir.X) + " , " + 

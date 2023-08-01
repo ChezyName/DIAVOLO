@@ -262,6 +262,7 @@ public:
 
 	UFUNCTION(Server,Reliable)
 	void onDeath();
+	UPROPERTY(Replicated)
 	bool isDead = false;
 
 	UPROPERTY(Replicated,BlueprintReadOnly)

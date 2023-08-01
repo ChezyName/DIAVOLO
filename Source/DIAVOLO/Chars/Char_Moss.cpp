@@ -45,7 +45,7 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 		
 		CharState = EPlayerStates::E_ABILITY;
 		PlayAnimationServer(RPGAnimation);
-		SetActorRotation(LookAtRotation);
+		//SetActorRotation(LookAtRotation);
 		//ParentProxy->MoveToLocation(GetActorLocation());
 		GetMovementComponent()->Deactivate();
 		
@@ -129,7 +129,7 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 
 		CharState = EPlayerStates::E_ABILITY;
 		PlayAnimationServer(ShotgunAnimation);
-		SetActorRotation(LookAtRotation);
+		//SetActorRotation(LookAtRotation);
 		//ParentProxy->MoveToLocation(GetActorLocation());
 		GetMovementComponent()->Deactivate();
 		
@@ -181,11 +181,11 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 
 void AChar_Moss::onUltimate(FVector Location, AEnemy* Enemy)
 {
-	GEngine->AddOnScreenDebugMessage(-1,45,FColor::Blue,"Using Moss ULTIMATE!");
 	Super::onUltimate(Location, Enemy);
 	// && UltimateCD < 0 && Mana >= AttackManaConsumption.Ultimate && !bUsingAbility
 	if(Enemy != nullptr)
 	{
+		GEngine->AddOnScreenDebugMessage(-1,45,FColor::Blue,"Using Moss ULTIMATE on " + Enemy->GetName());
 		//FVector MyLoc = Enemy->GetActorLocation();
 		/*
 		MyLoc.Z = GetActorLocation().Z;

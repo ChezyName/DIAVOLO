@@ -173,13 +173,15 @@ void ADIAVOLOCharacter::Tick(float DeltaSeconds)
 
 			// Set the character's yaw rotation to face the target direction
 			FRotator NewRotation = FRotator(0.0f, YawAngle, 0.0f);
-			AddActorLocalRotation(NewRotation);
+			SetActorRotation(NewRotation);
 		}
 
+		/*
 		FRotator CharRot = GetActorRotation();
 		CharRot.Pitch = 0;
 		CharRot.Roll = 0;
 		SetActorRotation(CharRot);
+		*/
 	}
 
 	//if(HasAuthority()) GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red, "SERVER ON " + GetController()->GetName());
@@ -338,6 +340,7 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	DOREPLIFETIME(ADIAVOLOCharacter,Health);
 	DOREPLIFETIME(ADIAVOLOCharacter,Mana);
+	DOREPLIFETIME(ADIAVOLOCharacter,isDead);
 
 	DOREPLIFETIME(ADIAVOLOCharacter,CharState);
 	DOREPLIFETIME(ADIAVOLOCharacter,bUsingAbility);
