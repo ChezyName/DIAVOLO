@@ -209,6 +209,9 @@ void ADIAVOLOCharacter::onDeath()
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->WakeAllRigidBodies();
 	isDead = true;
+
+	APlayerController* pController = Cast<APlayerController>(GetController());
+	if(pController) pController->StartSpectatingOnly();
 }
 
 void ADIAVOLOCharacter::PlaySoundSingle_Implementation(USoundWave* SFX)
