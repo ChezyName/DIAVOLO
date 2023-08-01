@@ -263,15 +263,19 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 {
 	Super::onSkill1_Implementation(Location, Enemy);
 	
-	if(Mana < AttackManaConsumption.Skill1) return;
+	if(Mana < AttackManaConsumption.Skill1 || bUsingAbility) return;
 	GEngine->AddOnScreenDebugMessage(-1,60,FColor::Emerald, GetActorLocation().ToString() + " // " + Location.ToString());
 
+	/*
 	FVector MyLoc = Location;
 	MyLoc.Z = GetActorLocation().Z;
 	FVector PDir = MyLoc - GetActorLocation();
 	PDir.Normalize();
+	*/
 
-	LookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
+	//FVector PDir = Location;
+
+	//GetActorRotation() = FRotationMatrix::MakeFromX(PDir).Rotator();
 
 	if(IsValid(Claw) && bSwapped == false && Claw->Destroying == false && TPDelay < 0)
 	{
@@ -306,7 +310,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		//Stop Movement
 		//ParentProxy->MoveToLocation(GetActorLocation());
 		
-		SetActorRotation(LookAtRotation);
+		//SetActorRotation(GetActorRotation());
 		
 		if(ClawAnimation) PlayAnimationServer(ClawAnimation);
 		GetMovementComponent()->SetActive(false);
@@ -318,7 +322,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 			bSwapped = false;
 		
 			//Create Projectile Facing Enemy
-			Claw = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,ClawProjectile,FTransform(LookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+			Claw = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,ClawProjectile,FTransform(GetActorRotation(),GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 			if(Claw != nullptr)
 			{
 				//Finalizing Create Projecitle
@@ -329,7 +333,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 				Claw->FunctionOnDestroy.BindUFunction(this,FName("EndGrappleCallback"));
 						
 				//Spawn The Actor
-				UGameplayStatics::FinishSpawningActor(Claw, FTransform(LookAtRotation,GetActorLocation()));
+				UGameplayStatics::FinishSpawningActor(Claw, FTransform(GetActorRotation(),GetActorLocation()));
 				bSpawned = true;
 			}
 
@@ -363,9 +367,9 @@ void AChar_BEAST::EndGrappleCallback()
 void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 {
 	Super::onSkill2(Location, Enemy);
-	
+	GEngine->AddOnScreenDebugMessage(-1,12,FColor::Red,"Using Spin Razors");
 	//Pre Ability
-	if(Mana < AttackManaConsumption.Skill2 || Skill2CD > 0) return;
+	if(Mana < AttackManaConsumption.Skill2 || Skill2CD > 0 || bUsingAbility) return;
 	CharState = EPlayerStates::E_ABILITY;
 	bUsingAbility = true;
 	Skill2Active = true;
@@ -430,17 +434,17 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 {
 	Super::onSkill3(Location, Enemy);
 	
-	if(Mana < AttackManaConsumption.Skill3 || Skill3CD > 0) return;
+	if(Mana < AttackManaConsumption.Skill3 || Skill3CD > 0 || bUsingAbility) return;
 	FVector MyLoc = Location;
 	MyLoc.Z = GetActorLocation().Z;
 	FVector PDir = MyLoc - GetActorLocation();
 	PDir.Normalize();
 
-	FRotator NewLookAtRotation = FRotationMatrix::MakeFromX(PDir).Rotator();
-	SetActorRotation(NewLookAtRotation);
+	//FRotator NewGetActorRotation() = FRotationMatrix::MakeFromX(PDir).Rotator();
+	//SetActorRotation(GetActorRotation());
 	//ParentProxy->MoveToLocation(GetActorLocation());
 	
-	Grapple = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,GrappleProjectile,FTransform(NewLookAtRotation,GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+	Grapple = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,GrappleProjectile,FTransform(GetActorRotation(),GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 	if(Grapple != nullptr)
 	{
 		if(GrappleStart) PlayAnimationServer(GrappleStart);
@@ -465,7 +469,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 		ManaCD = ManaCDOnSkillUse;
 						
 		//Spawn The Actor
-		UGameplayStatics::FinishSpawningActor(Grapple, FTransform(NewLookAtRotation,GetActorLocation()));
+		UGameplayStatics::FinishSpawningActor(Grapple, FTransform(GetActorRotation(),GetActorLocation()));
 	}
 }
 
@@ -502,14 +506,7 @@ void AChar_BEAST::onUltimate(FVector Location, AEnemy* Enemy)
 {
 	Super::onUltimate(Location, Enemy);
 	
-	if(RazorsActive)
-	{
-		RazorsActive = false;
-		UltimateCD = AttackCooldowns.Ultimate;
-		UltimateActive = false;
-		return;	
-	}
-	if(Mana < AttackManaConsumption.Ultimate || UltimateCD > 0 || RazorsActive) return;
+	if(Mana < AttackManaConsumption.Ultimate || UltimateCD > 0 || RazorsActive || bUsingAbility) return;
 	RazorsActive = true;
 	Mana -= AttackManaConsumption.Ultimate;
 	ManaCD = ManaCDOnSkillUse;

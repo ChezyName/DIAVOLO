@@ -362,19 +362,21 @@ void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ADIAVOLOCharacter::MoveForward(float Value)
 {
-	if (Value != 0.0f)
+	if (Value != 0.0f && !bUsingAbility && !bisDodging)
 	{
 		// add movement in that direction
 		AddMovementInput(FVector::ForwardVector, Value);
+		StopEmote();
 	}
 }
 
 void ADIAVOLOCharacter::MoveRight(float Value)
 {
-	if (Value != 0.0f)
+	if (Value != 0.0f && !bUsingAbility && !bisDodging)
 	{
 		// add movement in that direction
 		AddMovementInput(FVector::RightVector, Value);
+		StopEmote();
 	}
 }
 
