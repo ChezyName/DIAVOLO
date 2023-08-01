@@ -30,8 +30,10 @@ public:
 	//Auto Attack
 	bool WindUpCanceled;
 
-	UPROPERTY(BlueprintReadWrite,Replicated)
+	UPROPERTY(BlueprintReadWrite)
 	bool bController = false;
+
+	void IsKeyboard(FKey key);
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	class ADIAVOLOCharacter* SpawnedCharacter;
@@ -71,6 +73,7 @@ protected:
 	void SetLookAtRot(FRotator NewRot);
 	
 	void LookAtController();
+	void LookAtBoss();
 
 	void SetControllerX(float X);
 	void SetControllerY(float Y);

@@ -369,6 +369,7 @@ void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ADIAVOLOCharacter::MoveForward(float Value)
 {
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Y Movement: " + FString::SanitizeFloat(Value));
 	if (Value != 0.0f && !bUsingAbility && !bisDodging)
 	{
 		// add movement in that direction

@@ -131,7 +131,6 @@ void ADIAVOLOPlayerController::setEnemy_Implementation(AEnemy* Enemy)
 void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-
 	if(IsLocalController() && !bController)
 	{
 		LookAtMouse();
@@ -238,6 +237,14 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 
 	InputComponent->BindAxis("LookX",this,&ADIAVOLOPlayerController::SetControllerX);
 	InputComponent->BindAxis("LookY",this,&ADIAVOLOPlayerController::SetControllerY);
+
+	InputComponent->BindAction("Detection", IE_Pressed, this, &ADIAVOLOPlayerController::IsKeyboard);
+}
+
+void ADIAVOLOPlayerController::IsKeyboard(FKey key)
+{
+	GEngine->AddOnScreenDebugMessage(-1,12,key.IsGamepadKey() ? FColor::Red : FColor::Blue,key.ToString());
+	bController = key.IsGamepadKey();
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
@@ -349,7 +356,6 @@ void ADIAVOLOPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	//DOREPLIFETIME(ADIAVOLOPlayerController,MousePosition);
 	
 	DOREPLIFETIME(ADIAVOLOPlayerController,BossCharacter);
-	DOREPLIFETIME(ADIAVOLOPlayerController,bController);
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
@@ -611,14 +617,20 @@ void ADIAVOLOPlayerController::LookAtController()
 	}
 }
 
+void ADIAVOLOPlayerController::LookAtBoss()
+{
+}
+
 void ADIAVOLOPlayerController::SetControllerX(float X)
 {
+	if(X == 0) return;
 	ControllerAimDir.X = X;
 	if(bController) LookAtController();
 }
 
 void ADIAVOLOPlayerController::SetControllerY(float Y)
 {
+	if(Y == 0) return;
 	ControllerAimDir.Y = Y;
 	if(bController) LookAtController();
 }
