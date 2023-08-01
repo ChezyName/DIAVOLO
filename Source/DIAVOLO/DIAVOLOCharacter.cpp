@@ -61,11 +61,16 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = false; // Rotate character to moving direction
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	//GetCharacterMovement()->bOrientRotationToMovement = false; // Rotate character to moving direction
+	//GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
+	//GetCharacterMovement()->bConstrainToPlane = true;
+	//GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
+	//GetCharacterMovement()->GravityScale = 2.f;
+	//GetCharacterMovement()->JumpZVelocity = 650;
+	//GetCharacterMovement()->AirControl = 0.65f;
+	//GetCharacterMovement()->bRunPhysicsWithNoController = true;
+	
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -88,7 +93,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	bReplicates = true;
-	GetMovementComponent()->SetIsReplicated(true);
+	//GetMovementComponent()->SetIsReplicated(true);
 	GetMesh()->SetIsReplicated(true);
 }
 
@@ -351,8 +356,26 @@ void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAxis("Zoom",this,&ADIAVOLOCharacter::ZoomCamera);
-	PlayerInputComponent->BindAxis("UpMovement",this,&ADIAVOLOCharacter::SetUpMovement);
-	PlayerInputComponent->BindAxis("RightMovement",this,&ADIAVOLOCharacter::SetRightMovement);
+	PlayerInputComponent->BindAxis("UpMovement",this,&ADIAVOLOCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("RightMovement",this,&ADIAVOLOCharacter::MoveRight);
+}
+
+void ADIAVOLOCharacter::MoveForward(float Value)
+{
+	if (Value != 0.0f)
+	{
+		// add movement in that direction
+		AddMovementInput(FVector::ForwardVector, Value);
+	}
+}
+
+void ADIAVOLOCharacter::MoveRight(float Value)
+{
+	if (Value != 0.0f)
+	{
+		// add movement in that direction
+		AddMovementInput(FVector::RightVector, Value);
+	}
 }
 
 void ADIAVOLOCharacter::ZoomCamera(float Speed)
@@ -386,12 +409,13 @@ void ADIAVOLOCharacter::stopEmoteSound_Implementation()
 //===========================================================================================
 //                                MOVEMENT
 
+/*
 void ADIAVOLOCharacter::SetUpMovement(float Value)
 {
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Movement Y: " + FString::SanitizeFloat(Value));
 	if(Value != 0.0f)
 	{
-		AddMovementInput(FVector::ForwardVector * Value,1,false);
+		AddMovement(FVector::ForwardVector * Value);
 	}
 	//SetRightMovementS(Value);
 }
@@ -401,7 +425,17 @@ void ADIAVOLOCharacter::SetRightMovement(float Value)
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,"Movement X: " + FString::SanitizeFloat(Value));
 	if(Value != 0.0f)
 	{
-		AddMovementInput(FVector::RightVector * Value,1,false);
+		AddMovement(FVector::RightVector * Value);
 	}
 		
 }
+
+void ADIAVOLOCharacter::AddMovement_Implementation(FVector Direction)
+{
+	if (HasAuthority()) // Only execute this on the server
+	{
+		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green,"Velocity: " + Direction.ToString());
+		GetCharacterMovement()->AddInputVector(Direction);
+	}
+}
+*/

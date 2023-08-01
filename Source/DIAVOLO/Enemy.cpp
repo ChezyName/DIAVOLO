@@ -25,6 +25,31 @@ void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
+void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis("UpMovement", this, &AEnemy::MoveForward);
+	PlayerInputComponent->BindAxis("RightMovement", this, &AEnemy::MoveRight);
+}
+
+void AEnemy::MoveForward(float Value)
+{
+	if (Value != 0.0f)
+	{
+		// add movement in that direction
+		AddMovementInput(GetActorForwardVector(), Value);
+	}
+}
+
+void AEnemy::MoveRight(float Value)
+{
+	if (Value != 0.0f)
+	{
+		// add movement in that direction
+		AddMovementInput(GetActorRightVector(), Value);
+	}
+}
+
 void AEnemy::PlayAnimationServer_Implementation(UAnimMontage* Animation)
 {
 	PlayAnimMontage(Animation);

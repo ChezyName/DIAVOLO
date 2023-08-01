@@ -271,21 +271,19 @@ void ADIAVOLOPlayerController::onStartSetChar_Implementation()
 		Rotation = StartLoc->GetActorRotation();
 	}
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
-	SpawnParams.bNoFail = true;
-
 	// spawn actual player
 	if(GetState())
 	{
-		SpawnedCharacter = Cast<ADIAVOLOCharacter>(GetWorld()->SpawnActor(GetState()->CharacterToSpawn, &Location, &Rotation, SpawnParams));
-
+		SpawnedCharacter = Cast<ADIAVOLOCharacter>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,
+			GetState()->CharacterToSpawn,FTransform(Rotation,Location),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+		
 		if (SpawnedCharacter)
 		{
 			Possess(SpawnedCharacter);
 			GEngine->AddOnScreenDebugMessage(-1, 160, FColor::Green, "Possession Successful!");
 			SpawnedCharacter->OnDeathFunction.BindUFunction(this,FName("onDeath"));
+			SpawnedCharacter->SetOwner(this);
+			UGameplayStatics::FinishSpawningActor(SpawnedCharacter, FTransform(Rotation,Location));
 		}
 		else
 		{

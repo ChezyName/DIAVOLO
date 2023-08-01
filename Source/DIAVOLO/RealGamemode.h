@@ -22,7 +22,7 @@ private:
 	//virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	//virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
-
-	//UClass* GetDefaultPawnClassForController(AController* InController) override;
+	
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 	//virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 };

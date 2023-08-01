@@ -81,11 +81,11 @@ void ARealGamemode::HandleStartingNewPlayer_Implementation(APlayerController* Ne
 		}
 	}
 }
+*/
 
 UClass* ARealGamemode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
 	ADiavoloPS* PS = InController->GetPlayerState<ADiavoloPS>();
-	if(PS && PS->CharacterToSpawn) return SpectatorClass;
+	if(IsValid(PS) && PS->CharacterToSpawn) return PS->CharacterToSpawn;
 	return DefaultPawnClass;
 }
-*/

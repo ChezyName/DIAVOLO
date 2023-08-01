@@ -146,9 +146,14 @@ public:
 	void DodgeRoll(FVector MouseLocation);
 
 	//UFUNCTION(Client,Reliable)
+	/*
 	void SetUpMovement(float Value);
 	//FUNCTION(Client,Reliable)
 	void SetRightMovement(float Value);
+
+	UFUNCTION(Server,Unreliable)
+	void AddMovement(FVector Direction);
+	*/
 
 	/*
 	UFUNCTION(Server,Reliable)
@@ -313,7 +318,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+
+	/** Handles moving forward/backward */
+	void MoveForward(float Val);
+	/** Handles stafing movement, left and right */
+	void MoveRight(float Val);
 
 	void ZoomCamera(float Speed);
 };

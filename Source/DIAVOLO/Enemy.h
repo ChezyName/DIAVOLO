@@ -47,6 +47,13 @@ protected:
 private:
 	UFUNCTION(NetMulticast,Reliable)
 	void PlayAnimationClient(UAnimMontage* Animation);
+
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	
+	/** Handles moving forward/backward */
+	void MoveForward(float Val);
+	/** Handles stafing movement, left and right */
+	void MoveRight(float Val);
 	
 public:	
 	UFUNCTION(Server,Reliable)
