@@ -162,7 +162,7 @@ public:
 	void SetRightMovementS(float Value);
 	*/
 
-	UFUNCTION(Client,Reliable)
+	UFUNCTION(NetMulticast,Reliable)
 	void ClientDeathNonBP();
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -260,6 +260,7 @@ public:
 	DECLARE_DELEGATE(DOnDeath)
 	DOnDeath OnDeathFunction;
 
+	UFUNCTION(Server,Reliable)
 	void onDeath();
 	bool isDead = false;
 

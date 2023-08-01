@@ -135,8 +135,10 @@ void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 	if(IsLocalController() && !bController)
 	{
 		LookAtMouse();
+		/*
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Magenta,
 			GetName() + " @ " + FString(SpawnedCharacter == nullptr ? "isNull" : "Not Null!"));
+		*/
 	}
 
 	/*
@@ -563,7 +565,7 @@ void ADIAVOLOPlayerController::endUltimate_Implementation()
 
 void ADIAVOLOPlayerController::LookAtMouse()
 {
-	if (SpawnedCharacter)
+	if (SpawnedCharacter && !SpawnedCharacter->bUsingAbility &&  !SpawnedCharacter->bisDodging)
 	{
 		// Calculate the direction the character should look at (ignoring Z-axis)
 		FVector CharacterLocation = SpawnedCharacter->GetActorLocation();
@@ -578,7 +580,8 @@ void ADIAVOLOPlayerController::LookAtMouse()
 			NewRotation.Roll = 0.0f;
 
 			// Set the actor rotation with the new rotation
-			SpawnedCharacter->SetActorRotation(NewRotation);
+			ControlRotation.Yaw = NewRotation.Yaw;
+			//SpawnedCharacter->SetActorRotation(NewRotation);
 		}
 
 		GEngine->AddOnScreenDebugMessage(-1, 0, FColor::Orange,
@@ -586,9 +589,14 @@ void ADIAVOLOPlayerController::LookAtMouse()
 	}
 }
 
+void ADIAVOLOPlayerController::SetLookAtRot_Implementation(FRotator NewRot)
+{
+	SpawnedCharacter->SetActorRotation(NewRot);
+}
+
 void ADIAVOLOPlayerController::LookAtController()
 {
-	if (SpawnedCharacter)
+	if (SpawnedCharacter && !SpawnedCharacter->bUsingAbility &&  !SpawnedCharacter->bisDodging)
 	{
 		GEngine->AddOnScreenDebugMessage(-1,0,FColor::Orange,
 			"Controller Pos: " + FString::SanitizeFloat(ControllerAimDir.X) + " , " + 
@@ -597,8 +605,9 @@ void ADIAVOLOPlayerController::LookAtController()
 		float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
 
 		// Set the rotation for the player character
-		FRotator NewRotation = FRotator(0.0f, AngleDegrees+90, 0.0f);
-		SpawnedCharacter->SetActorRotation(NewRotation);
+		ControlRotation.Yaw = AngleDegrees+90;
+		//FRotator NewRotation = FRotator(0.0f, AngleDegrees+90, 0.0f);
+		//SpawnedCharacter->SetActorRotation(NewRotation);
 	}
 }
 

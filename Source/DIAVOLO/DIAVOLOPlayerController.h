@@ -66,6 +66,10 @@ protected:
 	void LookAtMouse();
 
 	FVector2D ControllerAimDir;
+
+	UFUNCTION(Server,Unreliable)
+	void SetLookAtRot(FRotator NewRot);
+	
 	void LookAtController();
 
 	void SetControllerX(float X);

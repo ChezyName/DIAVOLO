@@ -320,6 +320,9 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		TimerDelegate.BindLambda([&]
 		{
 			bSwapped = false;
+
+			DrawDebugDirectionalArrow(GetWorld(),GetActorLocation(),GetActorForwardVector()*5,2,FColor::Red,
+				false,30,0,2);
 		
 			//Create Projectile Facing Enemy
 			Claw = Cast<ACallBackProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,ClawProjectile,FTransform(GetActorRotation(),GetActorLocation()),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
@@ -331,6 +334,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 				Claw->Damage = ClawDamage * DamageMultiplier;
 				Claw->SetOwner(this);
 				Claw->FunctionOnDestroy.BindUFunction(this,FName("EndGrappleCallback"));
+				Claw->SetActorRotation(GetActorRotation());
 						
 				//Spawn The Actor
 				UGameplayStatics::FinishSpawningActor(Claw, FTransform(GetActorRotation(),GetActorLocation()));

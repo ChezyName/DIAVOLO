@@ -57,7 +57,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
@@ -99,6 +99,7 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 
 void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount, bool IgnoreIFrames)
 {
+	if(isDead) return;
 	if((bisDodging || IFRAMES) && !IgnoreIFrames)
 	{
 		//Do Effect
@@ -107,7 +108,7 @@ void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount, b
 	Health -= DamageAmount;
 	if(Health <= 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"Character Died, Running Back Numbers!");
+		//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"Character Died, Running Back Numbers!");
 		OnDeathFunction.ExecuteIfBound();
 		onDeath();
 		ClientDeathNonBP();
@@ -197,7 +198,7 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
 }
 
-void ADIAVOLOCharacter::onDeath()
+void ADIAVOLOCharacter::onDeath_Implementation()
 {
 	GetCharacterMovement()->DisableMovement();
 
