@@ -76,11 +76,9 @@ EPlayerStates ADIAVOLOPlayerController::GetCharState()
 
 void ADIAVOLOPlayerController::onDeath_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Red,"Character Has Been Killed");
-	ARealGamemode* GM = Cast<ARealGamemode>(GetWorld()->GetAuthGameMode());
-	if(GM) GM->onCharacterDeath();
-
-	//Spawn Spectator Class
+	UnPossess();
+	ChangeState(NAME_Spectating);
+	/*
 	FVector Location = SpawnedCharacter->GetCameraBoom()->GetComponentLocation();
 	FRotator Rotation = SpawnedCharacter->GetCameraBoom()->GetComponentRotation();
 
@@ -88,9 +86,11 @@ void ADIAVOLOPlayerController::onDeath_Implementation()
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
 	SpawnParams.bNoFail = true;
+	UnPossess();
 	APawn* NewChar = Cast<APawn>(GetWorld()->SpawnActor(SpectatorClass, &Location, &Rotation, SpawnParams));
-	//Possess(NewChar);
-	NewChar->SetPlayerState(GetState());
+	Possess(NewChar);
+	//NewChar->SetPlayerState(GetState());
+	*/
 }
 
 void ADIAVOLOPlayerController::OnPossess(APawn* InPawn)
@@ -252,12 +252,7 @@ void ADIAVOLOPlayerController::IsKeyboard()
 void ADIAVOLOPlayerController::BeginPlay()
 {
 	//onStartSetChar();
-	Super::BeginPlay();
-}
-
-void ADIAVOLOPlayerController::onStartSetChar_Implementation()
-{
-	// get current location of player proxy
+	
 	TArray<AActor*> FoundEnemies;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), FoundEnemies);
 	for(AActor* Enemy : FoundEnemies)
@@ -269,6 +264,13 @@ void ADIAVOLOPlayerController::onStartSetChar_Implementation()
 			break;
 		}
 	}
+	
+	Super::BeginPlay();
+}
+
+void ADIAVOLOPlayerController::onStartSetChar_Implementation()
+{
+	// get current location of player proxy
 	
 	AActor* StartLoc = nullptr;
 	if(GetWorld() && GetWorld()->GetAuthGameMode())

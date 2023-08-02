@@ -272,7 +272,7 @@ public:
 	DECLARE_DELEGATE(DOnDeath)
 	DOnDeath OnDeathFunction;
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(NetMulticast,Reliable)
 	void onDeath();
 	UPROPERTY(Replicated)
 	bool isDead = false;

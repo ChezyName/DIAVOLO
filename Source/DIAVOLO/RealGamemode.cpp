@@ -8,7 +8,7 @@
 
 void ARealGamemode::onCharacterDeath()
 {
-	//GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"SOMEONE DIED!!!");
+	GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"SOMEONE DIED!!!");
 	TArray<AActor*> Characters;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADIAVOLOCharacter::StaticClass(), Characters);
 	bool isDead = true;
@@ -26,7 +26,9 @@ void ARealGamemode::onCharacterDeath()
 	//Everyone Dead
 	if(isDead)
 	{
-		ResetGame();
+		GEngine->AddOnScreenDebugMessage(-1,30,FColor::Magenta,"EVERYONE DIED!!!");
+		//ResetGame();
+		RestartGame();
 	}
 }
 

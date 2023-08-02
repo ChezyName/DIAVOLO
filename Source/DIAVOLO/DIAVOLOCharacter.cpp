@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "DIAVOLOCharacter.h"
+
+#include "RealGamemode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -109,6 +111,14 @@ void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount, b
 	if(Health <= 0)
 	{
 		//GEngine->AddOnScreenDebugMessage(-1,25,FColor::Red,"Character Died, Running Back Numbers!");
+		isDead = true;
+		
+		ARealGamemode* RGM = Cast<ARealGamemode>(GetWorld()->GetAuthGameMode());
+		if(RGM) RGM->onCharacterDeath();
+
+		ADIAVOLOCharacter* pController = Cast<ADIAVOLOCharacter>(GetController());
+		if(pController) pController->onDeath();
+		
 		OnDeathFunction.ExecuteIfBound();
 		onDeath();
 		ClientDeathNonBP();
@@ -217,9 +227,6 @@ void ADIAVOLOCharacter::onDeath_Implementation()
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->WakeAllRigidBodies();
 	isDead = true;
-
-	APlayerController* pController = Cast<APlayerController>(GetController());
-	if(pController) pController->StartSpectatingOnly();
 }
 
 void ADIAVOLOCharacter::PlaySoundSingle_Implementation(USoundWave* SFX)

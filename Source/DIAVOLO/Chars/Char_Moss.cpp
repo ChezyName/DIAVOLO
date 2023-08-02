@@ -10,6 +10,7 @@
 void AChar_Moss::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Green,FString(bHealEnabled ? "HEALING" : ""));
 	if(bHealEnabled && Mana >= AttackManaConsumption.Skill2){
 		cHealTick--;
 		if(cHealTick < 0 && HealthGained < MaxHealthGain)
@@ -31,9 +32,9 @@ void AChar_Moss::Tick(float DeltaSeconds)
 	else if(!Canceled) endSkill2();
 }
 
-void AChar_Moss::onSkill1_Implementation(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 {
-	Super::onSkill1_Implementation(Location, Enemy);
+	Super::onSkill1(Location, Enemy);
 	if(Skill1CD < 0 && Mana >= AttackManaConsumption.Skill1 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
 		FVector MyLoc = Location;
@@ -47,7 +48,7 @@ void AChar_Moss::onSkill1_Implementation(FVector Location, AEnemy* Enemy)
 		PlayAnimationServer(RPGAnimation);
 		//SetActorRotation(LookAtRotation);
 		//ParentProxy->MoveToLocation(GetActorLocation());
-		GetMovementComponent()->Deactivate();
+		//GetMovementComponent()->Deactivate();
 		
 		//Launch Rocket
 		FTimerDelegate TimerBefore;
@@ -76,7 +77,7 @@ void AChar_Moss::onSkill1_Implementation(FVector Location, AEnemy* Enemy)
 				bUsingAbility = false;
 				ManaCD = ManaCDOnSkillUse;
 				CharState = EPlayerStates::E_IDLE;
-				GetMovementComponent()->Activate();
+				//GetMovementComponent()->Activate();
 			});
 			FTimerHandle TimerHandle2;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle2, TimerAfter, RPGTimeAfter, false);
@@ -88,10 +89,10 @@ void AChar_Moss::onSkill1_Implementation(FVector Location, AEnemy* Enemy)
 	}
 }
 
-void AChar_Moss::onSkill2_Implementation(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onSkill2(FVector Location, AEnemy* Enemy)
 {
-	Super::onSkill2_Implementation(Location, Enemy);
-	if(Skill2CD < 0 && Mana >= AttackManaConsumption.Skill2 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility
+	Super::onSkill2(Location, Enemy);
+	if(Skill2CD < 0 && Mana >= AttackManaConsumption.Skill2 && !bUsingAbility
 		&& Health < MaxHealth)
 	{
 		bHealEnabled = true;
@@ -102,9 +103,9 @@ void AChar_Moss::onSkill2_Implementation(FVector Location, AEnemy* Enemy)
 	}
 }
 
-void AChar_Moss::endSkill2_Implementation()
+void AChar_Moss::endSkill2()
 {
-	Super::endSkill2_Implementation();
+	Super::endSkill2();
 	if(bHealEnabled)
 	{
 		bHealEnabled = false;
@@ -115,9 +116,9 @@ void AChar_Moss::endSkill2_Implementation()
 	}
 }
 
-void AChar_Moss::onSkill3_Implementation(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 {
-	Super::onSkill3_Implementation(Location, Enemy);
+	Super::onSkill3(Location, Enemy);
 	if(Skill3CD < 0 && Mana >= AttackManaConsumption.Skill3 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
 		FVector MyLoc = Location;
@@ -131,7 +132,7 @@ void AChar_Moss::onSkill3_Implementation(FVector Location, AEnemy* Enemy)
 		PlayAnimationServer(ShotgunAnimation);
 		//SetActorRotation(LookAtRotation);
 		//ParentProxy->MoveToLocation(GetActorLocation());
-		GetMovementComponent()->Deactivate();
+		//GetMovementComponent()->Deactivate();
 		
 		FTimerDelegate TimeBefore;
 		TimeBefore.BindLambda([&]
@@ -168,7 +169,7 @@ void AChar_Moss::onSkill3_Implementation(FVector Location, AEnemy* Enemy)
 				bUsingAbility = false;
 				ManaCD = ManaCDOnSkillUse;
 				CharState = EPlayerStates::E_IDLE;
-				GetMovementComponent()->Activate();
+				//GetMovementComponent()->Activate();
 				StopAnimationServer(ShotgunAnimation);
 			});
 			FTimerHandle TimerHandle2;
@@ -179,9 +180,9 @@ void AChar_Moss::onSkill3_Implementation(FVector Location, AEnemy* Enemy)
 	}
 }
 
-void AChar_Moss::onUltimate_Implementation(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onUltimate(FVector Location, AEnemy* Enemy)
 {
-	Super::onUltimate_Implementation(Location, Enemy);
+	Super::onUltimate(Location, Enemy);
 	// && UltimateCD < 0 && Mana >= AttackManaConsumption.Ultimate && !bUsingAbility
 	if(Enemy != nullptr)
 	{
@@ -204,11 +205,7 @@ void AChar_Moss::onUltimate_Implementation(FVector Location, AEnemy* Enemy)
 		float HalfRange = NukeRange/2;
 		for(int i = 0; i < NukesCount; i++)
 		{
-			FVector NukeStartLoc = Enemy->GetActorLocation();
-			NukeStartLoc.Z += 1500;
-			NukeStartLoc.X += FMath::FRandRange(-HalfRange,HalfRange);
-			NukeStartLoc.Y += FMath::FRandRange(-HalfRange,HalfRange);
-			SpawnNuke(NukeStartLoc,FMath::FRandRange(MinMaxDelayPerSpawn.X,MinMaxDelayPerSpawn.Y));
+			SpawnNuke(Enemy,FMath::FRandRange(MinMaxDelayPerSpawn.X,MinMaxDelayPerSpawn.Y));
 		}
 
 		//After Ability Usage
@@ -217,17 +214,22 @@ void AChar_Moss::onUltimate_Implementation(FVector Location, AEnemy* Enemy)
 		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
 		CharState = EPlayerStates::E_IDLE;
-		GetMovementComponent()->Activate();
+		//GetMovementComponent()->Activate();
 		//StopAnimationServer(ShotgunAnimation);
 	}
 }
 
-void AChar_Moss::SpawnNuke(FVector Location,float Delay)
+void AChar_Moss::SpawnNuke(AEnemy* Enemy,float Delay)
 {
 	FTimerDelegate NukeTime;
-	NukeTime.BindLambda([Location, this]()
+	NukeTime.BindLambda([Enemy, this]()
 	{
-		AExplosiveProjectile* Nuke = Cast<AExplosiveProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,NukeProjectile,FTransform(FRotationMatrix::MakeFromX(-GetActorUpVector()).Rotator(),Location),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
+		float HalfRange = NukeRange/2;
+		FVector NukeStartLoc = Enemy->GetActorLocation();
+		NukeStartLoc.Z += 1500;
+		NukeStartLoc.X += FMath::FRandRange(-HalfRange,HalfRange);
+		NukeStartLoc.Y += FMath::FRandRange(-HalfRange,HalfRange);
+		AExplosiveProjectile* Nuke = Cast<AExplosiveProjectile>(UGameplayStatics::BeginDeferredActorSpawnFromClass(this,NukeProjectile,FTransform(FRotationMatrix::MakeFromX(-GetActorUpVector()).Rotator(),NukeStartLoc),ESpawnActorCollisionHandlingMethod::AlwaysSpawn,this));
 			if(Nuke != nullptr)
 			{
 				//Finalizing Create Projecitle
@@ -237,7 +239,7 @@ void AChar_Moss::SpawnNuke(FVector Location,float Delay)
 				Nuke->SetOwner(this);
 						
 				//Spawn The Actor
-				UGameplayStatics::FinishSpawningActor(Nuke, FTransform(FRotationMatrix::MakeFromX(-GetActorUpVector()).Rotator(),Location));
+				UGameplayStatics::FinishSpawningActor(Nuke, FTransform(FRotationMatrix::MakeFromX(-GetActorUpVector()).Rotator(),NukeStartLoc));
 			}
 	});
 	FTimerHandle NukeHandleSpawner;
