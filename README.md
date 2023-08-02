@@ -29,9 +29,13 @@ Additionally The Player Has A ***Dodge Roll*** Ability Where The Player Gains *I
 The Players Also Have 4 Abilities, 3 Basic Abilities **(Q W E)** and an Ultimate Ability, **R**.
 
 **Full Control List:**
-| Q  W  E  | R | LMB | SPACE |
-|---|---|---|---|
-| Basic Ability | Ultimate Ability | Movement | Dodge |
+| Q  L-Shift  E  | F | WASD | SPACE | Mouse | G | Scroll Wheel |
+|---|---|---|---|---|---|---|
+| Basic Abilities | Ultimate Ability | Movement | Dodge | Aiming | Emote | Camera Zoom|
+
+| L-Bumper  L-Trigger R-Bumper  | R-Trigger | L-Stick | A // X // Face Button Down | R-Stick | Left Stick Click // Right Stick Click | D-Pad Up // D-Pad Down |
+|---|---|---|---|---|---|---|
+| Basic Abilities | Ultimate Ability | Movement | Dodge | Aiming | Emote | Camera Zoom|
 
   
 
