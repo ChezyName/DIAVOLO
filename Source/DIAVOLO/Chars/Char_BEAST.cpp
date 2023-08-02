@@ -221,6 +221,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			if(GrapplePull) StopAnimationServer(GrapplePull);
 			Grappling = false;
 			GrappleOut = false;
+			//GetMovementComponent()->SetActive(true);
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
@@ -228,6 +229,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			if(Grapple) Grapple->Destroy();
 			Skill3CD = AttackCooldowns.Skill3;
 			Skill3Active = false;
+			IFRAMES = false;
 		}
 	}
 	
@@ -246,6 +248,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			if(GrappleStart) StopAnimationServer(GrappleStart);
 			if(GrapplePull) StopAnimationServer(GrapplePull);
 			GrappleOut = false;
+			//GetMovementComponent()->SetActive(true);
 			Grappling = false;
 			toLoc = FVector::ZeroVector;
 			CharState = EPlayerStates::E_IDLE;
@@ -253,6 +256,7 @@ void AChar_BEAST::Tick(float DeltaSeconds)
 			if(Grapple) Grapple->Destroy();
 			Skill3CD = AttackCooldowns.Skill3;
 			Skill3Active = false;
+			IFRAMES = false;
 		}
 	}
 	
@@ -313,7 +317,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 		//SetActorRotation(GetActorRotation());
 		
 		if(ClawAnimation) PlayAnimationServer(ClawAnimation);
-		GetMovementComponent()->SetActive(false);
+		//GetMovementComponent()->SetActive(false);
 
 		//Wait Windup To Deal Damage
 		FTimerDelegate TimerDelegate;
@@ -344,7 +348,7 @@ void AChar_BEAST::onSkill1(FVector Location, AEnemy* Enemy)
 			TPDelay = ClawTeleportDelay;
 			Mana -= AttackManaConsumption.Skill1;
 			ManaCD = ManaCDOnSkillUse;
-			GetMovementComponent()->SetActive(true);
+			//GetMovementComponent()->SetActive(true);
 			bDoing = false;
 			CharState = EPlayerStates::E_IDLE;
 			bUsingAbility = false;
@@ -379,10 +383,12 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 	Skill2Active = true;
 	IFRAMES = true;
 
+	//GetMovementComponent()->SetActive(false);
+
 	//Stop Movement
 	//ParentProxy->MoveToLocation(GetActorLocation());
 	SpinActive = true;
-	GetMesh()->SetVisibility(false);
+	HideCharacter(false);
 	bEndedEarly = false;
 	StopOnMinSpin = false;
 	WaitMinSpin = MINSpinDuration;
@@ -402,7 +408,8 @@ void AChar_BEAST::onSkill2(FVector Location, AEnemy* Enemy)
 		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
 		IFRAMES = false;
-		GetMesh()->SetVisibility(true);
+		//GetMovementComponent()->SetActive(true);
+		HideCharacter(true);
 		StopPlayRazor(false);
 	});
 
@@ -427,9 +434,10 @@ void AChar_BEAST::endSkill2()
 		CharState = EPlayerStates::E_IDLE;
 		bUsingAbility = false;
 		ManaCD = ManaCDOnSkillUse;
-		GetMesh()->SetVisibility(true);
+		HideCharacter(true);
 		StopPlayRazor(false);
 		IFRAMES = false;
+		//GetMovementComponent()->SetActive(true);
 	}
 	Super::endSkill2();
 }
@@ -453,6 +461,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 	{
 		if(GrappleStart) PlayAnimationServer(GrappleStart);
 		Skill3Active = true;
+		IFRAMES = true;
 		
 		//Finalizing Create Projecitle
 		Grapple->ProjectileOwner = this;
@@ -465,6 +474,7 @@ void AChar_BEAST::onSkill3(FVector Location, AEnemy* Enemy)
 		GrappleOutT = GrappleLifetime;
 
 		Grapple->FunctionOnOverlap.BindUFunction(this,FName("onGrappleHit"));
+		//GetMovementComponent()->SetActive(false);
 
 		CharState = EPlayerStates::E_ABILITY;
 		bUsingAbility = true;

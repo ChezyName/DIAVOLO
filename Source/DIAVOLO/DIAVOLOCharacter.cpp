@@ -93,8 +93,8 @@ ADIAVOLOCharacter::ADIAVOLOCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	bReplicates = true;
-	//GetMovementComponent()->SetIsReplicated(true);
-	GetMesh()->SetIsReplicated(true);
+	GetMovementComponent()->SetIsReplicated(true);
+	//GetMesh()->SetIsReplicated(true);
 }
 
 void ADIAVOLOCharacter::CharacterTakeDamage_Implementation(float DamageAmount, bool IgnoreIFrames)
@@ -198,6 +198,11 @@ void ADIAVOLOCharacter::MoveToRange(FVector Position, float Range)
 
 	const FVector Target = Position - (Dir * Range);
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), Target);
+}
+
+void ADIAVOLOCharacter::HideCharacter_Implementation(bool Hidden)
+{
+	GetMesh()->SetVisibility(Hidden);
 }
 
 void ADIAVOLOCharacter::onDeath_Implementation()
@@ -344,6 +349,7 @@ void ADIAVOLOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ADIAVOLOCharacter,CharState);
 	DOREPLIFETIME(ADIAVOLOCharacter,bUsingAbility);
+	DOREPLIFETIME(ADIAVOLOCharacter,bisDodging);
 	
 	DOREPLIFETIME(ADIAVOLOCharacter,BasicCD);
 	DOREPLIFETIME(ADIAVOLOCharacter,Skill1CD);
@@ -370,7 +376,7 @@ void ADIAVOLOCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 void ADIAVOLOCharacter::MoveForward(float Value)
 {
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Y Movement: " + FString::SanitizeFloat(Value));
-	if (Value != 0.0f && !bUsingAbility && !bisDodging)
+	if (Value != 0.0f && !bisDodging && !bUsingAbility)
 	{
 		// add movement in that direction
 		AddMovementInput(FVector::ForwardVector, Value);
@@ -380,7 +386,7 @@ void ADIAVOLOCharacter::MoveForward(float Value)
 
 void ADIAVOLOCharacter::MoveRight(float Value)
 {
-	if (Value != 0.0f && !bUsingAbility && !bisDodging)
+	if (Value != 0.0f && !bisDodging && !bUsingAbility)
 	{
 		// add movement in that direction
 		AddMovementInput(FVector::RightVector, Value);

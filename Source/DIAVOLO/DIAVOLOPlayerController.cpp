@@ -18,7 +18,7 @@
 ADIAVOLOPlayerController::ADIAVOLOPlayerController()
 {
 	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::Default;
+	//DefaultMouseCursor = EMouseCursor::Default;
 }
 
 FVector ADIAVOLOPlayerController::getMousePosition()
@@ -89,7 +89,7 @@ void ADIAVOLOPlayerController::onDeath_Implementation()
 	SpawnParams.Instigator = GetInstigator();
 	SpawnParams.bNoFail = true;
 	APawn* NewChar = Cast<APawn>(GetWorld()->SpawnActor(SpectatorClass, &Location, &Rotation, SpawnParams));
-	Possess(NewChar);
+	//Possess(NewChar);
 	NewChar->SetPlayerState(GetState());
 }
 
@@ -131,6 +131,7 @@ void ADIAVOLOPlayerController::setEnemy_Implementation(AEnemy* Enemy)
 void ADIAVOLOPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+	//if(IsLocalController()) IsKeyboard();
 	if(IsLocalController() && !bController)
 	{
 		LookAtMouse();
@@ -238,13 +239,14 @@ void ADIAVOLOPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("LookX",this,&ADIAVOLOPlayerController::SetControllerX);
 	InputComponent->BindAxis("LookY",this,&ADIAVOLOPlayerController::SetControllerY);
 
-	InputComponent->BindAction("Detection", IE_Pressed, this, &ADIAVOLOPlayerController::IsKeyboard);
+	//InputComponent->BindAction("Detection", IE_Pressed, this, &ADIAVOLOPlayerController::IsKeyboard);
 }
 
-void ADIAVOLOPlayerController::IsKeyboard(FKey key)
+void ADIAVOLOPlayerController::IsKeyboard()
 {
-	GEngine->AddOnScreenDebugMessage(-1,12,key.IsGamepadKey() ? FColor::Red : FColor::Blue,key.ToString());
-	bController = key.IsGamepadKey();
+	GEngine->AddOnScreenDebugMessage(-1,12,!IsInputKeyDown(EKeys::AnyKey) ? FColor::Green : FColor::Red,"Gamepad?");
+	bController = !IsInputKeyDown(EKeys::AnyKey);
+	bShowMouseCursor = !bController;
 }
 
 void ADIAVOLOPlayerController::BeginPlay()
@@ -288,7 +290,7 @@ void ADIAVOLOPlayerController::onStartSetChar_Implementation()
 		
 		if (SpawnedCharacter)
 		{
-			Possess(SpawnedCharacter);
+			//Possess(SpawnedCharacter);
 			GEngine->AddOnScreenDebugMessage(-1, 160, FColor::Green, "Possession Successful!");
 			SpawnedCharacter->OnDeathFunction.BindUFunction(this,FName("onDeath"));
 			SpawnedCharacter->SetOwner(this);
@@ -633,4 +635,26 @@ void ADIAVOLOPlayerController::SetControllerY(float Y)
 	if(Y == 0) return;
 	ControllerAimDir.Y = Y;
 	if(bController) LookAtController();
+}
+
+void ADIAVOLOPlayerController::MoveUp(float Speed)
+{
+	if(SpawnedCharacter)
+	{
+		SpawnedCharacter->MoveForward(Speed);
+	}
+}
+void ADIAVOLOPlayerController::MoveRight(float Speed)
+{
+	if(SpawnedCharacter)
+	{
+		SpawnedCharacter->MoveRight(Speed);
+	}
+}
+void ADIAVOLOPlayerController::ZoomCamera(float Speed)
+{
+	if(SpawnedCharacter)
+	{
+		SpawnedCharacter->ZoomCamera(Speed);
+	}
 }

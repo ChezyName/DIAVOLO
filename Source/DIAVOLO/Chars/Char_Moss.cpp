@@ -31,9 +31,9 @@ void AChar_Moss::Tick(float DeltaSeconds)
 	else if(!Canceled) endSkill2();
 }
 
-void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onSkill1_Implementation(FVector Location, AEnemy* Enemy)
 {
-	Super::onSkill1(Location, Enemy);
+	Super::onSkill1_Implementation(Location, Enemy);
 	if(Skill1CD < 0 && Mana >= AttackManaConsumption.Skill1 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
 		FVector MyLoc = Location;
@@ -88,9 +88,9 @@ void AChar_Moss::onSkill1(FVector Location, AEnemy* Enemy)
 	}
 }
 
-void AChar_Moss::onSkill2(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onSkill2_Implementation(FVector Location, AEnemy* Enemy)
 {
-	Super::onSkill2(Location, Enemy);
+	Super::onSkill2_Implementation(Location, Enemy);
 	if(Skill2CD < 0 && Mana >= AttackManaConsumption.Skill2 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility
 		&& Health < MaxHealth)
 	{
@@ -102,9 +102,9 @@ void AChar_Moss::onSkill2(FVector Location, AEnemy* Enemy)
 	}
 }
 
-void AChar_Moss::endSkill2()
+void AChar_Moss::endSkill2_Implementation()
 {
-	Super::endSkill2();
+	Super::endSkill2_Implementation();
 	if(bHealEnabled)
 	{
 		bHealEnabled = false;
@@ -115,9 +115,9 @@ void AChar_Moss::endSkill2()
 	}
 }
 
-void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onSkill3_Implementation(FVector Location, AEnemy* Enemy)
 {
-	Super::onSkill3(Location, Enemy);
+	Super::onSkill3_Implementation(Location, Enemy);
 	if(Skill3CD < 0 && Mana >= AttackManaConsumption.Skill3 && CharState != EPlayerStates::E_ABILITY && !bUsingAbility)
 	{
 		FVector MyLoc = Location;
@@ -179,9 +179,9 @@ void AChar_Moss::onSkill3(FVector Location, AEnemy* Enemy)
 	}
 }
 
-void AChar_Moss::onUltimate(FVector Location, AEnemy* Enemy)
+void AChar_Moss::onUltimate_Implementation(FVector Location, AEnemy* Enemy)
 {
-	Super::onUltimate(Location, Enemy);
+	Super::onUltimate_Implementation(Location, Enemy);
 	// && UltimateCD < 0 && Mana >= AttackManaConsumption.Ultimate && !bUsingAbility
 	if(Enemy != nullptr)
 	{

@@ -33,7 +33,14 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bController = false;
 
-	void IsKeyboard(FKey key);
+	void IsKeyboard();
+
+	UFUNCTION(BlueprintCallable)
+	void MoveUp(float Speed);
+	UFUNCTION(BlueprintCallable)
+	void MoveRight(float Speed);
+	UFUNCTION(BlueprintCallable)
+	void ZoomCamera(float Speed);
 
 	UPROPERTY(Replicated,BlueprintReadOnly)
 	class ADIAVOLOCharacter* SpawnedCharacter;
@@ -62,7 +69,7 @@ protected:
 
 	FVector MouseLookDir = FVector::ForwardVector;
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void onStartSetChar();
 	
 	void LookAtMouse();
@@ -80,7 +87,7 @@ protected:
 	
 	bool CloseEnough();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void setEnemy(AEnemy* Enemy);
 	
 	// Begin PlayerController interface
@@ -92,7 +99,7 @@ protected:
 	void MoveToMouseCursor();
 	
 	/** Navigate player to the given world location. */
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	UFUNCTION(Client,Reliable)
@@ -135,13 +142,13 @@ protected:
 	UFUNCTION(Server,Reliable)
 	void endUltimate();
 
-	UFUNCTION(Reliable,Client)
+	UFUNCTION(Unreliable,Client)
 	void startEmoteC();
-	UFUNCTION(Reliable,Server)
+	UFUNCTION(Unreliable,Server)
 	void startEmoteS();
-	UFUNCTION(Reliable,Client)
+	UFUNCTION(Unreliable,Client)
 	void endEmoteC();
-	UFUNCTION(Reliable,Server)
+	UFUNCTION(Unreliable,Server)
 	void endEmoteS();
 	
 
@@ -161,13 +168,13 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void ServerUpdateState();
 	
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void DoAutoAttack();
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void ChangeCharState(EPlayerStates NewState);
 };
 

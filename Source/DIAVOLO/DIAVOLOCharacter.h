@@ -116,6 +116,14 @@ class ADIAVOLOCharacter : public ACharacter
 {
 	GENERATED_BODY()
 public:
+
+	void ZoomCamera(float Speed);
+
+	/** Handles moving forward/backward */
+	void MoveForward(float Val);
+	/** Handles stafing movement, left and right */
+	void MoveRight(float Val);
+	
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
 	float ZoomSpeed = 50;
 	UPROPERTY(EditAnywhere,Category="CameraZoom")
@@ -169,6 +177,7 @@ public:
 	void ClientDeath();
 
 	bool IFRAMES = false;
+	UPROPERTY(Replicated)
 	bool bisDodging = false;
 	FVector DodgeDirection;
 
@@ -244,17 +253,20 @@ public:
 	UFUNCTION(NetMulticast,Reliable)
 	void PlaySoundSingle(USoundWave* SFX);
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void ServerSetState(EPlayerStates State);
 
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void PlayAnimationServer(UAnimMontage* Animation);
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	void StopAnimationServer(UAnimMontage* Animation);
 
 	UFUNCTION(NetMulticast,Reliable)
+	void HideCharacter(bool Hidden);
+
+	UFUNCTION(NetMulticast,Unreliable)
 	void PlayAnimationClient(UAnimMontage* Animation);
-	UFUNCTION(NetMulticast,Reliable)
+	UFUNCTION(NetMulticast,Unreliable)
 	void StopAnimationClient(UAnimMontage* Animation);
 
 	DECLARE_DELEGATE(DOnDeath)
@@ -285,7 +297,7 @@ public:
 	UPROPERTY(EditAnywhere,Category="Character Info | Attacks",BlueprintReadOnly)
 	FAbilityIcons AbilityIcons;
 	
-	UFUNCTION(Server,Reliable)
+	UFUNCTION(Server,Unreliable)
 	virtual void onBasicSkill(AEnemy* Enemy);
 	UFUNCTION(Server,Reliable)
 	virtual void onSkill1(FVector Location,AEnemy* Enemy);
@@ -321,12 +333,5 @@ private:
 	class UDecalComponent* CursorToWorld;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-
-	/** Handles moving forward/backward */
-	void MoveForward(float Val);
-	/** Handles stafing movement, left and right */
-	void MoveRight(float Val);
-
-	void ZoomCamera(float Speed);
 };
 

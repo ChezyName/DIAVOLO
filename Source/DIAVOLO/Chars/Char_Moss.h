@@ -90,21 +90,21 @@ private:
 	virtual void Tick(float DeltaSeconds) override;
 	
 	//Skill 1
-	virtual void onSkill1(FVector Location, AEnemy* Enemy) override;
+	virtual void onSkill1_Implementation(FVector Location, AEnemy* Enemy) override;
 	AExplosiveProjectile* Rocket;
 
 	//Skill 2
-	virtual void onSkill2(FVector Location, AEnemy* Enemy) override;
-	virtual void endSkill2() override;
+	virtual void onSkill2_Implementation(FVector Location, AEnemy* Enemy) override;
+	virtual void endSkill2_Implementation() override;
 	bool bHealEnabled = false;
 	float cHealTick = 0;
 	bool Canceled = false;
 	float HealthGained = 0;
 
 	//Skill 3
-	virtual void onSkill3(FVector Location, AEnemy* Enemy) override;
+	virtual void onSkill3_Implementation(FVector Location, AEnemy* Enemy) override;
 	
 	//Ultimate
-	virtual void onUltimate(FVector Location, AEnemy* Enemy) override;
+	virtual void onUltimate_Implementation(FVector Location, AEnemy* Enemy) override;
 	void SpawnNuke(FVector Location,float Delay=0);
 };
